@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { CircleMarker, MapContainer, Popup, TileLayer, Tooltip as LeafletTooltip } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
 import { fetchPlatforms } from "./api";
 import type { Platform } from "./types";
 
@@ -27,7 +28,7 @@ export default function App() {
         setPlatforms(data);
         setSelectedIds(data.slice(0, 6).map((p) => p.id));
       })
-      .catch(() => setError("Não foi possível carregar os dados da API. Verifique se o serviço no Render está ativo."))
+      .catch(() => setError("Não foi possível carregar os dados da API. Recarregue em alguns instantes."))
       .finally(() => setLoading(false));
   }, []);
 
