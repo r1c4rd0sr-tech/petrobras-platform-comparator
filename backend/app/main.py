@@ -11,7 +11,7 @@ app = FastAPI(title="Petrobras Platform Comparator API", version="0.1.0")
 
 allowed_origins = os.getenv(
     "CORS_ORIGINS",
-    "http://localhost:5173,https://petrobras-platform-comparator.vercel.app",
+    "http://localhost:5173,https://petrobras-platform-comparator.vercel.app,https://petrobras-platform-comparator-5yf6yofjn-rsrautomacao.vercel.app",
 ).split(",")
 
 app.add_middleware(
