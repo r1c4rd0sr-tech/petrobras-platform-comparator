@@ -1,0 +1,4 @@
+[
+  {"slug": "p-77", "name": "P-77", "status": "operational", "unit_type": "FPSO", "basin": "Santos", "field": "Búzios", "operator": "Petrobras", "latitude": -25.0, "longitude": -42.0, "distance_to_coast_km": 180, "year": 2022, "oil_bpd": 150000, "gas_mmd": 6, "boed": 170000, "accommodation": 200, "source_url": "https://petrobras.com.br/"},
+  {"slug": "p-78", "name": "P-78", "status": "operational", "unit_type": "FPSO", "basin": "Santos", "field": "Búzios", "operator": "Petrobras", "latitude": -25.2, "longitude": -42.2, "distance_to_coast_km": 185, "year": 2024, "oil_bpd": 150000, "gas_mmd": 7, "boed": 175000, "accommodation": 200, "source_url": "https://petrobras.com.br/"}
+]
