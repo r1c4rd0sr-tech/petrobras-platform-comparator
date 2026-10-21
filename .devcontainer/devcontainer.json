@@ -7,10 +7,11 @@
     }
   },
   "postCreateCommand": "cd backend && pip install -r requirements.txt && cd ../frontend && npm install",
+  "postStartCommand": "cd backend && nohup uvicorn app.main:app --host 0.0.0.0 --port 8000 > /tmp/api.log 2>&1 & cd ../frontend && nohup npm run dev -- --host 0.0.0.0 --port 5173 > /tmp/web.log 2>&1 &",
   "forwardPorts": [8000, 5173],
   "portsAttributes": {
-    "8000": {"label": "FastAPI", "onAutoForward": "openBrowser"},
-    "5173": {"label": "Vite", "onAutoForward": "openBrowser"}
+    "8000": {"label": "API FastAPI", "onAutoForward": "openBrowser"},
+    "5173": {"label": "Aplicação web", "onAutoForward": "openBrowser"}
   },
   "customizations": {
     "vscode": {
