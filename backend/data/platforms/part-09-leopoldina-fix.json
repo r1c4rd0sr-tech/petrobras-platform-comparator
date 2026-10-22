@@ -1,0 +1,30 @@
+[
+  {
+    "slug": "fpso-leopoldina",
+    "name": "FPSO Leopoldina",
+    "status": "em_construcao",
+    "unit_type": "FPSO",
+    "basin": "Santos Basin",
+    "field": "Gato do Mato",
+    "operator": "Shell / MODEC",
+    "latitude": null,
+    "longitude": null,
+    "water_depth_m": 2000.0,
+    "distance_to_coast_km": null,
+    "year": 2029,
+    "service_life_years": 25,
+    "oil_bpd": 120000.0,
+    "gas_mmd": null,
+    "boed": null,
+    "water_injection_bpd": null,
+    "storage_bbl": 1600000.0,
+    "accommodation": null,
+    "length_m": null,
+    "width_m": null,
+    "weight_t": null,
+    "location": "Offshore Brazil",
+    "notes": "FPSO do projeto de Gato do Mato, operado pela Shell (50%), com Ecopetrol (30%), TotalEnergies (20%) e PPSA como gestora do PSC. FPSO construído e operado pela MODEC para a Shell; capacidade de 120 mil bpd; armazenamento de 1,6 milhão de barris; profundidade de aproximadamente 2.000 m; entrada em operação prevista para 2029.",
+    "source_url": "https://www.modec.com/news/2025/20250325_pr_gdm_psa.html",
+    "data_version": "V2.8-extras"
+  }
+]
