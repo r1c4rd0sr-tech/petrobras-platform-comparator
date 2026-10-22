@@ -159,6 +159,16 @@ export default function App() {
                   );
                 })}
               </MapContainer>
+              <div className="map-legend">
+                <strong>Legenda:</strong>
+                {selected.length === 0 && <span className="legend-item">Nenhuma unidade selecionada</span>}
+                {selected.map((p) => (
+                  <span key={p.id} className="legend-item">
+                    <span className="legend-dot" style={{ background: pinColor(p.id) }}></span>
+                    {p.name}
+                  </span>
+                ))}
+              </div>
             </section>
           </div>
 
@@ -189,7 +199,7 @@ export default function App() {
                   <ResponsiveContainer width="100%" height={420}><BarChart data={chartData}><CartesianGrid strokeDasharray="3 3" stroke="#22384f" /><XAxis dataKey="name" stroke="#93a7bb" /><YAxis stroke="#93a7bb" /><Tooltip /><Legend /><Bar dataKey="Óleo" fill="#008542" /><Bar dataKey="Gás" fill="#ffcc29" /><Bar dataKey="BOE" fill="#0c2340" /></BarChart></ResponsiveContainer>
                 </div>
               )}
-              {tab === "mapas" && <p>O mapa usa OpenStreetMap e mostra apenas as plataformas selecionadas (até 6), cada uma com um pin de cor própria.</p>}
+              {tab === "mapas" && <p>O mapa usa OpenStreetMap e mostra apenas as plataformas selecionadas (até 6), cada uma com um pin de cor própria. A legenda abaixo do mapa indica qual unidade corresponde a cada cor.</p>}
             </div>
           </section>
         </>
