@@ -13,6 +13,7 @@ const STATUS_LABEL: Record<string, string> = {
 };
 
 const PIN_COLORS = ["#008542", "#ffcc29", "#0c2340", "#e30613", "#0072ce", "#7a28a0"];
+const MAX_SELECTED = 6;
 
 const num = (value: number | null | undefined, suffix = "") =>
   value === null || value === undefined || Number.isNaN(value) ? "—" : value.toLocaleString("pt-BR") + suffix;
@@ -77,7 +78,15 @@ export default function App() {
   const chartData = selected.map((p) => ({ name: p.name, Óleo: p.oil_bpd ?? 0, Gás: p.gas_mmd ?? 0, BOE: p.boed ?? 0 }));
   const totals = filtered.reduce((acc, p) => ({ oil: acc.oil + (p.oil_bpd ?? 0), gas: acc.gas + (p.gas_mmd ?? 0), boe: acc.boe + (p.boed ?? 0) }), { oil: 0, gas: 0, boe: 0 });
 
-  const toggle = (id: number) => setSelectedIds((current) => current.includes(id) ? current.filter((x) => x !== id) : current.length >= 6 ? [...current.slice(1), id] : [...current, id]);
+  const toggle = (id: number) => {
+    if (selectedIds.includes(id)) {
+      setSelectedIds(selectedIds.filter((x) => x !== id));
+    } else if (selectedIds.length >= MAX_SELECTED) {
+      window.alert("Você já atingiu o limite de 6 plataformas selecionadas. Remova uma antes de selecionar outra.");
+    } else {
+      setSelectedIds([...selectedIds, id]);
+    }
+  };
   const set = (key: keyof typeof filters, value: string) => setFilters((f) => ({ ...f, [key]: value }));
   const pinColor = (id: number) => PIN_COLORS[selected.findIndex((s) => s.id === id) % PIN_COLORS.length];
 
