@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { CircleMarker, MapContainer, Popup, TileLayer, Tooltip as LeafletTooltip } from "react-leaflet";
+import { MapContainer, Marker, Popup, TileLayer, Tooltip as LeafletTooltip } from "react-leaflet";
+import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { fetchPlatforms } from "./api";
 import type { Platform } from "./types";
@@ -15,6 +16,15 @@ const PIN_COLORS = ["#008542", "#ffcc29", "#0c2340", "#e30613", "#0072ce", "#7a2
 
 const num = (value: number | null | undefined, suffix = "") =>
   value === null || value === undefined || Number.isNaN(value) ? "—" : value.toLocaleString("pt-BR") + suffix;
+
+const pinIcon = (color: string) =>
+  L.divIcon({
+    className: "pin-icon",
+    html: `<div style="width:24px;height:24px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:${color};border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.4)"></div>`,
+    iconSize: [24, 24],
+    iconAnchor: [12, 24],
+    popupAnchor: [0, -22],
+  });
 
 export default function App() {
   const [platforms, setPlatforms] = useState<Platform[]>([]);
@@ -103,7 +113,13 @@ export default function App() {
         <>
           <div className="layout">
             <section className="panel">
-              <div className="panel-head"><h2>Plataformas ({filtered.length})</h2><span className="pill">Selecionadas: {selected.length}/6</span></div>
+              <div className="panel-head">
+                <h2>Plataformas ({filtered.length})</h2>
+                <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                  <span className="pill">Selecionadas: {selected.length}/6</span>
+                  <button className="clear-btn" onClick={() => setSelectedIds([])}>Limpar seleção</button>
+                </div>
+              </div>
               <div className="panel-body list">
                 {filtered.map((p) => (
                   <article key={p.id} className={`card ${selectedIds.includes(p.id) ? "selected" : ""}`}>
@@ -132,14 +148,14 @@ export default function App() {
             <section className="panel">
               <div className="panel-head"><h2>Mapa — unidades selecionadas</h2><span className="pill">{selected.length}/6 no mapa</span></div>
               <MapContainer className="map" center={[-24, -42]} zoom={5} scrollWheelZoom>
-                <TileLayer attribution="Esri, Maxar, Earthstar Geographics" url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}" />
+                <TileLayer attribution="&copy; OpenStreetMap contributors" url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
                 {selected.filter((p) => p.latitude !== null && p.longitude !== null).map((p) => {
                   const color = pinColor(p.id);
                   return (
-                    <CircleMarker key={p.id} center={[p.latitude!, p.longitude!]} radius={9} pathOptions={{ color, fillColor: color, fillOpacity: 0.9 }}>
+                    <Marker key={p.id} position={[p.latitude!, p.longitude!]} icon={pinIcon(color)}>
                       <LeafletTooltip>{p.name}</LeafletTooltip>
                       <Popup><strong>{p.name}</strong><br />{STATUS_LABEL[p.status] ?? p.status}<br />{p.unit_type}<br />Operador: {p.operator || "—"}<br />Campo: {p.field || "—"}<br />Óleo: {num(p.oil_bpd, " bpd")}<br />Gás: {num(p.gas_mmd, " MMm³/d")}</Popup>
-                    </CircleMarker>
+                    </Marker>
                   );
                 })}
               </MapContainer>
@@ -173,13 +189,13 @@ export default function App() {
                   <ResponsiveContainer width="100%" height={420}><BarChart data={chartData}><CartesianGrid strokeDasharray="3 3" stroke="#22384f" /><XAxis dataKey="name" stroke="#93a7bb" /><YAxis stroke="#93a7bb" /><Tooltip /><Legend /><Bar dataKey="Óleo" fill="#008542" /><Bar dataKey="Gás" fill="#ffcc29" /><Bar dataKey="BOE" fill="#0c2340" /></BarChart></ResponsiveContainer>
                 </div>
               )}
-              {tab === "mapas" && <p>O mapa mostra apenas as plataformas selecionadas (até 6), cada uma com um pin de cor própria para facilitar a identificação.</p>}
+              {tab === "mapas" && <p>O mapa usa OpenStreetMap e mostra apenas as plataformas selecionadas (até 6), cada uma com um pin de cor própria.</p>}
             </div>
           </section>
         </>
       )}
 
-      <footer className="footer">Base compilada e revisada com fontes públicas ANP, Petrobras e PPSA. Mapa usa Leaflet e imagens de satélite Esri. Distância até a costa é uma aproximação até o ponto litorâneo de referência mais próximo. Valide dados críticos antes de uso técnico. © 2026 Ricardo S. Rodrigues.</footer>
+      <footer className="footer">Base compilada e revisada com fontes públicas ANP, Petrobras e PPSA. Mapa usa Leaflet e OpenStreetMap. Distância até a costa é uma aproximação até o ponto litorâneo de referência mais próximo. Valide dados críticos antes de uso técnico. © 2026 Ricardo S. Rodrigues.</footer>
     </div>
   );
 }
