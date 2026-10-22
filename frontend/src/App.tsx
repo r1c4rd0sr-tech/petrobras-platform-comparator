@@ -11,6 +11,8 @@ const STATUS_LABEL: Record<string, string> = {
   decommissioned: "Descomissionada",
 };
 
+const PIN_COLORS = ["#008542", "#ffcc29", "#0c2340", "#e30613", "#0072ce", "#7a28a0"];
+
 const num = (value: number | null | undefined, suffix = "") =>
   value === null || value === undefined || Number.isNaN(value) ? "—" : value.toLocaleString("pt-BR") + suffix;
 
@@ -67,13 +69,14 @@ export default function App() {
 
   const toggle = (id: number) => setSelectedIds((current) => current.includes(id) ? current.filter((x) => x !== id) : current.length >= 6 ? [...current.slice(1), id] : [...current, id]);
   const set = (key: keyof typeof filters, value: string) => setFilters((f) => ({ ...f, [key]: value }));
+  const pinColor = (id: number) => PIN_COLORS[selected.findIndex((s) => s.id === id) % PIN_COLORS.length];
 
   return (
     <div className="app">
       <header className="topbar">
         <div>
           <h1>Comparador de Plataformas Petrobras</h1>
-          <p>Compare até 6 plataformas em um único mapa interativo, com legenda, pontos coloridos, coordenadas, distância até a costa, operador, gráficos e estatísticas.</p>
+          <p>Selecione até 6 unidades para comparar no mapa, cada uma com um pin de cor própria.</p>
         </div>
         <span className="badge">{loading ? "Carregando..." : `${platforms.length} unidades na base`}</span>
       </header>
@@ -127,15 +130,18 @@ export default function App() {
             </section>
 
             <section className="panel">
-              <div className="panel-head"><h2>Mapa interativo</h2><span className="pill">Leaflet • Esri Satellite</span></div>
+              <div className="panel-head"><h2>Mapa — unidades selecionadas</h2><span className="pill">{selected.length}/6 no mapa</span></div>
               <MapContainer className="map" center={[-24, -42]} zoom={5} scrollWheelZoom>
                 <TileLayer attribution="Esri, Maxar, Earthstar Geographics" url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}" />
-                {filtered.filter((p) => p.latitude !== null && p.longitude !== null).map((p) => (
-                  <CircleMarker key={p.id} center={[p.latitude!, p.longitude!]} radius={selectedIds.includes(p.id) ? 9 : 6} pathOptions={{ color: p.status === "operational" ? "#22c55e" : p.status === "construction" ? "#f59e0b" : "#ef4444", fillColor: p.status === "operational" ? "#22c55e" : p.status === "construction" ? "#f59e0b" : "#ef4444", fillOpacity: 0.85 }}>
-                    <LeafletTooltip>{p.name}</LeafletTooltip>
-                    <Popup><strong>{p.name}</strong><br />{STATUS_LABEL[p.status] ?? p.status}<br />{p.unit_type}<br />Operador: {p.operator || "—"}<br />Campo: {p.field || "—"}<br />Óleo: {num(p.oil_bpd, " bpd")}<br />Gás: {num(p.gas_mmd, " MMm³/d")}</Popup>
-                  </CircleMarker>
-                ))}
+                {selected.filter((p) => p.latitude !== null && p.longitude !== null).map((p) => {
+                  const color = pinColor(p.id);
+                  return (
+                    <CircleMarker key={p.id} center={[p.latitude!, p.longitude!]} radius={9} pathOptions={{ color, fillColor: color, fillOpacity: 0.9 }}>
+                      <LeafletTooltip>{p.name}</LeafletTooltip>
+                      <Popup><strong>{p.name}</strong><br />{STATUS_LABEL[p.status] ?? p.status}<br />{p.unit_type}<br />Operador: {p.operator || "—"}<br />Campo: {p.field || "—"}<br />Óleo: {num(p.oil_bpd, " bpd")}<br />Gás: {num(p.gas_mmd, " MMm³/d")}</Popup>
+                    </CircleMarker>
+                  );
+                })}
               </MapContainer>
             </section>
           </div>
@@ -164,10 +170,10 @@ export default function App() {
               {tab === "graficos" && (
                 <div className="charts">
                   <h3>Produção das plataformas selecionadas</h3>
-                  <ResponsiveContainer width="100%" height={420}><BarChart data={chartData}><CartesianGrid strokeDasharray="3 3" stroke="#22384f" /><XAxis dataKey="name" stroke="#93a7bb" /><YAxis stroke="#93a7bb" /><Tooltip /><Legend /><Bar dataKey="Óleo" fill="#38bdf8" /><Bar dataKey="Gás" fill="#22c55e" /><Bar dataKey="BOE" fill="#f59e0b" /></BarChart></ResponsiveContainer>
+                  <ResponsiveContainer width="100%" height={420}><BarChart data={chartData}><CartesianGrid strokeDasharray="3 3" stroke="#22384f" /><XAxis dataKey="name" stroke="#93a7bb" /><YAxis stroke="#93a7bb" /><Tooltip /><Legend /><Bar dataKey="Óleo" fill="#008542" /><Bar dataKey="Gás" fill="#ffcc29" /><Bar dataKey="BOE" fill="#0c2340" /></BarChart></ResponsiveContainer>
                 </div>
               )}
-              {tab === "mapas" && <p>Use os filtros à esquerda para destacar unidades no mapa satelital. Os marcadores são coloridos por status e ampliados quando selecionados.</p>}
+              {tab === "mapas" && <p>O mapa mostra apenas as plataformas selecionadas (até 6), cada uma com um pin de cor própria para facilitar a identificação.</p>}
             </div>
           </section>
         </>
