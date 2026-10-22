@@ -1,4 +1,8 @@
+import csv
+import io
+
 from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi.responses import StreamingResponse
 from sqlalchemy import or_
 from sqlalchemy.orm import Session
 from ..database import get_db
@@ -25,6 +29,23 @@ def list_platforms(search: str | None = None, status: str | None = None, basin: 
     if min_gas_mmd is not None:
         query = query.filter(Platform.gas_mmd >= min_gas_mmd)
     return query.order_by(Platform.name).all()
+
+
+@router.get("/export.csv")
+def export_platforms_csv(db: Session = Depends(get_db)):
+    platforms = db.query(Platform).order_by(Platform.name).all()
+    output = io.StringIO()
+    writer = csv.writer(output)
+    columns = [c.name for c in Platform.__table__.columns]
+    writer.writerow(columns)
+    for platform in platforms:
+        writer.writerow([getattr(platform, column) for column in columns])
+    output.seek(0)
+    return StreamingResponse(
+        iter([output.getvalue()]),
+        media_type="text/csv",
+        headers={"Content-Disposition": "attachment; filename=plataformas_petrobras.csv"},
+    )
 
 
 @router.post("", response_model=PlatformRead, status_code=201)
