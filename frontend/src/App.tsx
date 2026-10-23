@@ -41,7 +41,7 @@ export default function App() {
     fetchPlatforms()
       .then((data) => {
         setPlatforms(data);
-        setSelectedIds(data.slice(0, 6).map((p) => p.id));
+        setSelectedIds([]);
       })
       .catch(() => setError("Não foi possível carregar os dados da API. Recarregue em alguns instantes."))
       .finally(() => setLoading(false));
