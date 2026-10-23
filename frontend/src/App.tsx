@@ -80,7 +80,6 @@ export default function App() {
   const chartData = selected.map((p) => ({ name: p.name, Óleo: p.oil_bpd ?? 0, Gás: p.gas_mmd ?? 0, BOE: p.boed ?? 0 }));
   const totals = filtered.reduce((acc, p) => ({ oil: acc.oil + (p.oil_bpd ?? 0), gas: acc.gas + (p.gas_mmd ?? 0), boe: acc.boe + (p.boed ?? 0) }), { oil: 0, gas: 0, boe: 0 });
 
-  // Estatísticas avançadas
   const withDepth = filtered.filter((p) => p.water_depth_m != null);
   const avgDepth = withDepth.length ? withDepth.reduce((s, p) => s + (p.water_depth_m ?? 0), 0) / withDepth.length : 0;
   const maxDepth = withDepth.length ? Math.max(...withDepth.map((p) => p.water_depth_m ?? 0)) : 0;
@@ -224,7 +223,7 @@ export default function App() {
 
           <section className="panel" style={{ marginTop: 18 }}>
             <div className="tabs">
-              {["comparativo", "estatisticas", "graficos", "mapas"].map((x) => <button key={x} className={`tab ${tab === x ? "active" : ""}`} onClick={() => setTab(x)}>{x === "estatisticas" ? "Estatísticas" : x.charAt(0).toUpperCase() + x.slice(1)}</button>)}
+              {["comparativo", "estatisticas", "graficos"].map((x) => <button key={x} className={`tab ${tab === x ? "active" : ""}`} onClick={() => setTab(x)}>{x === "estatisticas" ? "Estatísticas" : x.charAt(0).toUpperCase() + x.slice(1)}</button>)}
             </div>
             <div className="panel-body">
               {tab === "comparativo" && (
@@ -322,7 +321,6 @@ export default function App() {
                   <ResponsiveContainer width="100%" height={420}><BarChart data={chartData}><CartesianGrid strokeDasharray="3 3" stroke="#22384f" /><XAxis dataKey="name" stroke="#93a7bb" /><YAxis stroke="#93a7bb" /><Tooltip /><Legend /><Bar dataKey="Óleo" fill="#008542" /><Bar dataKey="Gás" fill="#ffcc29" /><Bar dataKey="BOE" fill="#0c2340" /></BarChart></ResponsiveContainer>
                 </div>
               )}
-              {tab === "mapas" && <p>O mapa usa OpenStreetMap e mostra apenas as plataformas selecionadas (até 6), cada uma com um pin de cor própria. A legenda abaixo do mapa indica qual unidade corresponde a cada cor.</p>}
             </div>
           </section>
         </>
