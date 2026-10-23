@@ -12,10 +12,10 @@ const STATUS_LABEL: Record<string, string> = {
   decommissioned: "Descomissionada",
 };
 
-const PIN_COLORS = ["#008542", "#ffcc29", "#0c2340", "#e30613", "#0072ce", "#7a28a0"];
+const PIN_COLORS = ["#008542", "#ffcc29", "#0c2340", "#e30613", "#0072ce", "#7a28a0", "#00a878", "#f28c28", "#c2185b", "#5d4037"];
 const STATUS_COLORS = ["#008542", "#ffcc29", "#e30613"];
 const CHART_COLORS = ["#008542", "#0072ce", "#ffcc29", "#0c2340", "#e30613", "#7a28a0", "#00a878", "#f28c28"];
-const MAX_SELECTED = 6;
+const MAX_SELECTED = 10;
 
 const num = (value: number | null | undefined, suffix = "") =>
   value === null || value === undefined || Number.isNaN(value) ? "—" : value.toLocaleString("pt-BR") + suffix;
@@ -109,6 +109,31 @@ export default function App() {
     return Object.entries(map).map(([name, value]) => ({ name, value })).sort((a, b) => b.value - a.value);
   }, [filtered]);
 
+  // Gráficos das plataformas selecionadas
+  const selStatusData = useMemo(() => {
+    const map: Record<string, number> = {};
+    selected.forEach((p) => { const k = STATUS_LABEL[p.status] ?? p.status; map[k] = (map[k] ?? 0) + 1; });
+    return Object.entries(map).map(([name, value]) => ({ name, value }));
+  }, [selected]);
+
+  const selBasinData = useMemo(() => {
+    const map: Record<string, number> = {};
+    selected.forEach((p) => { const k = p.basin || "Não informado"; map[k] = (map[k] ?? 0) + 1; });
+    return Object.entries(map).map(([name, value]) => ({ name, value })).sort((a, b) => b.value - a.value);
+  }, [selected]);
+
+  const selOperatorData = useMemo(() => {
+    const map: Record<string, number> = {};
+    selected.forEach((p) => { const k = p.operator || "Não informado"; map[k] = (map[k] ?? 0) + (p.oil_bpd ?? 0); });
+    return Object.entries(map).map(([name, Óleo]) => ({ name, Óleo })).sort((a, b) => b.Óleo - a.Óleo);
+  }, [selected]);
+
+  const selTypeData = useMemo(() => {
+    const map: Record<string, number> = {};
+    selected.forEach((p) => { const k = p.unit_type || "Não informado"; map[k] = (map[k] ?? 0) + 1; });
+    return Object.entries(map).map(([name, value]) => ({ name, value })).sort((a, b) => b.value - a.value);
+  }, [selected]);
+
   const topOil = useMemo(() => [...filtered].filter((p) => (p.oil_bpd ?? 0) > 0).sort((a, b) => (b.oil_bpd ?? 0) - (a.oil_bpd ?? 0)).slice(0, 5), [filtered]);
   const topDepth = useMemo(() => [...filtered].filter((p) => p.water_depth_m != null).sort((a, b) => (b.water_depth_m ?? 0) - (a.water_depth_m ?? 0)).slice(0, 5), [filtered]);
 
@@ -116,7 +141,7 @@ export default function App() {
     if (selectedIds.includes(id)) {
       setSelectedIds(selectedIds.filter((x) => x !== id));
     } else if (selectedIds.length >= MAX_SELECTED) {
-      window.alert("Você já atingiu o limite de 6 plataformas selecionadas. Remova uma antes de selecionar outra.");
+      window.alert("Você já atingiu o limite de 10 plataformas selecionadas. Remova uma antes de selecionar outra.");
     } else {
       setSelectedIds([...selectedIds, id]);
     }
@@ -135,7 +160,7 @@ export default function App() {
       <header className="topbar">
         <div>
           <h1>Comparador de Plataformas Petrobras</h1>
-          <p>Selecione até 6 unidades para comparar no mapa, cada uma com um pin de cor própria.</p>
+          <p>Selecione até 10 unidades para comparar no mapa, cada uma com um pin de cor própria.</p>
         </div>
         <span className="badge">{loading ? "Carregando..." : `${platforms.length} unidades na base`}</span>
       </header>
@@ -165,7 +190,7 @@ export default function App() {
               <div className="panel-head">
                 <h2>Plataformas ({filtered.length})</h2>
                 <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                  <span className="pill">Selecionadas: {selected.length}/6</span>
+                  <span className="pill">Selecionadas: {selected.length}/10</span>
                   <button className="clear-btn" onClick={() => setSelectedIds([])}>Limpar seleção</button>
                 </div>
               </div>
@@ -195,7 +220,7 @@ export default function App() {
             </section>
 
             <section className="panel">
-              <div className="panel-head"><h2>Mapa — unidades selecionadas</h2><span className="pill">{selected.length}/6 no mapa</span></div>
+              <div className="panel-head"><h2>Mapa — unidades selecionadas</h2><span className="pill">{selected.length}/10 no mapa</span></div>
               <MapContainer className="map" center={[-24, -42]} zoom={5} scrollWheelZoom>
                 <TileLayer attribution="&copy; OpenStreetMap contributors" url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
                 {selected.filter((p) => p.latitude !== null && p.longitude !== null).map((p) => {
@@ -317,8 +342,67 @@ export default function App() {
               )}
               {tab === "graficos" && (
                 <div className="charts">
-                  <h3>Produção das plataformas selecionadas</h3>
-                  <ResponsiveContainer width="100%" height={420}><BarChart data={chartData}><CartesianGrid strokeDasharray="3 3" stroke="#22384f" /><XAxis dataKey="name" stroke="#93a7bb" /><YAxis stroke="#93a7bb" /><Tooltip /><Legend /><Bar dataKey="Óleo" fill="#008542" /><Bar dataKey="Gás" fill="#ffcc29" /><Bar dataKey="BOE" fill="#0c2340" /></BarChart></ResponsiveContainer>
+                  <h3>Comparação das plataformas selecionadas ({selected.length}/10)</h3>
+                  {selected.length === 0 && <p style={{ color: "#93a7bb" }}>Selecione plataformas na lista à esquerda para ver os gráficos comparativos.</p>}
+                  {selected.length > 0 && (
+                    <>
+                      <h4 style={{ color: "#fff" }}>Produção (óleo, gás e BOE)</h4>
+                      <ResponsiveContainer width="100%" height={360}><BarChart data={chartData}><CartesianGrid strokeDasharray="3 3" stroke="#22384f" /><XAxis dataKey="name" stroke="#93a7bb" fontSize={11} /><YAxis stroke="#93a7bb" /><Tooltip /><Legend /><Bar dataKey="Óleo" fill="#008542" /><Bar dataKey="Gás" fill="#ffcc29" /><Bar dataKey="BOE" fill="#0c2340" /></BarChart></ResponsiveContainer>
+
+                      <div style={{ display: "flex", gap: 16, flexWrap: "wrap", marginTop: 24 }}>
+                        <div style={chartBoxStyle}>
+                          <h4 style={{ marginTop: 0, color: "#fff" }}>Status das selecionadas</h4>
+                          <ResponsiveContainer width="100%" height={240}>
+                            <PieChart>
+                              <Pie data={selStatusData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={75} label>
+                                {selStatusData.map((_, i) => <Cell key={i} fill={STATUS_COLORS[i % STATUS_COLORS.length]} />)}
+                              </Pie>
+                              <Tooltip /><Legend />
+                            </PieChart>
+                          </ResponsiveContainer>
+                        </div>
+                        <div style={chartBoxStyle}>
+                          <h4 style={{ marginTop: 0, color: "#fff" }}>Bacias das selecionadas</h4>
+                          <ResponsiveContainer width="100%" height={240}>
+                            <BarChart data={selBasinData}>
+                              <CartesianGrid strokeDasharray="3 3" stroke="#22384f" />
+                              <XAxis dataKey="name" stroke="#93a7bb" fontSize={11} />
+                              <YAxis stroke="#93a7bb" />
+                              <Tooltip /><Legend />
+                              <Bar dataKey="value" name="Unidades" fill="#008542" />
+                            </BarChart>
+                          </ResponsiveContainer>
+                        </div>
+                      </div>
+
+                      <div style={{ display: "flex", gap: 16, flexWrap: "wrap", marginTop: 24 }}>
+                        <div style={chartBoxStyle}>
+                          <h4 style={{ marginTop: 0, color: "#fff" }}>Operadores das selecionadas (óleo bpd)</h4>
+                          <ResponsiveContainer width="100%" height={240}>
+                            <BarChart data={selOperatorData} layout="vertical">
+                              <CartesianGrid strokeDasharray="3 3" stroke="#22384f" />
+                              <XAxis type="number" stroke="#93a7bb" />
+                              <YAxis type="category" dataKey="name" stroke="#93a7bb" width={140} fontSize={11} />
+                              <Tooltip /><Legend />
+                              <Bar dataKey="Óleo" fill="#0072ce" />
+                            </BarChart>
+                          </ResponsiveContainer>
+                        </div>
+                        <div style={chartBoxStyle}>
+                          <h4 style={{ marginTop: 0, color: "#fff" }}>Tipos de unidade selecionadas</h4>
+                          <ResponsiveContainer width="100%" height={240}>
+                            <BarChart data={selTypeData}>
+                              <CartesianGrid strokeDasharray="3 3" stroke="#22384f" />
+                              <XAxis dataKey="name" stroke="#93a7bb" fontSize={11} />
+                              <YAxis stroke="#93a7bb" />
+                              <Tooltip /><Legend />
+                              <Bar dataKey="value" name="Unidades" fill="#ffcc29" />
+                            </BarChart>
+                          </ResponsiveContainer>
+                        </div>
+                      </div>
+                    </>
+                  )}
                 </div>
               )}
             </div>
