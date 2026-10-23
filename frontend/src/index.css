@@ -30,6 +30,11 @@ body {
   background: var(--petro-yellow); color: var(--petro-dark);
   padding: 8px 14px; border-radius: 999px; font-weight: 600; white-space: nowrap;
 }
+.theme-toggle {
+  padding: 8px 14px; border-radius: 999px; font-weight: 600; cursor: pointer;
+  border: 2px solid var(--petro-yellow); background: transparent; color: #fff;
+}
+.theme-toggle:hover { background: rgba(255,255,255,.12); }
 
 .filters {
   display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px;
@@ -147,3 +152,34 @@ body {
   background: #fff; border: 1px solid var(--petro-border);
   font-size: 12px; color: #5b6b7b;
 }
+
+/* ===== Tema escuro — cores Petrobras ===== */
+[data-theme="dark"] body { background: #081527; color: #e8eef5; }
+[data-theme="dark"] .filters { background: #0f2740; border-color: #1e3a5c; }
+[data-theme="dark"] .filters label { color: #a8c4de; }
+[data-theme="dark"] .filters input,
+[data-theme="dark"] .filters select { background: #0c2340; color: #e8eef5; border-color: #1e3a5c; }
+[data-theme="dark"] .filters button { background: #008542; }
+[data-theme="dark"] .loading { background: #12314f; color: #7fd4a8; }
+[data-theme="dark"] .panel { background: #0f2740; border-color: #1e3a5c; }
+[data-theme="dark"] .panel-head { border-color: #1e3a5c; }
+[data-theme="dark"] .panel-head h2 { color: #e8eef5; }
+[data-theme="dark"] .pill { background: #1e3a5c; color: #e8eef5; }
+[data-theme="dark"] .pill.operational { background: #0d3b26; color: #7fd4a8; }
+[data-theme="dark"] .pill.construction { background: #3d3208; color: #ffcc29; }
+[data-theme="dark"] .pill.decommissioned { background: #3d1418; color: #ff8a80; }
+[data-theme="dark"] .card { background: #0c2340; border-color: #1e3a5c; }
+[data-theme="dark"] .card-top h4 { color: #e8eef5; }
+[data-theme="dark"] .meta { color: #a8c4de; }
+[data-theme="dark"] .meta span { background: #12314f; color: #a8c4de; }
+[data-theme="dark"] .metric { background: #12314f; }
+[data-theme="dark"] .metric b { color: #e8eef5; }
+[data-theme="dark"] .clear-btn { background: #0c2340; color: #e8eef5; border-color: #1e3a5c; }
+[data-theme="dark"] .clear-btn:hover { background: #12314f; }
+[data-theme="dark"] .map-legend { background: #0f2740; color: #e8eef5; border-color: #1e3a5c; }
+[data-theme="dark"] .tab { background: #0c2340; color: #e8eef5; border-color: #1e3a5c; }
+[data-theme="dark"] .tab.active { background: #008542; border-color: #008542; color: #fff; }
+[data-theme="dark"] .table th { background: #12314f; color: #e8eef5; }
+[data-theme="dark"] .table th, [data-theme="dark"] .table td { border-color: #1e3a5c; }
+[data-theme="dark"] .charts h3 { color: #e8eef5; }
+[data-theme="dark"] .footer { background: #0f2740; color: #a8c4de; border-color: #1e3a5c; }

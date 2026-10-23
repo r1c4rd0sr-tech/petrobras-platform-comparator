@@ -14,7 +14,6 @@ const STATUS_LABEL: Record<string, string> = {
 
 const PIN_COLORS = ["#008542", "#ffcc29", "#0c2340", "#e30613", "#0072ce", "#7a28a0", "#00a878", "#f28c28", "#c2185b", "#5d4037"];
 const STATUS_COLORS = ["#008542", "#ffcc29", "#e30613"];
-const CHART_COLORS = ["#008542", "#0072ce", "#ffcc29", "#0c2340", "#e30613", "#7a28a0", "#00a878", "#f28c28"];
 const MAX_SELECTED = 10;
 
 const num = (value: number | null | undefined, suffix = "") =>
@@ -35,7 +34,12 @@ export default function App() {
   const [error, setError] = useState("");
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [tab, setTab] = useState("comparativo");
+  const [theme, setTheme] = useState<"light" | "dark">("light");
   const [filters, setFilters] = useState({ search: "", status: "", unit_type: "", basin: "", field: "", operator: "", oil: "", gas: "", year: "", accommodation: "", sort: "oil" });
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+  }, [theme]);
 
   useEffect(() => {
     fetchPlatforms()
@@ -109,7 +113,6 @@ export default function App() {
     return Object.entries(map).map(([name, value]) => ({ name, value })).sort((a, b) => b.value - a.value);
   }, [filtered]);
 
-  // Gráficos das plataformas selecionadas
   const selStatusData = useMemo(() => {
     const map: Record<string, number> = {};
     selected.forEach((p) => { const k = STATUS_LABEL[p.status] ?? p.status; map[k] = (map[k] ?? 0) + 1; });
@@ -162,7 +165,12 @@ export default function App() {
           <h1>Comparador de Plataformas Petrobras</h1>
           <p>Selecione até 10 unidades para comparar no mapa, cada uma com um pin de cor própria.</p>
         </div>
-        <span className="badge">{loading ? "Carregando..." : `${platforms.length} unidades na base`}</span>
+        <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+          <button className="theme-toggle" onClick={() => setTheme(theme === "light" ? "dark" : "light")}>
+            {theme === "light" ? "🌙 Escuro" : "☀️ Claro"}
+          </button>
+          <span className="badge">{loading ? "Carregando..." : `${platforms.length} unidades na base`}</span>
+        </div>
       </header>
 
       <section className="filters">
