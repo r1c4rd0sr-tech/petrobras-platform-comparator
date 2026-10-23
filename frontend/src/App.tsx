@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { Bar, BarChart, CartesianGrid, Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { MapContainer, Marker, Popup, TileLayer, Tooltip as LeafletTooltip } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -13,6 +13,8 @@ const STATUS_LABEL: Record<string, string> = {
 };
 
 const PIN_COLORS = ["#008542", "#ffcc29", "#0c2340", "#e30613", "#0072ce", "#7a28a0"];
+const STATUS_COLORS = ["#008542", "#ffcc29", "#e30613"];
+const CHART_COLORS = ["#008542", "#0072ce", "#ffcc29", "#0c2340", "#e30613", "#7a28a0", "#00a878", "#f28c28"];
 const MAX_SELECTED = 6;
 
 const num = (value: number | null | undefined, suffix = "") =>
@@ -78,6 +80,39 @@ export default function App() {
   const chartData = selected.map((p) => ({ name: p.name, Óleo: p.oil_bpd ?? 0, Gás: p.gas_mmd ?? 0, BOE: p.boed ?? 0 }));
   const totals = filtered.reduce((acc, p) => ({ oil: acc.oil + (p.oil_bpd ?? 0), gas: acc.gas + (p.gas_mmd ?? 0), boe: acc.boe + (p.boed ?? 0) }), { oil: 0, gas: 0, boe: 0 });
 
+  // Estatísticas avançadas
+  const withDepth = filtered.filter((p) => p.water_depth_m != null);
+  const avgDepth = withDepth.length ? withDepth.reduce((s, p) => s + (p.water_depth_m ?? 0), 0) / withDepth.length : 0;
+  const maxDepth = withDepth.length ? Math.max(...withDepth.map((p) => p.water_depth_m ?? 0)) : 0;
+  const totalAccommodation = filtered.reduce((s, p) => s + (p.accommodation ?? 0), 0);
+
+  const statusData = useMemo(() => {
+    const map: Record<string, number> = {};
+    filtered.forEach((p) => { const k = STATUS_LABEL[p.status] ?? p.status; map[k] = (map[k] ?? 0) + 1; });
+    return Object.entries(map).map(([name, value]) => ({ name, value }));
+  }, [filtered]);
+
+  const basinData = useMemo(() => {
+    const map: Record<string, { count: number; oil: number }> = {};
+    filtered.forEach((p) => { const k = p.basin || "Não informado"; if (!map[k]) map[k] = { count: 0, oil: 0 }; map[k].count++; map[k].oil += p.oil_bpd ?? 0; });
+    return Object.entries(map).map(([name, v]) => ({ name, Unidades: v.count, Óleo: v.oil })).sort((a, b) => b.Unidades - a.Unidades).slice(0, 6);
+  }, [filtered]);
+
+  const operatorData = useMemo(() => {
+    const map: Record<string, number> = {};
+    filtered.forEach((p) => { const k = p.operator || "Não informado"; map[k] = (map[k] ?? 0) + (p.oil_bpd ?? 0); });
+    return Object.entries(map).map(([name, Óleo]) => ({ name, Óleo })).sort((a, b) => b.Óleo - a.Óleo).slice(0, 6);
+  }, [filtered]);
+
+  const typeData = useMemo(() => {
+    const map: Record<string, number> = {};
+    filtered.forEach((p) => { const k = p.unit_type || "Não informado"; map[k] = (map[k] ?? 0) + 1; });
+    return Object.entries(map).map(([name, value]) => ({ name, value })).sort((a, b) => b.value - a.value);
+  }, [filtered]);
+
+  const topOil = useMemo(() => [...filtered].filter((p) => (p.oil_bpd ?? 0) > 0).sort((a, b) => (b.oil_bpd ?? 0) - (a.oil_bpd ?? 0)).slice(0, 5), [filtered]);
+  const topDepth = useMemo(() => [...filtered].filter((p) => p.water_depth_m != null).sort((a, b) => (b.water_depth_m ?? 0) - (a.water_depth_m ?? 0)).slice(0, 5), [filtered]);
+
   const toggle = (id: number) => {
     if (selectedIds.includes(id)) {
       setSelectedIds(selectedIds.filter((x) => x !== id));
@@ -89,6 +124,12 @@ export default function App() {
   };
   const set = (key: keyof typeof filters, value: string) => setFilters((f) => ({ ...f, [key]: value }));
   const pinColor = (id: number) => PIN_COLORS[selected.findIndex((s) => s.id === id) % PIN_COLORS.length];
+
+  const kpiStyle: React.CSSProperties = { background: "linear-gradient(135deg,#0c2340 0%,#123a5c 100%)", borderRadius: 12, padding: "14px 18px", color: "#fff", minWidth: 150, flex: 1 };
+  const kpiLabel: React.CSSProperties = { fontSize: 12, opacity: 0.75, display: "block", marginBottom: 4 };
+  const kpiValue: React.CSSProperties = { fontSize: 22, fontWeight: 700, display: "block" };
+  const chartBoxStyle: React.CSSProperties = { background: "#0f2740", borderRadius: 12, padding: 16, flex: 1, minWidth: 320 };
+  const rankBoxStyle: React.CSSProperties = { background: "#0f2740", borderRadius: 12, padding: 16, flex: 1, minWidth: 280 };
 
   return (
     <div className="app">
@@ -194,12 +235,85 @@ export default function App() {
                 </div>
               )}
               {tab === "estatisticas" && (
-                <div className="stats">
-                  <div className="stat"><span>Unidades filtradas</span><strong>{filtered.length}</strong></div>
-                  <div className="stat"><span>Óleo total</span><strong>{num(totals.oil, " bpd")}</strong></div>
-                  <div className="stat"><span>Gás total</span><strong>{num(totals.gas, " MMm³/d")}</strong></div>
-                  <div className="stat"><span>BOE total</span><strong>{num(totals.boe, "/d")}</strong></div>
-                  <div className="stat"><span>Selecionadas</span><strong>{selected.length}</strong></div>
+                <div>
+                  <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 20 }}>
+                    <div style={kpiStyle}><span style={kpiLabel}>Unidades filtradas</span><strong style={kpiValue}>{filtered.length}</strong><span style={{ fontSize: 11, opacity: 0.6 }}>{platforms.length} na base total</span></div>
+                    <div style={kpiStyle}><span style={kpiLabel}>Óleo total</span><strong style={kpiValue}>{num(totals.oil, " bpd")}</strong></div>
+                    <div style={kpiStyle}><span style={kpiLabel}>Gás total</span><strong style={kpiValue}>{num(totals.gas, " MMm³/d")}</strong></div>
+                    <div style={kpiStyle}><span style={kpiLabel}>BOE total</span><strong style={kpiValue}>{num(totals.boe, "/d")}</strong></div>
+                    <div style={kpiStyle}><span style={kpiLabel}>Profundidade média</span><strong style={kpiValue}>{num(Math.round(avgDepth), " m")}</strong><span style={{ fontSize: 11, opacity: 0.6 }}>máx: {num(maxDepth, " m")}</span></div>
+                    <div style={kpiStyle}><span style={kpiLabel}>Acomodação total</span><strong style={kpiValue}>{num(totalAccommodation)}</strong><span style={{ fontSize: 11, opacity: 0.6 }}>pessoas</span></div>
+                  </div>
+
+                  <div style={{ display: "flex", gap: 16, flexWrap: "wrap", marginBottom: 20 }}>
+                    <div style={chartBoxStyle}>
+                      <h4 style={{ marginTop: 0, color: "#fff" }}>Distribuição por status</h4>
+                      <ResponsiveContainer width="100%" height={240}>
+                        <PieChart>
+                          <Pie data={statusData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={75} label>
+                            {statusData.map((_, i) => <Cell key={i} fill={STATUS_COLORS[i % STATUS_COLORS.length]} />)}
+                          </Pie>
+                          <Tooltip /><Legend />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    </div>
+                    <div style={chartBoxStyle}>
+                      <h4 style={{ marginTop: 0, color: "#fff" }}>Top bacias por nº de unidades</h4>
+                      <ResponsiveContainer width="100%" height={240}>
+                        <BarChart data={basinData}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="#22384f" />
+                          <XAxis dataKey="name" stroke="#93a7bb" fontSize={11} />
+                          <YAxis stroke="#93a7bb" />
+                          <Tooltip /><Legend />
+                          <Bar dataKey="Unidades" fill="#008542" />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </div>
+
+                  <div style={{ display: "flex", gap: 16, flexWrap: "wrap", marginBottom: 20 }}>
+                    <div style={chartBoxStyle}>
+                      <h4 style={{ marginTop: 0, color: "#fff" }}>Top operadores por produção de óleo (bpd)</h4>
+                      <ResponsiveContainer width="100%" height={240}>
+                        <BarChart data={operatorData} layout="vertical">
+                          <CartesianGrid strokeDasharray="3 3" stroke="#22384f" />
+                          <XAxis type="number" stroke="#93a7bb" />
+                          <YAxis type="category" dataKey="name" stroke="#93a7bb" width={140} fontSize={11} />
+                          <Tooltip /><Legend />
+                          <Bar dataKey="Óleo" fill="#0072ce" />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
+                    <div style={chartBoxStyle}>
+                      <h4 style={{ marginTop: 0, color: "#fff" }}>Distribuição por tipo de unidade</h4>
+                      <ResponsiveContainer width="100%" height={240}>
+                        <BarChart data={typeData}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="#22384f" />
+                          <XAxis dataKey="name" stroke="#93a7bb" fontSize={11} />
+                          <YAxis stroke="#93a7bb" />
+                          <Tooltip /><Legend />
+                          <Bar dataKey="value" name="Unidades" fill="#ffcc29" />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </div>
+
+                  <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
+                    <div style={rankBoxStyle}>
+                      <h4 style={{ marginTop: 0, color: "#fff" }}>Top 5 produtores de óleo</h4>
+                      <ol style={{ color: "#cfe0f0", paddingLeft: 20, margin: 0 }}>
+                        {topOil.map((p) => <li key={p.id} style={{ marginBottom: 6 }}><strong style={{ color: "#fff" }}>{p.name}</strong> — {num(p.oil_bpd, " bpd")}</li>)}
+                        {topOil.length === 0 && <li>Nenhuma unidade com produção de óleo nos filtros atuais.</li>}
+                      </ol>
+                    </div>
+                    <div style={rankBoxStyle}>
+                      <h4 style={{ marginTop: 0, color: "#fff" }}>Top 5 por profundidade</h4>
+                      <ol style={{ color: "#cfe0f0", paddingLeft: 20, margin: 0 }}>
+                        {topDepth.map((p) => <li key={p.id} style={{ marginBottom: 6 }}><strong style={{ color: "#fff" }}>{p.name}</strong> — {num(p.water_depth_m, " m")}</li>)}
+                        {topDepth.length === 0 && <li>Nenhuma unidade com profundidade informada nos filtros atuais.</li>}
+                      </ol>
+                    </div>
+                  </div>
                 </div>
               )}
               {tab === "graficos" && (
