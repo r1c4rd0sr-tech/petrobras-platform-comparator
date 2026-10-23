@@ -152,11 +152,17 @@ export default function App() {
   const set = (key: keyof typeof filters, value: string) => setFilters((f) => ({ ...f, [key]: value }));
   const pinColor = (id: number) => PIN_COLORS[selected.findIndex((s) => s.id === id) % PIN_COLORS.length];
 
+  const isDark = theme === "dark";
   const kpiStyle: React.CSSProperties = { background: "linear-gradient(135deg,#0c2340 0%,#123a5c 100%)", borderRadius: 12, padding: "14px 18px", color: "#fff", minWidth: 150, flex: 1 };
   const kpiLabel: React.CSSProperties = { fontSize: 12, opacity: 0.75, display: "block", marginBottom: 4 };
   const kpiValue: React.CSSProperties = { fontSize: 22, fontWeight: 700, display: "block" };
-  const chartBoxStyle: React.CSSProperties = { background: "#0f2740", borderRadius: 12, padding: 16, flex: 1, minWidth: 320 };
-  const rankBoxStyle: React.CSSProperties = { background: "#0f2740", borderRadius: 12, padding: 16, flex: 1, minWidth: 280 };
+  const chartBoxStyle: React.CSSProperties = { background: isDark ? "#0f2740" : "#f4f6f8", borderRadius: 12, padding: 16, flex: 1, minWidth: 320 };
+  const rankBoxStyle: React.CSSProperties = { background: isDark ? "#0f2740" : "#f4f6f8", borderRadius: 12, padding: 16, flex: 1, minWidth: 280 };
+  const chartTitleStyle: React.CSSProperties = { marginTop: 0, color: isDark ? "#fff" : "#0c2340" };
+  const gridColor = isDark ? "#22384f" : "#d9e2ea";
+  const axisColor = isDark ? "#93a7bb" : "#5b6b7b";
+  const rankTextStyle: React.CSSProperties = { color: isDark ? "#cfe0f0" : "#1c2b3a", paddingLeft: 20, margin: 0 };
+  const rankStrongColor = isDark ? "#fff" : "#0c2340";
 
   return (
     <div className="app">
@@ -279,7 +285,7 @@ export default function App() {
 
                   <div style={{ display: "flex", gap: 16, flexWrap: "wrap", marginBottom: 20 }}>
                     <div style={chartBoxStyle}>
-                      <h4 style={{ marginTop: 0, color: "#fff" }}>Distribuição por status</h4>
+                      <h4 style={chartTitleStyle}>Distribuição por status</h4>
                       <ResponsiveContainer width="100%" height={240}>
                         <PieChart>
                           <Pie data={statusData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={75} label>
@@ -290,12 +296,12 @@ export default function App() {
                       </ResponsiveContainer>
                     </div>
                     <div style={chartBoxStyle}>
-                      <h4 style={{ marginTop: 0, color: "#fff" }}>Top bacias por nº de unidades</h4>
+                      <h4 style={chartTitleStyle}>Top bacias por nº de unidades</h4>
                       <ResponsiveContainer width="100%" height={240}>
                         <BarChart data={basinData}>
-                          <CartesianGrid strokeDasharray="3 3" stroke="#22384f" />
-                          <XAxis dataKey="name" stroke="#93a7bb" fontSize={11} />
-                          <YAxis stroke="#93a7bb" />
+                          <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
+                          <XAxis dataKey="name" stroke={axisColor} fontSize={11} />
+                          <YAxis stroke={axisColor} />
                           <Tooltip /><Legend />
                           <Bar dataKey="Unidades" fill="#008542" />
                         </BarChart>
@@ -305,24 +311,24 @@ export default function App() {
 
                   <div style={{ display: "flex", gap: 16, flexWrap: "wrap", marginBottom: 20 }}>
                     <div style={chartBoxStyle}>
-                      <h4 style={{ marginTop: 0, color: "#fff" }}>Top operadores por produção de óleo (bpd)</h4>
+                      <h4 style={chartTitleStyle}>Top operadores por produção de óleo (bpd)</h4>
                       <ResponsiveContainer width="100%" height={240}>
                         <BarChart data={operatorData} layout="vertical">
-                          <CartesianGrid strokeDasharray="3 3" stroke="#22384f" />
-                          <XAxis type="number" stroke="#93a7bb" />
-                          <YAxis type="category" dataKey="name" stroke="#93a7bb" width={140} fontSize={11} />
+                          <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
+                          <XAxis type="number" stroke={axisColor} />
+                          <YAxis type="category" dataKey="name" stroke={axisColor} width={140} fontSize={11} />
                           <Tooltip /><Legend />
                           <Bar dataKey="Óleo" fill="#0072ce" />
                         </BarChart>
                       </ResponsiveContainer>
                     </div>
                     <div style={chartBoxStyle}>
-                      <h4 style={{ marginTop: 0, color: "#fff" }}>Distribuição por tipo de unidade</h4>
+                      <h4 style={chartTitleStyle}>Distribuição por tipo de unidade</h4>
                       <ResponsiveContainer width="100%" height={240}>
                         <BarChart data={typeData}>
-                          <CartesianGrid strokeDasharray="3 3" stroke="#22384f" />
-                          <XAxis dataKey="name" stroke="#93a7bb" fontSize={11} />
-                          <YAxis stroke="#93a7bb" />
+                          <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
+                          <XAxis dataKey="name" stroke={axisColor} fontSize={11} />
+                          <YAxis stroke={axisColor} />
                           <Tooltip /><Legend />
                           <Bar dataKey="value" name="Unidades" fill="#ffcc29" />
                         </BarChart>
@@ -332,16 +338,16 @@ export default function App() {
 
                   <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
                     <div style={rankBoxStyle}>
-                      <h4 style={{ marginTop: 0, color: "#fff" }}>Top 5 produtores de óleo</h4>
-                      <ol style={{ color: "#cfe0f0", paddingLeft: 20, margin: 0 }}>
-                        {topOil.map((p) => <li key={p.id} style={{ marginBottom: 6 }}><strong style={{ color: "#fff" }}>{p.name}</strong> — {num(p.oil_bpd, " bpd")}</li>)}
+                      <h4 style={chartTitleStyle}>Top 5 produtores de óleo</h4>
+                      <ol style={rankTextStyle}>
+                        {topOil.map((p) => <li key={p.id} style={{ marginBottom: 6 }}><strong style={{ color: rankStrongColor }}>{p.name}</strong> — {num(p.oil_bpd, " bpd")}</li>)}
                         {topOil.length === 0 && <li>Nenhuma unidade com produção de óleo nos filtros atuais.</li>}
                       </ol>
                     </div>
                     <div style={rankBoxStyle}>
-                      <h4 style={{ marginTop: 0, color: "#fff" }}>Top 5 por profundidade</h4>
-                      <ol style={{ color: "#cfe0f0", paddingLeft: 20, margin: 0 }}>
-                        {topDepth.map((p) => <li key={p.id} style={{ marginBottom: 6 }}><strong style={{ color: "#fff" }}>{p.name}</strong> — {num(p.water_depth_m, " m")}</li>)}
+                      <h4 style={chartTitleStyle}>Top 5 por profundidade</h4>
+                      <ol style={rankTextStyle}>
+                        {topDepth.map((p) => <li key={p.id} style={{ marginBottom: 6 }}><strong style={{ color: rankStrongColor }}>{p.name}</strong> — {num(p.water_depth_m, " m")}</li>)}
                         {topDepth.length === 0 && <li>Nenhuma unidade com profundidade informada nos filtros atuais.</li>}
                       </ol>
                     </div>
@@ -351,15 +357,15 @@ export default function App() {
               {tab === "graficos" && (
                 <div className="charts">
                   <h3>Comparação das plataformas selecionadas ({selected.length}/10)</h3>
-                  {selected.length === 0 && <p style={{ color: "#93a7bb" }}>Selecione plataformas na lista à esquerda para ver os gráficos comparativos.</p>}
+                  {selected.length === 0 && <p style={{ color: axisColor }}>Selecione plataformas na lista à esquerda para ver os gráficos comparativos.</p>}
                   {selected.length > 0 && (
                     <>
-                      <h4 style={{ color: "#fff" }}>Produção (óleo, gás e BOE)</h4>
-                      <ResponsiveContainer width="100%" height={360}><BarChart data={chartData}><CartesianGrid strokeDasharray="3 3" stroke="#22384f" /><XAxis dataKey="name" stroke="#93a7bb" fontSize={11} /><YAxis stroke="#93a7bb" /><Tooltip /><Legend /><Bar dataKey="Óleo" fill="#008542" /><Bar dataKey="Gás" fill="#ffcc29" /><Bar dataKey="BOE" fill="#0c2340" /></BarChart></ResponsiveContainer>
+                      <h4 style={chartTitleStyle}>Produção (óleo, gás e BOE)</h4>
+                      <ResponsiveContainer width="100%" height={360}><BarChart data={chartData}><CartesianGrid strokeDasharray="3 3" stroke={gridColor} /><XAxis dataKey="name" stroke={axisColor} fontSize={11} /><YAxis stroke={axisColor} /><Tooltip /><Legend /><Bar dataKey="Óleo" fill="#008542" /><Bar dataKey="Gás" fill="#ffcc29" /><Bar dataKey="BOE" fill="#0c2340" /></BarChart></ResponsiveContainer>
 
                       <div style={{ display: "flex", gap: 16, flexWrap: "wrap", marginTop: 24 }}>
                         <div style={chartBoxStyle}>
-                          <h4 style={{ marginTop: 0, color: "#fff" }}>Status das selecionadas</h4>
+                          <h4 style={chartTitleStyle}>Status das selecionadas</h4>
                           <ResponsiveContainer width="100%" height={240}>
                             <PieChart>
                               <Pie data={selStatusData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={75} label>
@@ -370,12 +376,12 @@ export default function App() {
                           </ResponsiveContainer>
                         </div>
                         <div style={chartBoxStyle}>
-                          <h4 style={{ marginTop: 0, color: "#fff" }}>Bacias das selecionadas</h4>
+                          <h4 style={chartTitleStyle}>Bacias das selecionadas</h4>
                           <ResponsiveContainer width="100%" height={240}>
                             <BarChart data={selBasinData}>
-                              <CartesianGrid strokeDasharray="3 3" stroke="#22384f" />
-                              <XAxis dataKey="name" stroke="#93a7bb" fontSize={11} />
-                              <YAxis stroke="#93a7bb" />
+                              <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
+                              <XAxis dataKey="name" stroke={axisColor} fontSize={11} />
+                              <YAxis stroke={axisColor} />
                               <Tooltip /><Legend />
                               <Bar dataKey="value" name="Unidades" fill="#008542" />
                             </BarChart>
@@ -385,24 +391,24 @@ export default function App() {
 
                       <div style={{ display: "flex", gap: 16, flexWrap: "wrap", marginTop: 24 }}>
                         <div style={chartBoxStyle}>
-                          <h4 style={{ marginTop: 0, color: "#fff" }}>Operadores das selecionadas (óleo bpd)</h4>
+                          <h4 style={chartTitleStyle}>Operadores das selecionadas (óleo bpd)</h4>
                           <ResponsiveContainer width="100%" height={240}>
                             <BarChart data={selOperatorData} layout="vertical">
-                              <CartesianGrid strokeDasharray="3 3" stroke="#22384f" />
-                              <XAxis type="number" stroke="#93a7bb" />
-                              <YAxis type="category" dataKey="name" stroke="#93a7bb" width={140} fontSize={11} />
+                              <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
+                              <XAxis type="number" stroke={axisColor} />
+                              <YAxis type="category" dataKey="name" stroke={axisColor} width={140} fontSize={11} />
                               <Tooltip /><Legend />
                               <Bar dataKey="Óleo" fill="#0072ce" />
                             </BarChart>
                           </ResponsiveContainer>
                         </div>
                         <div style={chartBoxStyle}>
-                          <h4 style={{ marginTop: 0, color: "#fff" }}>Tipos de unidade selecionadas</h4>
+                          <h4 style={chartTitleStyle}>Tipos de unidade selecionadas</h4>
                           <ResponsiveContainer width="100%" height={240}>
                             <BarChart data={selTypeData}>
-                              <CartesianGrid strokeDasharray="3 3" stroke="#22384f" />
-                              <XAxis dataKey="name" stroke="#93a7bb" fontSize={11} />
-                              <YAxis stroke="#93a7bb" />
+                              <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
+                              <XAxis dataKey="name" stroke={axisColor} fontSize={11} />
+                              <YAxis stroke={axisColor} />
                               <Tooltip /><Legend />
                               <Bar dataKey="value" name="Unidades" fill="#ffcc29" />
                             </BarChart>
