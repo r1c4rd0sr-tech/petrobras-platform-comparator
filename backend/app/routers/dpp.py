@@ -37,29 +37,33 @@ def _decode(content: bytes) -> str:
 
 
 @lru_cache(maxsize=64)
-def _csv_de_zip(url: str) -> str:
-    """Baixa o ZIP uma vez e retorna o CSV interno como texto (cache em memória)."""
+def _csvs_de_zip(url: str) -> tuple[str, ...]:
+    """Baixa o ZIP uma vez e retorna TODOS os CSVs internos como texto (cache)."""
     with httpx.Client(timeout=60, follow_redirects=True) as client:
         resp = client.get(url)
         resp.raise_for_status()
+    textos = []
     with zipfile.ZipFile(io.BytesIO(resp.content)) as z:
-        nome_csv = next(n for n in z.namelist() if n.lower().endswith(".csv"))
-        return _decode(z.read(nome_csv))
+        for nome in z.namelist():
+            if nome.lower().endswith(".csv"):
+                textos.append(_decode(z.read(nome)))
+    return tuple(textos)
 
 
-def _agregar_por_campo(csv_texto: str, campo: str) -> dict | None:
-    leitor = csv.DictReader(io.StringIO(csv_texto))
+def _agregar_por_campo(csvs: tuple[str, ...], campo: str) -> dict | None:
     total_oleo = 0.0
     total_gas = 0.0
     periodo = None
-    for linha in leitor:
-        nome = (linha.get("Campo") or linha.get("CAMPO") or "").strip()
-        if nome.lower() != campo.strip().lower():
-            continue
-        if periodo is None:
-            periodo = (linha.get("Período") or linha.get("Periodo") or linha.get("PERÍODO") or "").strip()
-        total_oleo += _parse_float(linha.get("Óleo (bbl/dia)") or linha.get("Oleo (bbl/dia)") or "0")
-        total_gas += _parse_float(linha.get("Gás (10^6 m3/dia)") or linha.get("Gas (10^6 m3/dia)") or "0")
+    for csv_texto in csvs:
+        leitor = csv.DictReader(io.StringIO(csv_texto))
+        for linha in leitor:
+            nome = (linha.get("Campo") or linha.get("CAMPO") or "").strip()
+            if nome.lower() != campo.strip().lower():
+                continue
+            if periodo is None:
+                periodo = (linha.get("Período") or linha.get("Periodo") or linha.get("PERÍODO") or "").strip()
+            total_oleo += _parse_float(linha.get("Óleo (bbl/dia)") or linha.get("Oleo (bbl/dia)") or "0")
+            total_gas += _parse_float(linha.get("Gás (10^6 m3/dia)") or linha.get("Gas (10^6 m3/dia)") or "0")
     if periodo is None:
         return None
     return {"periodo": periodo, "campo": campo, "oleo_bpd": round(total_oleo, 2), "gas_mmd": round(total_gas, 3)}
@@ -68,27 +72,24 @@ def _agregar_por_campo(csv_texto: str, campo: str) -> dict | None:
 @router.get("/producao")
 async def producao(
     campo: str = Query(..., description="Nome do campo de produção"),
-    meses: int = Query(36, ge=1, le=36, description="Meses históricos (máx. 36)")
-    ,
+    meses: int = Query(36, ge=1, le=36, description="Meses históricos (máx. 36)"),
     ano: int | None = Query(None, description="Ano específico para teste pontual"),
     mes: int | None = Query(None, ge=1, le=12, description="Mês específico para teste pontual"),
 ):
     """Série histórica por campo a partir dos ZIPs de produção por poço da ANP.
 
-    - ano/mes informados: retorna apenas aquele mês (teste pontual)
-    - caso contrário: últimos N meses (2021-2023 mensal; <=2020 anual)
-    - 2024+: disponível apenas via CDP/ORDS (aviso)
+    Cada ZIP contém 3 CSVs (Mar, Presal, Terra) — todos são processados.
     """
     if ano and mes:
         url = _url_zip(ano, mes)
         try:
-            csv_texto = _csv_de_zip(url)
-            registro = _agregar_por_campo(csv_texto, campo)
+            csvs = _csvs_de_zip(url)
+            registro = _agregar_por_campo(csvs, campo)
             return {
                 "campo": campo,
                 "periodo": f"{ano}-{mes:02d}",
                 "dados": [registro] if registro else [],
-                "avisos": [] if registro else ["Campo não encontrado no CSV deste mês"],
+                "avisos": [] if registro else ["Campo não encontrado nos CSVs deste mês"],
             }
         except Exception as e:
             raise HTTPException(status_code=502, detail=f"Falha ao consultar ZIP {ano}-{mes:02d}: {e}")
@@ -107,8 +108,8 @@ async def producao(
             continue
         url = _url_zip(a, m)
         try:
-            csv_texto = _csv_de_zip(url)
-            registro = _agregar_por_campo(csv_texto, campo)
+            csvs = _csvs_de_zip(url)
+            registro = _agregar_por_campo(csvs, campo)
             if registro:
                 dados.append(registro)
         except Exception as e:
