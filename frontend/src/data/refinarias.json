@@ -15,7 +15,7 @@
     "longitude": -47.15,
     "notes": "Maior refinaria da Petrobras em capacidade de processamento: 69 mil m³/dia (aproximadamente 434 mil barris/dia), atendendo a 30% do território brasileiro. Localizada em Paulínia (SP). Coordenada aproximada do município.",
     "source_url": "https://petrobras.com.br/quem-somos/refino",
-    "data_version": "V1.1-refino"
+    "data_version": "V1.2-refino"
   },
   {
     "id": 2002,
@@ -33,7 +33,7 @@
     "longitude": -43.32,
     "notes": "Uma das maiores refinarias do Brasil em capacidade instalada, com 239 mil barris/dia. Responsável por 80% da produção de lubrificantes e parafinas do país. Localizada em Duque de Caxias (RJ). Coordenada aproximada do município.",
     "source_url": "https://petrobras.com.br/quem-somos/refino",
-    "data_version": "V1.1-refino"
+    "data_version": "V1.2-refino"
   },
   {
     "id": 2003,
@@ -51,7 +51,7 @@
     "longitude": -45.88,
     "notes": "Refinaria Henrique Lage, em São José dos Campos (SP), com área total de 10 milhões m². Segunda refinaria da Petrobras em volume de processamento: 40 mil m³/dia (aproximadamente 251,5 mil barris/dia). Coordenada aproximada do município.",
     "source_url": "https://petrobras.com.br/quem-somos/refino",
-    "data_version": "V1.1-refino"
+    "data_version": "V1.2-refino"
   },
   {
     "id": 2004,
@@ -69,7 +69,7 @@
     "longitude": -35.06,
     "notes": "Refinaria Abreu e Lima, em Ipojuca (PE). Capacidade atual de 230 mil barris/dia, com expansão prevista para 260 mil barris/dia até 2028 com o Trem 2. Coordenada aproximada do município.",
     "source_url": "https://petrobras.com.br/quem-somos/refino",
-    "data_version": "V1.1-refino"
+    "data_version": "V1.2-refino"
   },
   {
     "id": 2005,
@@ -87,7 +87,7 @@
     "longitude": -44.2,
     "notes": "Refinaria Gabriel Passos, em Betim (MG). Capacidade de processamento de 26 mil m³/dia (aproximadamente 163,5 mil barris/dia), com estudos para elevar a até 40 mil m³/dia. Coordenada aproximada do município.",
     "source_url": "https://petrobras.com.br/quem-somos/refino",
-    "data_version": "V1.1-refino"
+    "data_version": "V1.2-refino"
   },
   {
     "id": 2006,
@@ -105,7 +105,7 @@
     "longitude": -49.41,
     "notes": "Refinaria Presidente Getúlio Vargas, em Araucária (PR), quinta maior refinaria do Brasil, responsável por aproximadamente 12% da produção nacional de derivados de petróleo. Capacidade de 33 mil m³/dia (207.563 barris/dia). Coordenada aproximada do município.",
     "source_url": "https://petrobras.com.br/en/quem-somos/refinaria-presidente-getulio-vargas",
-    "data_version": "V1.1-refino"
+    "data_version": "V1.2-refino"
   },
   {
     "id": 2007,
@@ -123,7 +123,7 @@
     "longitude": -51.18,
     "notes": "Refinaria Alberto Pasqualini, em Canoas (RS), com área de 580 hectares. Processa 32 mil m³/dia (aproximadamente 201 mil barris/dia), com foco na produção de óleo diesel para o mercado regional. Coordenada aproximada do município.",
     "source_url": "https://petrobras.com.br/quem-somos/refino",
-    "data_version": "V1.1-refino"
+    "data_version": "V1.2-refino"
   },
   {
     "id": 2008,
@@ -135,13 +135,13 @@
     "operator": "Petrobras",
     "status": "operational",
     "year": 1955,
-    "oil_bpd": null,
+    "oil_bpd": 178000.0,
     "gas_mmd": null,
     "latitude": -23.89,
     "longitude": -46.42,
-    "notes": "Refinaria Presidente Bernardes, em Cubatão (SP), unidade com alta capacidade de conversão. Capacidade de processamento a ser complementada. Coordenada aproximada do município.",
-    "source_url": "https://petrobras.com.br/quem-somos/refino",
-    "data_version": "V1.1-refino"
+    "notes": "Refinaria Presidente Bernardes, em Cubatão (SP), unidade com alta capacidade de conversão. Capacidade instalada de 178 mil barris/dia (28.300 m³/dia), responsável por 11% da produção de derivados da Petrobras. Coordenada aproximada do município.",
+    "source_url": "https://petrobras.com.br/quem-somos/refinaria-presidente-bernardes",
+    "data_version": "V1.2-refino"
   },
   {
     "id": 2009,
@@ -153,13 +153,13 @@
     "operator": "Petrobras",
     "status": "operational",
     "year": 1954,
-    "oil_bpd": null,
+    "oil_bpd": 62500.0,
     "gas_mmd": null,
     "latitude": -23.67,
     "longitude": -46.46,
-    "notes": "Refinaria de Capuava, em Mauá (SP). Capacidade de processamento a ser complementada. Coordenada aproximada do município.",
-    "source_url": "https://petrobras.com.br/quem-somos/refino",
-    "data_version": "V1.1-refino"
+    "notes": "Refinaria de Capuava, em Mauá (SP). Capacidade de processamento de 10.000 m³/dia (aproximadamente 62,5 mil barris/dia). Coordenada aproximada do município.",
+    "source_url": "https://petrobras.com.br/quem-somos/refinaria-capuava",
+    "data_version": "V1.2-refino"
   },
   {
     "id": 2010,
@@ -171,13 +171,13 @@
     "operator": "Petrobras",
     "status": "operational",
     "year": 1949,
-    "oil_bpd": null,
+    "oil_bpd": 333000.0,
     "gas_mmd": null,
     "latitude": -12.74,
     "longitude": -38.68,
-    "notes": "Refinaria Landulpho Alves, em São Francisco do Conde (BA). Capacidade de processamento a ser complementada. Coordenada aproximada do município.",
+    "notes": "Refinaria Landulpho Alves (Mataripe), em São Francisco do Conde (BA), primeira refinaria do Brasil. Capacidade de produção de 333 mil barris/dia. Coordenada aproximada do município.",
     "source_url": "https://petrobras.com.br/quem-somos/refino",
-    "data_version": "V1.1-refino"
+    "data_version": "V1.2-refino"
   },
   {
     "id": 2011,
@@ -195,7 +195,7 @@
     "longitude": -38.51,
     "notes": "Unidade de lubrificantes e derivados de petróleo do Nordeste, em Fortaleza (CE). Capacidade instalada de 8 mil barris/dia (1.300 m³/dia), com foco em asfaltos e óleos lubrificantes. Coordenada aproximada do município.",
     "source_url": "https://petrobras.com.br/quem-somos/refinarinaria-lubrificantes-derivados-nordeste",
-    "data_version": "V1.1-refino"
+    "data_version": "V1.2-refino"
   },
   {
     "id": 2012,
@@ -207,13 +207,13 @@
     "operator": "Petrobras",
     "status": "operational",
     "year": 1956,
-    "oil_bpd": null,
+    "oil_bpd": 46000.0,
     "gas_mmd": null,
     "latitude": -3.1,
     "longitude": -60.02,
-    "notes": "Refinaria Isaac Sabbá, em Manaus (AM). Capacidade de processamento a ser complementada. Coordenada aproximada do município.",
+    "notes": "Refinaria Isaac Sabbá, em Manaus (AM). Capacidade de processamento de 46 mil barris/dia, atendendo principalmente à região Norte. Coordenada aproximada do município.",
     "source_url": "https://petrobras.com.br/quem-somos/refino",
-    "data_version": "V1.1-refino"
+    "data_version": "V1.2-refino"
   },
   {
     "id": 2013,
@@ -231,7 +231,7 @@
     "longitude": -45.4,
     "notes": "Maior unidade operacional da Transpetro em movimentação de produtos. Recebe petróleo nacional e importado por navio-petroleiro e abastece as quatro refinarias do estado de São Paulo: Replan, Revap, Recap e RPBC. Coordenada aproximada do município.",
     "source_url": "https://transpetro.com.br/transpetro-institucional/nossas-atividades/dutos-e-terminais/terminais-aquaviarios/sao-sebastiao-sp.htm",
-    "data_version": "V1.1-refino"
+    "data_version": "V1.2-refino"
   },
   {
     "id": 2013,
@@ -249,7 +249,7 @@
     "longitude": -46.33,
     "notes": "Terminal aquaviário em Santos (SP), que regula o estoque de derivados, transfere e recebe de navios, abastece de bunker os navios no Porto de Santos e conecta-se à RPBC e ao Terminal Terrestre de Cubatão. Coordenada aproximada do município.",
     "source_url": "https://transpetro.com.br/transpetro-institucional/nossas-atividades/dutos-e-terminais/terminais-aquaviarios/santos-sp.htm",
-    "data_version": "V1.1-refino"
+    "data_version": "V1.2-refino"
   },
   {
     "id": 2014,
@@ -267,7 +267,7 @@
     "longitude": -43.15,
     "notes": "Terminal aquaviário da Baía de Guanabara (TABG), na Ilha do Governador, Rio de Janeiro (RJ). Coordenada aproximada.",
     "source_url": "https://transpetro.com.br/transpetro-institucional/nossas-atividades/dutos-e-terminais/terminais-aquaviarios/ilha-d-agua-rj.htm",
-    "data_version": "V1.1-refino"
+    "data_version": "V1.2-refino"
   },
   {
     "id": 2015,
@@ -285,7 +285,7 @@
     "longitude": -43.32,
     "notes": "Terminal terrestre em Campos Elíseos, Duque de Caxias (RJ). Coordenada aproximada do município.",
     "source_url": "https://transpetro.com.br/transpetro-institucional/nossas-atividades/dutos-e-terminais/terminais-terrestres/campos-eliseos-rj.htm",
-    "data_version": "V1.1-refino"
+    "data_version": "V1.2-refino"
   },
   {
     "id": 2016,
@@ -303,7 +303,7 @@
     "longitude": -44.03,
     "notes": "Terminal terrestre em Volta Redonda (RJ), que recebe óleo combustível por caminhões-tanque e realiza o bombeamento para a CSN. Coordenada aproximada do município.",
     "source_url": "https://transpetro.com.br/transpetro-institucional/nossas-atividades/dutos-e-terminais/terminais-terrestres/volta-redonda-rj.htm",
-    "data_version": "V1.1-refino"
+    "data_version": "V1.2-refino"
   },
   {
     "id": 2017,
@@ -321,7 +321,7 @@
     "longitude": -41.7,
     "notes": "Estação de compressão de gás natural na malha TBG, em Cabiúnas, região de Macaé (RJ). Coordenada aproximada.",
     "source_url": "https://petrobras.com.br/quem-somos/gas",
-    "data_version": "V1.1-refino"
+    "data_version": "V1.2-refino"
   },
   {
     "id": 2018,
@@ -339,7 +339,7 @@
     "longitude": -47.15,
     "notes": "Estação de compressão de gás natural na malha TBG, em Paulínia (SP). Coordenada aproximada do município.",
     "source_url": "https://petrobras.com.br/quem-somos/gas",
-    "data_version": "V1.1-refino"
+    "data_version": "V1.2-refino"
   },
   {
     "id": 2019,
@@ -357,6 +357,6 @@
     "longitude": -49.41,
     "notes": "Estação de compressão de gás natural na malha TBG, em Araucária (PR). Coordenada aproximada do município.",
     "source_url": "https://petrobras.com.br/quem-somos/gas",
-    "data_version": "V1.1-refino"
+    "data_version": "V1.2-refino"
   }
 ]
