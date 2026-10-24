@@ -1,9 +1,9 @@
+import asyncio
 import csv
 import io
 import unicodedata
 import zipfile
 from datetime import date
-from functools import lru_cache
 
 import httpx
 from fastapi import APIRouter, HTTPException, Query
@@ -20,9 +20,11 @@ JANELA_FIM_MES = 10
 JANELA_INICIO_ANO = 2021
 JANELA_INICIO_MES = 1
 
+# Cache em memória: URL do ZIP -> tupla de textos CSV
+_cache_zip: dict[str, tuple[str, ...]] = {}
+
 
 def _normalizar(texto: str) -> str:
-    """Remove acentos, lowercase e trim — para matching tolerante."""
     sem_acento = unicodedata.normalize("NFD", texto)
     sem_acento = "".join(c for c in sem_acento if unicodedata.category(c) != "Mn")
     return sem_acento.strip().casefold()
@@ -55,16 +57,17 @@ def _dict_reader(texto: str):
     return csv.DictReader(io.StringIO(texto), delimiter=delim)
 
 
-@lru_cache(maxsize=64)
-def _csvs_de_zip(url: str) -> tuple[str, ...]:
-    with httpx.Client(timeout=60, follow_redirects=True) as client:
-        resp = client.get(url)
-        resp.raise_for_status()
+async def _csvs_de_zip(client: httpx.AsyncClient, url: str) -> tuple[str, ...]:
+    if url in _cache_zip:
+        return _cache_zip[url]
+    resp = await client.get(url)
+    resp.raise_for_status()
     textos = []
     with zipfile.ZipFile(io.BytesIO(resp.content)) as z:
         for nome in z.namelist():
             if nome.lower().endswith(".csv"):
                 textos.append(_decode(z.read(nome)))
+    _cache_zip[url] = tuple(textos)
     return tuple(textos)
 
 
@@ -80,7 +83,6 @@ def _agregar_por_campo(csvs: tuple[str, ...], campo: str) -> dict | None:
             if not nome:
                 continue
             nome_norm = _normalizar(nome)
-            # Match exato normalizado OU contenção (ex.: "Buzios" encontra "Búzios")
             if nome_norm != alvo and alvo not in nome_norm and nome_norm not in alvo:
                 continue
             if periodo is None:
@@ -113,11 +115,12 @@ async def producao(
     ano: int | None = Query(None, description="Ano específico para teste pontual"),
     mes: int | None = Query(None, ge=1, le=12, description="Mês específico para teste pontual"),
 ):
-    """Série histórica por campo — matching tolerante a acentos e variações de nome."""
+    """Série histórica por campo — downloads paralelos dos ZIPs da ANP."""
     if ano and mes:
         url = _url_zip(ano, mes)
         try:
-            csvs = _csvs_de_zip(url)
+            async with httpx.AsyncClient(timeout=60, follow_redirects=True) as client:
+                csvs = await _csvs_de_zip(client, url)
             registro = _agregar_por_campo(csvs, campo)
             return {
                 "campo": campo,
@@ -128,17 +131,20 @@ async def producao(
         except Exception as e:
             raise HTTPException(status_code=502, detail=f"Falha ao consultar ZIP {ano}-{mes:02d}: {e}")
 
+    janela = _janela(meses)
     dados = []
     avisos = []
-    for a, m in _janela(meses):
-        url = _url_zip(a, m)
-        try:
-            csvs = _csvs_de_zip(url)
-            registro = _agregar_por_campo(csvs, campo)
-            if registro:
-                dados.append(registro)
-        except Exception as e:
-            avisos.append(f"{a}-{m:02d}: {e}")
+    async with httpx.AsyncClient(timeout=60, follow_redirects=True) as client:
+        tarefas = [_csvs_de_zip(client, _url_zip(a, m)) for a, m in janela]
+        resultados = await asyncio.gather(*tarefas, return_exceptions=True)
+
+    for (a, m), res in zip(janela, resultados):
+        if isinstance(res, Exception):
+            avisos.append(f"{a}-{m:02d}: {res}")
+            continue
+        registro = _agregar_por_campo(res, campo)
+        if registro:
+            dados.append(registro)
 
     dados.sort(key=lambda r: r["periodo"])
     return {"campo": campo, "meses": meses, "dados": dados, "avisos": avisos}
@@ -148,7 +154,8 @@ async def producao(
 async def debug(ano: int = Query(...), mes: int = Query(..., ge=1, le=12)):
     url = _url_zip(ano, mes)
     try:
-        csvs = _csvs_de_zip(url)
+        async with httpx.AsyncClient(timeout=60, follow_redirects=True) as client:
+            csvs = await _csvs_de_zip(client, url)
     except Exception as e:
         raise HTTPException(status_code=502, detail=f"Falha ao consultar ZIP: {e}")
     amostras = []
