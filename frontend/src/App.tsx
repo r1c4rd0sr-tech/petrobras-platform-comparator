@@ -9,6 +9,7 @@ import onshoreData from "./data/onshore.json";
 import refinariasData from "./data/refinarias.json";
 import terminaisArmazenamentoData from "./data/terminais-armazenamento.json";
 import utgnsGasData from "./data/utgns-gas.json";
+import ecompsGasbolData from "./data/ecomps-gasbol.json";
 
 const STATUS_LABEL: Record<string, string> = {
   operational: "Operacional",
@@ -106,7 +107,8 @@ export default function App() {
   const refinariasUnits = refinariasData as unknown as Platform[];
   const terminaisArmazenamentoUnits = terminaisArmazenamentoData as unknown as Platform[];
   const utgnsGasUnits = utgnsGasData as unknown as Platform[];
-  const activeUnits = modality === "maritimas" ? platforms : modality === "terrestres" ? onshoreUnits : [...refinariasUnits, ...terminaisArmazenamentoUnits, ...utgnsGasUnits];
+  const ecompsGasbolUnits = ecompsGasbolData as unknown as Platform[];
+  const activeUnits = modality === "maritimas" ? platforms : modality === "terrestres" ? onshoreUnits : [...refinariasUnits, ...terminaisArmazenamentoUnits, ...utgnsGasUnits, ...ecompsGasbolUnits];
   const isOnshore = modality === "terrestres";
   const isOffshore = modality === "maritimas";
   const isRefino = modality === "refinarias";
