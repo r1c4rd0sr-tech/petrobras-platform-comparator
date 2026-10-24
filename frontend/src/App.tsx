@@ -155,6 +155,18 @@ export default function App() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // Restaura seleção e modalidade a partir da URL (compartilhamento)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const mod = params.get("mod");
+    const sel = params.get("sel");
+    if (mod && ["maritimas", "terrestres", "refinarias"].includes(mod)) setModality(mod as Modality);
+    if (sel) {
+      const ids = sel.split(",").map(Number).filter((n) => !Number.isNaN(n));
+      setSelectedIds(ids);
+    }
+  }, []);
+
   useEffect(() => {
     fetchPlatforms()
       .then((data) => {
@@ -163,7 +175,6 @@ export default function App() {
           basin: normalizeBasin(p.basin),
           accommodation: POB_OVERRIDES[p.slug] ?? p.accommodation 
         })));
-        setSelectedIds([]);
       })
       .catch(() => setError("Não foi possível carregar os dados da API. Recarregue em alguns instantes."))
       .finally(() => setLoading(false));
@@ -286,6 +297,50 @@ export default function App() {
   const resetFilters = () => setFilters({ search: "", status: "", unit_type: "", basin: "", field: "", operator: "", state: "", municipality: "", oil: "", gas: "", year: "", accommodation: "", wells: "", storage: "", sort: "oil" });
   const pinColor = (id: number) => PIN_COLORS[selected.findIndex((s) => s.id === id) % PIN_COLORS.length];
 
+  // Exporta o comparativo em CSV (compatível com Excel PT-BR)
+  const exportCSV = () => {
+    if (selected.length === 0) { window.alert("Selecione pelo menos uma unidade para exportar."); return; }
+    const headers = ["Unidade", "Status", "Tipo", ...(isRefino ? ["Estado", "Município"] : ["Bacia", "Campo"]), "Operador", "Óleo (bpd)", "Gás (MMm³/d)", "BOE/d", "Ano", ...(isOffshore ? ["Acomodação", "Armazenamento (m³)", "Comprimento (m)", "Peso (t)", "Distância costa (km)"] : []), ...(isOnshore ? ["Poços produtivos"] : []), ...(isRefino ? ["Armazenamento (m³)"] : [])];
+    const rows = selected.map((p) => [
+      p.name,
+      STATUS_LABEL[p.status] ?? p.status,
+      p.unit_type ?? "",
+      ...(isRefino ? [(p as any).state ?? "", (p as any).municipality ?? ""] : [p.basin ?? "", p.field ?? ""]),
+      p.operator ?? "",
+      p.oil_bpd ?? "",
+      p.gas_mmd ?? "",
+      p.boed ?? "",
+      p.year ?? "",
+      ...(isOffshore ? [p.accommodation ?? "", p.storage_m3 ?? "", p.length_m ?? "", p.weight_t ?? "", p.distance_to_coast_km ?? ""] : []),
+      ...(isOnshore ? [(p as any).wells_productive ?? ""] : []),
+      ...(isRefino ? [p.storage_m3 ?? ""] : []),
+    ]);
+    const csv = [headers, ...rows].map((r) => r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(";")).join("\n");
+    const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `comparativo_unidades_${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  // Copia link com a seleção embutida na URL
+  const shareUrl = () => {
+    const params = new URLSearchParams();
+    if (selectedIds.length) params.set("sel", selectedIds.join(","));
+    if (modality !== "maritimas") params.set("mod", modality);
+    const qs = params.toString();
+    const url = `${window.location.origin}${window.location.pathname}${qs ? "?" + qs : ""}`;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(url).then(() => window.alert("Link copiado para a área de transferência!")).catch(() => window.prompt("Copie o link abaixo:", url));
+    } else {
+      window.prompt("Copie o link abaixo:", url);
+    }
+  };
+
   const isDark = theme === "dark";
   const kpiStyle: React.CSSProperties = { background: "linear-gradient(135deg,#0c2340 0%,#123a5c 100%)", borderRadius: 12, padding: "14px 18px", color: "#fff", minWidth: 150, flex: 1 };
   const kpiLabel: React.CSSProperties = { fontSize: 12, opacity: 0.75, display: "block", marginBottom: 4 };
@@ -298,6 +353,7 @@ export default function App() {
   const rankTextStyle: React.CSSProperties = { color: isDark ? "#cfe0f0" : "#1c2b3a", paddingLeft: 20, margin: 0 };
   const rankStrongColor = isDark ? "#fff" : "#0c2340";
   const chartRowStyle: React.CSSProperties = { display: "flex", gap: 16, flexWrap: "wrap", marginBottom: 24, flexDirection: isMobile ? "column" : "row" };
+  const actionBtnStyle: React.CSSProperties = { padding: "8px 14px", borderRadius: 8, border: "1px solid #2a4a6b", background: isDark ? "#123a5c" : "#e8eef4", color: isDark ? "#fff" : "#0c2340", fontSize: 13, cursor: "pointer", transition: "all .2s" };
 
   return (
     <div className="app">
@@ -391,9 +447,11 @@ export default function App() {
             <section className="panel">
               <div className="panel-head">
                 <h2>{isOnshore ? "Campos e Unidades" : isRefino ? "Refinarias, Terminais, Gás e Compressão" : "Plataformas"} ({filtered.length})</h2>
-                <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
                   <span className="pill">Selecionadas: {selected.length}/10</span>
                   <button className="clear-btn" onClick={() => setSelectedIds([])}>Limpar seleção</button>
+                  <button style={actionBtnStyle} onClick={shareUrl} title="Copia um link que restaura esta seleção ao abrir">🔗 Copiar link</button>
+                  <button style={actionBtnStyle} onClick={exportCSV} title="Baixa o comparativo das unidades selecionadas em CSV">⬇️ Exportar CSV</button>
                 </div>
               </div>
               <div className="panel-body list">
