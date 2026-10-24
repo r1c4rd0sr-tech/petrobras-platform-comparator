@@ -22,6 +22,30 @@ const PIN_COLORS = ["#008542", "#ffcc29", "#0c2340", "#e30613", "#0072ce", "#7a2
 const STATUS_COLORS = ["#008542", "#ffcc29", "#e30613", "#0072ce", "#f28c28", "#7a28a0", "#00a878", "#c2185b"];
 const MAX_SELECTED = 10;
 
+const TOOLTIP_UNIT_MAP: Record<string, string> = {
+  "Óleo": " bpd",
+  "Gás": " MMm³/d",
+  "BOE": " /d",
+  "Poços": "",
+  "Armazenamento": " m³",
+  "Campos": "",
+};
+
+const CustomTooltip = ({ active, payload, label }: any) => {
+  if (!active || !payload || !payload.length) return null;
+  return (
+    <div style={{ background: "#0c2340", border: "1px solid #2a4a6b", borderRadius: 8, padding: "10px 14px", boxShadow: "0 4px 14px rgba(0,0,0,.35)", maxWidth: 260 }}>
+      <p style={{ margin: "0 0 8px", fontWeight: 700, fontSize: 13, color: "#ffffff", lineHeight: 1.3 }}>{label}</p>
+      {payload.map((entry: any, i: number) => (
+        <p key={i} style={{ margin: "4px 0", fontSize: 12, color: "#ffffff", display: "flex", alignItems: "center", gap: 6 }}>
+          <span style={{ width: 10, height: 10, borderRadius: 2, background: entry.color || entry.fill, display: "inline-block", flexShrink: 0 }}></span>
+          <span style={{ color: "#ffffff" }}>{entry.name}: <strong style={{ color: "#ffcc29" }}>{Number(entry.value).toLocaleString("pt-BR")}{TOOLTIP_UNIT_MAP[entry.name] ?? ""}</strong></span>
+        </p>
+      ))}
+    </div>
+  );
+};
+
 type Modality = "maritimas" | "terrestres" | "refinarias";
 
 const MODALITY_OPTIONS: [Modality, string][] = [
@@ -489,7 +513,7 @@ export default function App() {
                             <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
                             <XAxis dataKey="name" stroke={axisColor} fontSize={11} />
                             <YAxis stroke={axisColor} />
-                            <Tooltip /><Legend />
+                            <Tooltip content={<CustomTooltip />} /><Legend />
                             <Bar dataKey="count" name="Campos" fill="#008542" />
                             <Bar dataKey="wells" name="Poços" fill="#ffcc29" />
                           </BarChart>
@@ -519,7 +543,7 @@ export default function App() {
                           <Pie data={statusData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={75} label>
                             {statusData.map((_, i) => <Cell key={i} fill={STATUS_COLORS[i % STATUS_COLORS.length]} />)}
                           </Pie>
-                          <Tooltip /><Legend />
+                          <Tooltip content={<CustomTooltip />} /><Legend />
                         </PieChart>
                       </ResponsiveContainer>
                     </div>
@@ -530,7 +554,7 @@ export default function App() {
                           <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
                           <XAxis dataKey="name" stroke={axisColor} fontSize={11} />
                           <YAxis stroke={axisColor} />
-                          <Tooltip /><Legend />
+                          <Tooltip content={<CustomTooltip />} /><Legend />
                           <Bar dataKey="Unidades" fill="#008542" />
                         </BarChart>
                       </ResponsiveContainer>
@@ -545,7 +569,7 @@ export default function App() {
                           <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
                           <XAxis type="number" stroke={axisColor} />
                           <YAxis type="category" dataKey="name" stroke={axisColor} width={140} fontSize={11} />
-                          <Tooltip /><Legend />
+                          <Tooltip content={<CustomTooltip />} /><Legend />
                           <Bar dataKey="Óleo" fill="#0072ce" />
                         </BarChart>
                       </ResponsiveContainer>
@@ -557,7 +581,7 @@ export default function App() {
                           <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
                           <XAxis dataKey="name" stroke={axisColor} fontSize={11} />
                           <YAxis stroke={axisColor} />
-                          <Tooltip /><Legend />
+                          <Tooltip content={<CustomTooltip />} /><Legend />
                           <Bar dataKey="value" name="Unidades" fill="#ffcc29" />
                         </BarChart>
                       </ResponsiveContainer>
@@ -610,7 +634,7 @@ export default function App() {
                               <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
                               <XAxis dataKey="name" stroke={axisColor} fontSize={11} interval={0} angle={-35} textAnchor="end" height={100} />
                               <YAxis stroke={axisColor} />
-                              <Tooltip /><Legend />
+                              <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(255,255,255,0.06)" }} /><Legend />
                               <Bar dataKey="Óleo" fill="#008542" />
                               {!isRefino && <Bar dataKey="BOE" fill="#ffcc29" />}
                             </BarChart>
@@ -624,7 +648,7 @@ export default function App() {
                                 <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
                                 <XAxis dataKey="name" stroke={axisColor} fontSize={11} interval={0} angle={-35} textAnchor="end" height={100} />
                                 <YAxis stroke={axisColor} />
-                                <Tooltip /><Legend />
+                                <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(255,255,255,0.06)" }} /><Legend />
                                 <Bar dataKey="Gás" fill="#f28c28" />
                               </BarChart>
                             </ResponsiveContainer>
@@ -637,7 +661,7 @@ export default function App() {
                                 <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
                                 <XAxis dataKey="name" stroke={axisColor} fontSize={11} interval={0} angle={-35} textAnchor="end" height={100} />
                                 <YAxis stroke={axisColor} />
-                                <Tooltip /><Legend />
+                                <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(255,255,255,0.06)" }} /><Legend />
                                 <Bar dataKey="Gás" fill="#f28c28" />
                               </BarChart>
                             </ResponsiveContainer>
@@ -653,7 +677,7 @@ export default function App() {
                                 <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
                                 <XAxis dataKey="name" stroke={axisColor} fontSize={11} interval={0} angle={-35} textAnchor="end" height={100} />
                                 <YAxis stroke={axisColor} />
-                                <Tooltip /><Legend />
+                                <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(255,255,255,0.06)" }} /><Legend />
                                 <Bar dataKey="Armazenamento" fill="#0072ce" />
                               </BarChart>
                             </ResponsiveContainer>
@@ -669,7 +693,7 @@ export default function App() {
                                 <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
                                 <XAxis dataKey="name" stroke={axisColor} fontSize={11} interval={0} angle={-35} textAnchor="end" height={100} />
                                 <YAxis stroke={axisColor} />
-                                <Tooltip /><Legend />
+                                <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(255,255,255,0.06)" }} /><Legend />
                                 <Bar dataKey="Poços" fill="#0072ce" />
                               </BarChart>
                             </ResponsiveContainer>
