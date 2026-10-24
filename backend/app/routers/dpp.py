@@ -68,33 +68,51 @@ def _agregar_por_campo(csv_texto: str, campo: str) -> dict | None:
 @router.get("/producao")
 async def producao(
     campo: str = Query(..., description="Nome do campo de produção"),
-    meses: int = Query(36, ge=1, le=36, description="Meses históricos (máx. 36 — 2021 a 2023)")
+    meses: int = Query(36, ge=1, le=36, description="Meses históricos (máx. 36)")
+    ,
+    ano: int | None = Query(None, description="Ano específico para teste pontual"),
+    mes: int | None = Query(None, ge=1, le=12, description="Mês específico para teste pontual"),
 ):
-    """Série histórica mensal por campo, a partir dos ZIPs de produção por poço da ANP.
+    """Série histórica por campo a partir dos ZIPs de produção por poço da ANP.
 
-    Cobertura: 2021-01 a 2023-12 (mensal). Anos <= 2020 usam ZIP anual.
-    Meses de 2024 em diante dependem do CDP/ORDS e entram como aviso.
+    - ano/mes informados: retorna apenas aquele mês (teste pontual)
+    - caso contrário: últimos N meses (2021-2023 mensal; <=2020 anual)
+    - 2024+: disponível apenas via CDP/ORDS (aviso)
     """
+    if ano and mes:
+        url = _url_zip(ano, mes)
+        try:
+            csv_texto = _csv_de_zip(url)
+            registro = _agregar_por_campo(csv_texto, campo)
+            return {
+                "campo": campo,
+                "periodo": f"{ano}-{mes:02d}",
+                "dados": [registro] if registro else [],
+                "avisos": [] if registro else ["Campo não encontrado no CSV deste mês"],
+            }
+        except Exception as e:
+            raise HTTPException(status_code=502, detail=f"Falha ao consultar ZIP {ano}-{mes:02d}: {e}")
+
     hoje = date.today()
     dados = []
     avisos = []
     for i in range(meses):
-        ano = hoje.year
-        mes = hoje.month - i
-        while mes <= 0:
-            mes += 12
-            ano -= 1
-        if ano >= 2024:
-            avisos.append(f"{ano}-{mes:02d}: disponível apenas via CDP/ORDS (integração futura)")
+        a = hoje.year
+        m = hoje.month - i
+        while m <= 0:
+            m += 12
+            a -= 1
+        if a >= 2024:
+            avisos.append(f"{a}-{m:02d}: disponível apenas via CDP/ORDS (integração futura)")
             continue
-        url = _url_zip(ano, mes)
+        url = _url_zip(a, m)
         try:
             csv_texto = _csv_de_zip(url)
             registro = _agregar_por_campo(csv_texto, campo)
             if registro:
                 dados.append(registro)
         except Exception as e:
-            avisos.append(f"{ano}-{mes:02d}: {e}")
+            avisos.append(f"{a}-{m:02d}: {e}")
 
     dados.sort(key=lambda r: r["periodo"])
     return {"campo": campo, "meses": meses, "dados": dados, "avisos": avisos}
