@@ -95,6 +95,7 @@ export default function App() {
 
   const onshoreUnits = onshoreData as unknown as Platform[];
   const activeUnits = modality === "maritimas" ? platforms : modality === "terrestres" ? onshoreUnits : [];
+  const isOnshore = modality === "terrestres";
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
@@ -141,7 +142,7 @@ export default function App() {
 
   const selected = useMemo(() => activeUnits.filter((p) => selectedIds.includes(p.id)), [activeUnits, selectedIds]);
   const chartData = selected.map((p) => ({ name: p.name, Óleo: p.oil_bpd ?? 0, Gás: p.gas_mmd ?? 0, BOE: p.boed ?? 0 }));
-  const totals = filtered.reduce((acc, p) => ({ oil: acc.oil + (p.oil_bpd ?? 0), gas: acc.gas + (p.gas_mmd ?? 0), boe: acc.boe + (p.boed ?? 0) }), { oil: 0, gas: 0, boe: 0 });
+  const totals = filtered.reduce((acc, p) => ({ oil: acc.oil + (p.oil_bpd ?? 0), gas: acc.gas + (p.gas_mmd ?? 0), boe: acc.boe + (p.boed ?? 0), wells: acc.wells + ((p as any).wells_productive ?? 0) }), { oil: 0, gas: 0, boe: 0, wells: 0 });
 
   const withDepth = filtered.filter((p) => p.water_depth_m != null);
   const avgDepth = withDepth.length ? withDepth.reduce((s, p) => s + (p.water_depth_m ?? 0), 0) / withDepth.length : 0;
@@ -170,6 +171,20 @@ export default function App() {
     const map: Record<string, number> = {};
     filtered.forEach((p) => { const k = p.unit_type || "Não informado"; map[k] = (map[k] ?? 0) + 1; });
     return Object.entries(map).map(([name, value]) => ({ name, value })).sort((a, b) => b.value - a.value);
+  }, [filtered]);
+
+  const poloData = useMemo(() => {
+    const map: Record<string, { count: number; oil: number; gas: number; boe: number; wells: number }> = {};
+    filtered.forEach((p) => {
+      const k = (p as any).polo || p.name;
+      if (!map[k]) map[k] = { count: 0, oil: 0, gas: 0, boe: 0, wells: 0 };
+      map[k].count++;
+      map[k].oil += p.oil_bpd ?? 0;
+      map[k].gas += p.gas_mmd ?? 0;
+      map[k].boe += p.boed ?? 0;
+      map[k].wells += (p as any).wells_productive ?? 0;
+    });
+    return Object.entries(map).map(([name, v]) => ({ name, ...v }));
   }, [filtered]);
 
   const selStatusData = useMemo(() => {
@@ -257,7 +272,7 @@ export default function App() {
         <div><label>Óleo mín. (bpd)</label><input type="number" value={filters.oil} onChange={(e) => set("oil", e.target.value)} /></div>
         <div><label>Gás mín. (MMm³/d)</label><input type="number" value={filters.gas} onChange={(e) => set("gas", e.target.value)} /></div>
         <div><label>Ano mín.</label><input type="number" value={filters.year} onChange={(e) => set("year", e.target.value)} /></div>
-        <div><label>Acomodação mín.</label><input type="number" value={filters.accommodation} onChange={(e) => set("accommodation", e.target.value)} /></div>
+        {!isOnshore && <div><label>Acomodação mín.</label><input type="number" value={filters.accommodation} onChange={(e) => set("accommodation", e.target.value)} /></div>}
         <div><label>Ordenar por</label><select value={filters.sort} onChange={(e) => set("sort", e.target.value)}><option value="oil">Óleo</option><option value="gas">Gás</option><option value="boed">BOE/d</option><option value="storage_m3">Armazenamento</option><option value="length_m">Comprimento</option><option value="weight_t">Peso</option><option value="distance_to_coast_km">Distância costa</option><option value="year">Ano</option><option value="name">Nome</option></select></div>
         <button onClick={() => setFilters({ search: "", status: "", unit_type: "", basin: "", field: "", operator: "", oil: "", gas: "", year: "", accommodation: "", sort: "oil" })}>Limpar filtros</button>
       </section>
@@ -274,7 +289,7 @@ export default function App() {
           <div className="layout">
             <section className="panel">
               <div className="panel-head">
-                <h2>Unidades ({filtered.length})</h2>
+                <h2>{isOnshore ? "Campos e Unidades" : "Plataformas"} ({filtered.length})</h2>
                 <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
                   <span className="pill">Selecionadas: {selected.length}/10</span>
                   <button className="clear-btn" onClick={() => setSelectedIds([])}>Limpar seleção</button>
@@ -287,17 +302,24 @@ export default function App() {
                     <div className="meta">
                       <span>Tipo: {p.unit_type || "—"}</span><span>Bacia: {p.basin || "—"}</span>
                       <span>Campo: {p.field || "—"}</span><span>Operador: {p.operator || "—"}</span>
-                      <span>Ano: {p.year || "—"}</span><span>Costa: {num(p.distance_to_coast_km, " km")}</span>
+                      <span>Ano: {p.year || "—"}</span>
+                      {!isOnshore && <span>Costa: {num(p.distance_to_coast_km, " km")}</span>}
                       <span>Lat: {p.latitude ?? "—"}</span><span>Lon: {p.longitude ?? "—"}</span>
                     </div>
                     <div className="metrics">
                       <span className="metric">Óleo<b>{num(p.oil_bpd, " bpd")}</b></span>
                       <span className="metric">Gás<b>{num(p.gas_mmd, " MMm³/d")}</b></span>
                       <span className="metric">BOE<b>{num(p.boed, "/d")}</b></span>
-                      <span className="metric">Acomodação<b>{num(p.accommodation)}</b></span>
-                      <span className="metric">Armazenamento<b>{num(p.storage_m3, " m³")}</b></span>
-                      <span className="metric">Comprimento<b>{num(p.length_m, " m")}</b></span>
-                      <span className="metric">Peso<b>{num(p.weight_t, " t")}</b></span>
+                      {isOnshore ? (
+                        <span className="metric">Poços<b>{num((p as any).wells_productive)}</b></span>
+                      ) : (
+                        <>
+                          <span className="metric">Acomodação<b>{num(p.accommodation)}</b></span>
+                          <span className="metric">Armazenamento<b>{num(p.storage_m3, " m³")}</b></span>
+                          <span className="metric">Comprimento<b>{num(p.length_m, " m")}</b></span>
+                          <span className="metric">Peso<b>{num(p.weight_t, " t")}</b></span>
+                        </>
+                      )}
                     </div>
                     <button className={`select-btn ${selectedIds.includes(p.id) ? "active" : ""}`} onClick={() => toggle(p.id)}>{selectedIds.includes(p.id) ? "Remover do comparativo" : "Selecionar para comparativo"}</button>
                   </article>
@@ -339,8 +361,8 @@ export default function App() {
             <div className="panel-body">
               {tab === "comparativo" && (
                 <div className="table-wrap">
-                  <table className="table"><thead><tr><th>Plataforma</th><th>Status</th><th>Tipo</th><th>Bacia</th><th>Campo</th><th>Operador</th><th>Óleo</th><th>Gás (MMm³/d)</th><th>BOE/d</th><th>Ano</th><th>Acomodação</th><th>Armazenamento</th><th>Comprimento</th><th>Peso</th><th>Distância costa (km)</th></tr></thead><tbody>
-                    {selected.map((p) => <tr key={p.id}><td>{p.name}</td><td>{STATUS_LABEL[p.status] ?? p.status}</td><td>{p.unit_type}</td><td>{p.basin || "—"}</td><td>{p.field || "—"}</td><td>{p.operator || "—"}</td><td>{num(p.oil_bpd)}</td><td>{num(p.gas_mmd, " MMm³/d")}</td><td>{num(p.boed)}</td><td>{p.year || "—"}</td><td>{num(p.accommodation)}</td><td>{num(p.storage_m3)}</td><td>{num(p.length_m)}</td><td>{num(p.weight_t)}</td><td>{num(p.distance_to_coast_km, " km")}</td></tr>)}
+                  <table className="table"><thead><tr><th>Plataforma</th><th>Status</th><th>Tipo</th><th>Bacia</th><th>Campo</th><th>Operador</th><th>Óleo</th><th>Gás (MMm³/d)</th><th>BOE/d</th><th>Ano</th>{!isOnshore && <><th>Acomodação</th><th>Armazenamento</th><th>Comprimento</th><th>Peso</th><th>Distância costa (km)</th></>}{isOnshore && <th>Poços produtivos</th>}</tr></thead><tbody>
+                    {selected.map((p) => <tr key={p.id}><td>{p.name}</td><td>{STATUS_LABEL[p.status] ?? p.status}</td><td>{p.unit_type}</td><td>{p.basin || "—"}</td><td>{p.field || "—"}</td><td>{p.operator || "—"}</td><td>{num(p.oil_bpd)}</td><td>{num(p.gas_mmd, " MMm³/d")}</td><td>{num(p.boed)}</td><td>{p.year || "—"}</td>{!isOnshore && <><td>{num(p.accommodation)}</td><td>{num(p.storage_m3)}</td><td>{num(p.length_m)}</td><td>{num(p.weight_t)}</td><td>{num(p.distance_to_coast_km, " km")}</td></>}{isOnshore && <td>{num((p as any).wells_productive)}</td>}</tr>)}
                   </tbody></table>
                 </div>
               )}
@@ -351,9 +373,46 @@ export default function App() {
                     <div style={kpiStyle}><span style={kpiLabel}>Óleo total</span><strong style={kpiValue}>{num(totals.oil, " bpd")}</strong></div>
                     <div style={kpiStyle}><span style={kpiLabel}>Gás total</span><strong style={kpiValue}>{num(totals.gas, " MMm³/d")}</strong></div>
                     <div style={kpiStyle}><span style={kpiLabel}>BOE total</span><strong style={kpiValue}>{num(totals.boe, "/d")}</strong></div>
-                    <div style={kpiStyle}><span style={kpiLabel}>Profundidade média</span><strong style={kpiValue}>{num(Math.round(avgDepth), " m")}</strong><span style={{ fontSize: 11, opacity: 0.6 }}>máx: {num(maxDepth, " m")}</span></div>
-                    <div style={kpiStyle}><span style={kpiLabel}>Acomodação total</span><strong style={kpiValue}>{num(totalAccommodation)}</strong><span style={{ fontSize: 11, opacity: 0.6 }}>pessoas</span></div>
+                    {isOnshore ? (
+                      <div style={kpiStyle}><span style={kpiLabel}>Poços produtivos</span><strong style={kpiValue}>{num(totals.wells)}</strong></div>
+                    ) : (
+                      <>
+                        <div style={kpiStyle}><span style={kpiLabel}>Profundidade média</span><strong style={kpiValue}>{num(Math.round(avgDepth), " m")}</strong><span style={{ fontSize: 11, opacity: 0.6 }}>máx: {num(maxDepth, " m")}</span></div>
+                        <div style={kpiStyle}><span style={kpiLabel}>Acomodação total</span><strong style={kpiValue}>{num(totalAccommodation)}</strong><span style={{ fontSize: 11, opacity: 0.6 }}>pessoas</span></div>
+                      </>
+                    )}
                   </div>
+
+                  {isOnshore && (
+                    <div style={{ display: "flex", gap: 16, flexWrap: "wrap", marginBottom: 20 }}>
+                      <div style={chartBoxStyle}>
+                        <h4 style={chartTitleStyle}>Comparação por Polo — campos e poços</h4>
+                        <ResponsiveContainer width="100%" height={240}>
+                          <BarChart data={poloData}>
+                            <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
+                            <XAxis dataKey="name" stroke={axisColor} fontSize={11} />
+                            <YAxis stroke={axisColor} />
+                            <Tooltip /><Legend />
+                            <Bar dataKey="count" name="Campos" fill="#008542" />
+                            <Bar dataKey="wells" name="Poços" fill="#ffcc29" />
+                          </BarChart>
+                        </ResponsiveContainer>
+                      </div>
+                      <div style={chartBoxStyle}>
+                        <h4 style={chartTitleStyle}>Totais por Polo</h4>
+                        <div className="table-wrap">
+                          <table className="table">
+                            <thead><tr><th>Polo</th><th>Campos</th><th>Poços</th><th>Óleo (bpd)</th><th>Gás (MMm³/d)</th><th>BOE/d</th></tr></thead>
+                            <tbody>
+                              {poloData.map((x) => (
+                                <tr key={x.name}><td>{x.name}</td><td>{x.count}</td><td>{num(x.wells)}</td><td>{num(x.oil)}</td><td>{num(x.gas)}</td><td>{num(x.boe)}</td></tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+                  )}
 
                   <div style={{ display: "flex", gap: 16, flexWrap: "wrap", marginBottom: 20 }}>
                     <div style={chartBoxStyle}>
@@ -416,20 +475,22 @@ export default function App() {
                         {topOil.length === 0 && <li>Nenhuma unidade com produção de óleo nos filtros atuais.</li>}
                       </ol>
                     </div>
-                    <div style={rankBoxStyle}>
-                      <h4 style={chartTitleStyle}>Top 5 por profundidade</h4>
-                      <ol style={rankTextStyle}>
-                        {topDepth.map((p) => <li key={p.id} style={{ marginBottom: 6 }}><strong style={{ color: rankStrongColor }}>{p.name}</strong> — {num(p.water_depth_m, " m")}</li>)}
-                        {topDepth.length === 0 && <li>Nenhuma unidade com profundidade informada nos filtros atuais.</li>}
-                      </ol>
-                    </div>
+                    {!isOnshore && (
+                      <div style={rankBoxStyle}>
+                        <h4 style={chartTitleStyle}>Top 5 por profundidade</h4>
+                        <ol style={rankTextStyle}>
+                          {topDepth.map((p) => <li key={p.id} style={{ marginBottom: 6 }}><strong style={{ color: rankStrongColor }}>{p.name}</strong> — {num(p.water_depth_m, " m")}</li>)}
+                          {topDepth.length === 0 && <li>Nenhuma unidade com profundidade informada nos filtros atuais.</li>}
+                        </ol>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
               {tab === "graficos" && (
                 <div className="charts">
-                  <h3>Comparação das plataformas selecionadas ({selected.length}/10)</h3>
-                  {selected.length === 0 && <p style={{ color: axisColor }}>Selecione plataformas na lista à esquerda para ver os gráficos comparativos.</p>}
+                  <h3>{isOnshore ? "Comparação dos campos selecionados" : "Comparação das plataformas selecionadas"} ({selected.length}/10)</h3>
+                  {selected.length === 0 && <p style={{ color: axisColor }}>Selecione {isOnshore ? "campos" : "plataformas"} na lista à esquerda para ver os gráficos comparativos.</p>}
                   {selected.length > 0 && (
                     <>
                       <div style={{ display: "flex", gap: 16, flexWrap: "wrap", marginBottom: 24 }}>
