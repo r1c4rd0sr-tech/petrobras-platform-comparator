@@ -13,7 +13,7 @@ const STATUS_LABEL: Record<string, string> = {
 };
 
 const PIN_COLORS = ["#008542", "#ffcc29", "#0c2340", "#e30613", "#0072ce", "#7a28a0", "#00a878", "#f28c28", "#c2185b", "#5d4037"];
-const STATUS_COLORS = ["#008542", "#ffcc29", "#e30613"];
+const STATUS_COLORS = ["#008542", "#ffcc29", "#e30613", "#0072ce", "#f28c28", "#7a28a0", "#00a878", "#c2185b"];
 const MAX_SELECTED = 10;
 
 const num = (value: number | null | undefined, suffix = "") =>
