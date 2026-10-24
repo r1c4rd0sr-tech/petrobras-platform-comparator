@@ -1,0 +1,39 @@
+{
+  "secao": "Refinarias, Terminais e Compressão",
+  "data_version": "V1.5-refino",
+  "total_units": 34,
+  "refinarias": {
+    "count": 12,
+    "with_processing_capacity": 12,
+    "total_processing_capacity_bpd": 2354063,
+    "top5": [
+      {"name": "REPLAN", "capacity_bpd": 434000},
+      {"name": "RLAM", "capacity_bpd": 333000},
+      {"name": "REVAP", "capacity_bpd": 251500},
+      {"name": "REDUC", "capacity_bpd": 239000},
+      {"name": "RNEST", "capacity_bpd": 230000}
+    ]
+  },
+  "terminais": {
+    "count": 19,
+    "with_storage_capacity": 18,
+    "without_storage_capacity": 1,
+    "total_storage_capacity_m3": 6024277,
+    "gnl_regasification": {
+      "name": "Baía de Guanabara",
+      "gas_capacity_m3_day": 30000000,
+      "note": "Unidade de regaseificação de GNL, sem armazenamento de líquidos"
+    },
+    "top5": [
+      {"name": "São Sebastião", "capacity_m3": 2011671},
+      {"name": "Guararema", "capacity_m3": 1070964},
+      {"name": "Angra dos Reis", "capacity_m3": 978046},
+      {"name": "Campos Elíseos", "capacity_m3": 545083},
+      {"name": "Santos", "capacity_m3": 263134}
+    ]
+  },
+  "estacoes_compressao": {
+    "count": 3,
+    "units": ["Cabiúnas (RJ)", "Paulínia (SP)", "Araucária (PR)"]
+  }
+}
