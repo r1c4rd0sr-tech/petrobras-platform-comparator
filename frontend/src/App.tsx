@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useMap } from "react-leaflet";
-import { Bar, BarChart, CartesianGrid, Cell, Legend, Pie, PieChart, PolarAngleAxis, PolarGrid, PolarRadiusAxis, Radar, RadarChart, ResponsiveContainer, Scatter, ScatterChart, Tooltip, XAxis, YAxis, ZAxis } from "recharts";
+import { Bar, BarChart, CartesianGrid, Cell, Legend, Line, LineChart, Pie, PieChart, PolarAngleAxis, PolarGrid, PolarRadiusAxis, Radar, RadarChart, ResponsiveContainer, Scatter, ScatterChart, Tooltip, XAxis, YAxis, ZAxis } from "recharts";
 import { MapContainer, Marker, Popup, TileLayer, Tooltip as LeafletTooltip } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -32,6 +32,8 @@ const TOOLTIP_UNIT_MAP: Record<string, string> = {
   "Campos": "",
   "BOE/poço": " /d por poço",
   "Óleo/acomodação": " bpd por pessoa",
+  "Óleo (bpd)": " bpd",
+  "Gás (Mm³/dia)": " Mm³/dia",
 };
 
 const CustomTooltip = ({ active, payload, label }: any) => {
@@ -173,9 +175,9 @@ export default function App() {
   const [isMobile, setIsMobile] = useState(typeof window !== "undefined" ? window.innerWidth < 768 : false);
   const [showHeatmap, setShowHeatmap] = useState(false);
   const [filters, setFilters] = useState({ search: "", status: "", unit_type: "", basin: "", field: "", operator: "", state: "", municipality: "", oil: "", gas: "", year: "", accommodation: "", wells: "", storage: "", sort: "oil" });
-  const [dppTest, setDppTest] = useState<any>(null);
-  const [dppTestStatus, setDppTestStatus] = useState<"idle" | "loading" | "ok" | "erro">("idle");
-  const [dppTestError, setDppTestError] = useState("");
+  const [dppSerie, setDppSerie] = useState<any[]>([]);
+  const [dppStatus, setDppStatus] = useState<"idle" | "loading" | "ok" | "erro">("idle");
+  const [dppErro, setDppErro] = useState("");
 
   const [onshoreUnits, setOnshoreUnits] = useState<Platform[]>(onshoreData as unknown as Platform[]);
   const [refinariasUnits, setRefinariasUnits] = useState<Platform[]>(refinariasData as unknown as Platform[]);
@@ -386,21 +388,19 @@ export default function App() {
   const resetFilters = () => setFilters({ search: "", status: "", unit_type: "", basin: "", field: "", operator: "", state: "", municipality: "", oil: "", gas: "", year: "", accommodation: "", wells: "", storage: "", sort: "oil" });
   const pinColor = (id: number) => PIN_COLORS[selected.findIndex((s) => s.id === id) % PIN_COLORS.length];
 
-  const testarDpp = async () => {
+  const carregarSerie = async () => {
     const campo = selected[0]?.field;
-    if (!campo) { window.alert("Selecione uma unidade com campo informado para testar a API DPP."); return; }
-    setDppTestStatus("loading");
-    setDppTestError("");
-    setDppTest(null);
+    if (!campo) { window.alert("Selecione uma unidade com campo informado."); return; }
+    setDppStatus("loading");
+    setDppErro("");
+    setDppSerie([]);
     try {
-      const raw = await fetchProducaoHistorica(campo);
-      console.log("[DPP] Resposta bruta para campo:", campo, raw);
-      setDppTest(raw);
-      setDppTestStatus("ok");
+      const raw = await fetchProducaoHistorica(campo, 36);
+      setDppSerie(raw.dados || []);
+      setDppStatus("ok");
     } catch (e: any) {
-      console.error("[DPP] Erro na consulta:", e);
-      setDppTestError(e?.message || "Erro desconhecido");
-      setDppTestStatus("erro");
+      setDppErro(e?.message || "Erro desconhecido");
+      setDppStatus("erro");
     }
   };
 
@@ -942,18 +942,40 @@ export default function App() {
 
                       <div style={chartRowStyle}>
                         <div style={chartBoxStyle}>
-                          <h4 style={chartTitleStyle}>Série Temporal — teste da API DPP/ANP</h4>
+                          <h4 style={chartTitleStyle}>Série Temporal — produção mensal do campo {selected[0]?.field || ""}</h4>
                           <p style={{ color: axisColor, fontSize: 12, marginTop: 0 }}>
-                            Etapa 1 da reintegração: valide a conectividade e o formato da resposta da API "Do Poço ao Posto" para o campo da primeira unidade selecionada ({selected[0]?.field || "—"}). A resposta bruta é registrada no console do navegador (F12 → Console).
+                            Fonte: dados abertos da ANP (produção por poço, agregada por campo). Cobertura: 2021–2023. Óleo em bbl/dia; gás em Mm³/dia.
                           </p>
-                          <button style={{ ...actionBtnStyle, background: "#008542", color: "#fff" }} onClick={testarDpp} disabled={dppTestStatus === "loading"}>
-                            {dppTestStatus === "loading" ? "Consultando..." : "🧪 Testar API DPP"}
+                          <button style={{ ...actionBtnStyle, background: "#008542", color: "#fff" }} onClick={carregarSerie} disabled={dppStatus === "loading"}>
+                            {dppStatus === "loading" ? "Carregando série..." : "📈 Carregar série temporal"}
                           </button>
-                          {dppTestStatus === "erro" && <p style={{ color: "#e30613", marginTop: 8 }}>Erro: {dppTestError}</p>}
-                          {dppTestStatus === "ok" && (
-                            <pre style={{ background: isDark ? "#0a1f33" : "#e8eef4", color: isDark ? "#cfe0f0" : "#1c2b3a", padding: 12, borderRadius: 8, fontSize: 11, maxHeight: 300, overflow: "auto", marginTop: 12 }}>
-                              {JSON.stringify(dppTest, null, 2).slice(0, 3000)}
-                            </pre>
+                          {dppStatus === "erro" && <p style={{ color: "#e30613", marginTop: 8 }}>Erro: {dppErro}</p>}
+                          {dppStatus === "ok" && dppSerie.length === 0 && <p style={{ color: axisColor, marginTop: 8 }}>Nenhum dado histórico encontrado para este campo.</p>}
+                          {dppSerie.length > 0 && (
+                            <>
+                              <h5 style={{ color: isDark ? "#fff" : "#0c2340", margin: "16px 0 4px" }}>Óleo (bbl/dia)</h5>
+                              <ResponsiveContainer width="100%" height={isMobile ? 260 : 320}>
+                                <LineChart data={dppSerie}>
+                                  <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
+                                  <XAxis dataKey="periodo" stroke={axisColor} fontSize={11} />
+                                  <YAxis stroke={axisColor} />
+                                  <Tooltip content={<CustomTooltip />} />
+                                  <Legend />
+                                  <Line type="monotone" dataKey="oleo_bpd" name="Óleo (bpd)" stroke="#008542" strokeWidth={2} dot={false} />
+                                </LineChart>
+                              </ResponsiveContainer>
+                              <h5 style={{ color: isDark ? "#fff" : "#0c2340", margin: "16px 0 4px" }}>Gás (Mm³/dia)</h5>
+                              <ResponsiveContainer width="100%" height={isMobile ? 260 : 320}>
+                                <LineChart data={dppSerie}>
+                                  <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
+                                  <XAxis dataKey="periodo" stroke={axisColor} fontSize={11} />
+                                  <YAxis stroke={axisColor} />
+                                  <Tooltip content={<CustomTooltip />} />
+                                  <Legend />
+                                  <Line type="monotone" dataKey="gas_mmd" name="Gás (Mm³/dia)" stroke="#f28c28" strokeWidth={2} dot={false} />
+                                </LineChart>
+                              </ResponsiveContainer>
+                            </>
                           )}
                         </div>
                       </div>

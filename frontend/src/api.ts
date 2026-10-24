@@ -32,8 +32,7 @@ export async function fetchEcompsGasbol() {
   return getJson("/api/data/ecomps-gasbol");
 }
 
-// Consulta o Boletim Mensal de Produção (BMP) da ANP via proxy no nosso backend.
-// O proxy evita o bloqueio de CORS da API DPP no navegador.
-export async function fetchProducaoHistorica(campo: string) {
-  return getJson(`/api/dpp/producao?campo=${encodeURIComponent(campo)}`);
+// Série histórica mensal por campo via proxy no backend (dados abertos ANP).
+export async function fetchProducaoHistorica(campo: string, meses = 36) {
+  return getJson(`/api/dpp/producao?campo=${encodeURIComponent(campo)}&meses=${meses}`);
 }
