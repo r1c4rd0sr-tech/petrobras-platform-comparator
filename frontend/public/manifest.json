@@ -1,0 +1,18 @@
+{
+  "name": "Comparador de Unidades Petrobrás",
+  "short_name": "Comparador Petrobrás",
+  "description": "Compare plataformas, campos e unidades de refino, gás e logística da Petrobrás.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0c2340",
+  "theme_color": "#0c2340",
+  "lang": "pt-BR",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

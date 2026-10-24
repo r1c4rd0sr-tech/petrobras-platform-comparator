@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useMap } from "react-leaflet";
 import { Bar, BarChart, CartesianGrid, Cell, Legend, Pie, PieChart, PolarAngleAxis, PolarGrid, PolarRadiusAxis, Radar, RadarChart, ResponsiveContainer, Scatter, ScatterChart, Tooltip, XAxis, YAxis, ZAxis } from "recharts";
 import { MapContainer, Marker, Popup, TileLayer, Tooltip as LeafletTooltip } from "react-leaflet";
 import L from "leaflet";
@@ -60,6 +61,29 @@ const CustomScatterTooltip = ({ active, payload }: any) => {
     </div>
   );
 };
+
+// Heatmap de densidade: círculos proporcionais à concentração de unidades próximas
+function DensityHeatmap({ points, visible }: { points: { lat: number; lng: number; density: number }[]; visible: boolean }) {
+  const map = useMap();
+  useEffect(() => {
+    if (!visible || !points.length) return;
+    const group = L.layerGroup(
+      points.map((pt) => {
+        const intensity = Math.min(pt.density / 8, 1);
+        const color = intensity > 0.66 ? "#e30613" : intensity > 0.33 ? "#ffcc29" : "#008542";
+        return L.circle([pt.lat, pt.lng], {
+          radius: 30000 + intensity * 70000,
+          color: "transparent",
+          fillColor: color,
+          fillOpacity: 0.2 + intensity * 0.3,
+          weight: 0,
+        });
+      })
+    ).addTo(map);
+    return () => { map.removeLayer(group); };
+  }, [map, points, visible]);
+  return null;
+}
 
 type Modality = "maritimas" | "terrestres" | "refinarias";
 
@@ -148,6 +172,7 @@ export default function App() {
   const [theme, setTheme] = useState<"light" | "dark">("dark");
   const [modality, setModality] = useState<Modality>("maritimas");
   const [isMobile, setIsMobile] = useState(typeof window !== "undefined" ? window.innerWidth < 768 : false);
+  const [showHeatmap, setShowHeatmap] = useState(false);
   const [filters, setFilters] = useState({ search: "", status: "", unit_type: "", basin: "", field: "", operator: "", state: "", municipality: "", oil: "", gas: "", year: "", accommodation: "", wells: "", storage: "", sort: "oil" });
 
   const [onshoreUnits, setOnshoreUnits] = useState<Platform[]>(onshoreData as unknown as Platform[]);
@@ -237,6 +262,19 @@ export default function App() {
     });
   }, [activeUnits, filters]);
 
+  // Pontos de densidade: conta unidades num raio aproximado de 150 km
+  const densityPoints = useMemo(() => {
+    const pts = filtered.filter((p) => p.latitude != null && p.longitude != null);
+    return pts.map((p) => {
+      const nearby = pts.filter((q) => {
+        const dLat = (q.latitude! - p.latitude!) * 111;
+        const dLon = (q.longitude! - p.longitude!) * 111 * Math.cos((p.latitude! * Math.PI) / 180);
+        return Math.sqrt(dLat * dLat + dLon * dLon) < 150;
+      }).length;
+      return { lat: p.latitude!, lng: p.longitude!, density: nearby };
+    });
+  }, [filtered]);
+
   const selected = useMemo(() => activeUnits.filter((p) => selectedIds.includes(p.id)), [activeUnits, selectedIds]);
   const chartData = selected.map((p) => {
     const poloRef = isOnshore ? (p as any).producao_polo_gas_mmd : null;
@@ -271,7 +309,6 @@ export default function App() {
     };
   });
 
-  // Radar — normaliza cada métrica para 0-100 em relação ao máximo entre as unidades selecionadas
   const radarData = useMemo(() => {
     if (selected.length === 0) return [];
     const metrics = ["Óleo", "Gás", "BOE"] as const;
@@ -556,9 +593,18 @@ export default function App() {
             </section>
 
             <section className="panel">
-              <div className="panel-head"><h2>Mapa — unidades selecionadas</h2><span className="pill">{selected.length}/10 no mapa</span></div>
+              <div className="panel-head">
+                <h2>Mapa — unidades selecionadas</h2>
+                <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+                  <button style={{ ...actionBtnStyle, background: showHeatmap ? "#008542" : (isDark ? "#123a5c" : "#e8eef4"), color: showHeatmap ? "#fff" : (isDark ? "#fff" : "#0c2340") }} onClick={() => setShowHeatmap(!showHeatmap)} title="Mostra a concentração de unidades por região">
+                    🔥 Heatmap de densidade
+                  </button>
+                  <span className="pill">{selected.length}/10 no mapa</span>
+                </div>
+              </div>
               <MapContainer className="map" center={[-24, -42]} zoom={5} scrollWheelZoom>
                 <TileLayer attribution="&copy; OpenStreetMap contributors" url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                <DensityHeatmap points={densityPoints} visible={showHeatmap} />
                 {selected.filter((p) => p.latitude !== null && p.longitude !== null).map((p) => {
                   const color = pinColor(p.id);
                   return (
@@ -571,6 +617,7 @@ export default function App() {
               </MapContainer>
               <div className="map-legend">
                 <strong>Legenda:</strong>
+                {showHeatmap && <span className="legend-item" style={{ color: axisColor }}>Verde = baixa densidade · Amarelo = média · Vermelho = alta concentração</span>}
                 {selected.length === 0 && <span className="legend-item">Nenhuma unidade selecionada</span>}
                 {selected.map((p) => (
                   <span key={p.id} className="legend-item">
