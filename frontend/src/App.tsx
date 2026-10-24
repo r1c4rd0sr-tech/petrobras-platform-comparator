@@ -4,6 +4,7 @@ import { MapContainer, Marker, Popup, TileLayer, Tooltip as LeafletTooltip } fro
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { fetchPlatforms, fetchOnshore, fetchRefinarias, fetchTerminaisArmazenamento, fetchUtgnsGas, fetchEcompsGasbol } from "./api";
+import { POB_OVERRIDES } from "./pob-overrides";
 import type { Platform } from "./types";
 import onshoreData from "./data/onshore.json";
 import refinariasData from "./data/refinarias.json";
@@ -126,7 +127,11 @@ export default function App() {
   useEffect(() => {
     fetchPlatforms()
       .then((data) => {
-        setPlatforms(data.map((p) => ({ ...p, basin: normalizeBasin(p.basin) })));
+        setPlatforms(data.map((p) => ({ 
+          ...p, 
+          basin: normalizeBasin(p.basin),
+          accommodation: POB_OVERRIDES[p.slug] ?? p.accommodation 
+        })));
         setSelectedIds([]);
       })
       .catch(() => setError("Não foi possível carregar os dados da API. Recarregue em alguns instantes."))
