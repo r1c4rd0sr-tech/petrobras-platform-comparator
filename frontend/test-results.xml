@@ -1,468 +1,63 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuites name="vitest tests" tests="27" failures="1" errors="0" time="3.952">
-    <testsuite name="src/__tests__/App.test.tsx" timestamp="2026-10-24T07:22:37.820Z" hostname="runnervmdkmh8" tests="10" failures="0" errors="0" skipped="0" time="1.776645053">
-        <testcase classname="src/__tests__/App.test.tsx" name="Seção 3 — Refino, Gás e Logística &gt; deve exibir 53 unidades na Seção 3 (12 refinarias + 19 terminais + 1 UTGCAB + 8 UTGNs + 13 ECOMPs)" time="0.472234778">
+<testsuites name="vitest tests" tests="27" failures="0" errors="0" time="2.406">
+    <testsuite name="src/__tests__/App.test.tsx" timestamp="2026-10-24T07:27:06.821Z" hostname="runnervmr9t6g" tests="10" failures="0" errors="0" skipped="0" time="1.170877564">
+        <testcase classname="src/__tests__/App.test.tsx" name="Seção 3 — Refino, Gás e Logística &gt; deve exibir 53 unidades na Seção 3 (12 refinarias + 19 terminais + 1 UTGCAB + 8 UTGNs + 13 ECOMPs)" time="0.300348534">
         </testcase>
-        <testcase classname="src/__tests__/App.test.tsx" name="Seção 3 — Refino, Gás e Logística &gt; deve conter 12 refinarias, 19 terminais, 1 UTGCAB, 8 UTGNs e 13 ECOMPs" time="0.000486685">
+        <testcase classname="src/__tests__/App.test.tsx" name="Seção 3 — Refino, Gás e Logística &gt; deve conter 12 refinarias, 19 terminais, 1 UTGCAB, 8 UTGNs e 13 ECOMPs" time="0.000416345">
         </testcase>
-        <testcase classname="src/__tests__/App.test.tsx" name="Seção 3 — Refino, Gás e Logística &gt; deve filtrar por estado na Seção 3" time="0.423953443">
+        <testcase classname="src/__tests__/App.test.tsx" name="Seção 3 — Refino, Gás e Logística &gt; deve filtrar por estado na Seção 3" time="0.282160175">
         </testcase>
-        <testcase classname="src/__tests__/App.test.tsx" name="Seção 3 — Refino, Gás e Logística &gt; deve filtrar por gás mínimo na Seção 3" time="0.306429103">
+        <testcase classname="src/__tests__/App.test.tsx" name="Seção 3 — Refino, Gás e Logística &gt; deve filtrar por gás mínimo na Seção 3" time="0.2221857">
         </testcase>
-        <testcase classname="src/__tests__/App.test.tsx" name="Seção 3 — Refino, Gás e Logística &gt; deve filtrar por armazenamento mínimo na Seção 3" time="0.182402518">
+        <testcase classname="src/__tests__/App.test.tsx" name="Seção 3 — Refino, Gás e Logística &gt; deve filtrar por armazenamento mínimo na Seção 3" time="0.13706021">
         </testcase>
-        <testcase classname="src/__tests__/App.test.tsx" name="Seção 3 — Refino, Gás e Logística &gt; deve permitir selecionar até 10 unidades na Seção 3" time="0.386920004">
+        <testcase classname="src/__tests__/App.test.tsx" name="Seção 3 — Refino, Gás e Logística &gt; deve permitir selecionar até 10 unidades na Seção 3" time="0.226140651">
         </testcase>
-        <testcase classname="src/__tests__/App.test.tsx" name="Seção 3 — Refino, Gás e Logística &gt; deve exibir a UTGCAB de Cabiúnas com capacidade de 24,6 MMm³/dia" time="0.000489346">
+        <testcase classname="src/__tests__/App.test.tsx" name="Seção 3 — Refino, Gás e Logística &gt; deve exibir a UTGCAB de Cabiúnas com capacidade de 24,6 MMm³/dia" time="0.000287401">
         </testcase>
-        <testcase classname="src/__tests__/App.test.tsx" name="Seção 3 — Refino, Gás e Logística &gt; deve conter 8 UTGNs com capacidade total de ~66,2 MMm³/dia" time="0.000251949">
+        <testcase classname="src/__tests__/App.test.tsx" name="Seção 3 — Refino, Gás e Logística &gt; deve conter 8 UTGNs com capacidade total de ~66,2 MMm³/dia" time="0.000159249">
         </testcase>
-        <testcase classname="src/__tests__/App.test.tsx" name="Seção 3 — Refino, Gás e Logística &gt; deve conter 13 ECOMPs com vazão nominal de 8,00 ou 30,08 MMm³/dia" time="0.001525184">
+        <testcase classname="src/__tests__/App.test.tsx" name="Seção 3 — Refino, Gás e Logística &gt; deve conter 13 ECOMPs com vazão nominal de 8,00 ou 30,08 MMm³/dia" time="0.000932408">
         </testcase>
-        <testcase classname="src/__tests__/App.test.tsx" name="Seção 3 — Refino, Gás e Logística &gt; não deve ter IDs duplicados na Seção 3" time="0.000222743">
-        </testcase>
-    </testsuite>
-    <testsuite name="src/__tests__/Maritimas.test.tsx" timestamp="2026-10-24T07:22:37.823Z" hostname="runnervmdkmh8" tests="10" failures="1" errors="0" skipped="0" time="2.211673143">
-        <testcase classname="src/__tests__/Maritimas.test.tsx" name="Seção 1 — Plataformas Marítimas &gt; deve exibir 3 plataformas na Seção 1 (mock)" time="0.19384805">
-        </testcase>
-        <testcase classname="src/__tests__/Maritimas.test.tsx" name="Seção 1 — Plataformas Marítimas &gt; deve filtrar por bacia" time="0.096991225">
-        </testcase>
-        <testcase classname="src/__tests__/Maritimas.test.tsx" name="Seção 1 — Plataformas Marítimas &gt; deve filtrar por campo" time="0.120430662">
-        </testcase>
-        <testcase classname="src/__tests__/Maritimas.test.tsx" name="Seção 1 — Plataformas Marítimas &gt; deve filtrar por operador" time="0.114271134">
-        </testcase>
-        <testcase classname="src/__tests__/Maritimas.test.tsx" name="Seção 1 — Plataformas Marítimas &gt; deve filtrar por óleo mínimo" time="0.129844549">
-        </testcase>
-        <testcase classname="src/__tests__/Maritimas.test.tsx" name="Seção 1 — Plataformas Marítimas &gt; deve filtrar por gás mínimo" time="0.096754161">
-        </testcase>
-        <testcase classname="src/__tests__/Maritimas.test.tsx" name="Seção 1 — Plataformas Marítimas &gt; deve filtrar por ano mínimo" time="0.13317166">
-        </testcase>
-        <testcase classname="src/__tests__/Maritimas.test.tsx" name="Seção 1 — Plataformas Marítimas &gt; deve filtrar por acomodação mínima" time="0.09067503">
-        </testcase>
-        <testcase classname="src/__tests__/Maritimas.test.tsx" name="Seção 1 — Plataformas Marítimas &gt; deve permitir selecionar até 10 plataformas" time="0.160570185">
-        </testcase>
-        <testcase classname="src/__tests__/Maritimas.test.tsx" name="Seção 1 — Plataformas Marítimas &gt; deve ordenar por óleo (decrescente)" time="1.073235834">
-            <failure message="[2mexpect([22m[31melement[39m[2m).toHaveTextContent()[22m
-
-Expected element to have text content:
-[32m  P-78[39m
-Received:
-[31m  P-77[39m
-
-Ignored nodes: comments, script, style
-[36m&lt;html[39m
-  [33mdata-theme[39m=[32m&quot;dark&quot;[39m
-[36m&gt;[39m
-  [36m&lt;head /&gt;[39m
-  [36m&lt;body&gt;[39m
-    [36m&lt;div&gt;[39m
-      [36m&lt;div[39m
-        [33mclass[39m=[32m&quot;app&quot;[39m
-      [36m&gt;[39m
-        [36m&lt;header[39m
-          [33mclass[39m=[32m&quot;topbar&quot;[39m
-        [36m&gt;[39m
-          [36m&lt;div&gt;[39m
-            [36m&lt;h1&gt;[39m
-              [0mComparador de Unidades Petrobrás[0m
-            [36m&lt;/h1&gt;[39m
-            [36m&lt;p&gt;[39m
-              [0mSelecione até 10 unidades para comparar no mapa, cada uma com um pin de cor própria.[0m
-            [36m&lt;/p&gt;[39m
-          [36m&lt;/div&gt;[39m
-          [36m&lt;div[39m
-            [33mstyle[39m=[32m&quot;display: flex; gap: 10px; align-items: center;&quot;[39m
-          [36m&gt;[39m
-            [36m&lt;div[39m
-              [33mstyle[39m=[32m&quot;display: flex; gap: 4px; background: rgb(15, 39, 64); padding: 4px; border-radius: 10px;&quot;[39m
-            [36m&gt;[39m
-              [36m&lt;button[39m
-                [33mstyle[39m=[32m&quot;padding: 8px 14px; border-radius: 8px; background: rgb(0, 133, 66); color: rgb(255, 255, 255); font-size: 13px; font-weight: 600; cursor: pointer; transition: all .2s;&quot;[39m
-              [36m&gt;[39m
-                [0mMarítimas[0m
-              [36m&lt;/button&gt;[39m
-              [36m&lt;button[39m
-                [33mstyle[39m=[32m&quot;padding: 8px 14px; border-radius: 8px; background: transparent; color: rgb(147, 167, 187); font-size: 13px; font-weight: 400; cursor: pointer; transition: all .2s;&quot;[39m
-              [36m&gt;[39m
-                [0mTerrestres[0m
-              [36m&lt;/button&gt;[39m
-              [36m&lt;button[39m
-                [33mstyle[39m=[32m&quot;padding: 8px 14px; border-radius: 8px; background: transparent; color: rgb(147, 167, 187); font-size: 13px; font-weight: 400; cursor: pointer; transition: all .2s;&quot;[39m
-              [36m&gt;[39m
-                [0mRefino, Gás e Logística[0m
-              [36m&lt;/button&gt;[39m
-            [36m&lt;/div&gt;[39m
-            [36m&lt;button[39m
-              [33mclass[39m=[32m&quot;theme-toggle&quot;[39m
-            [36m&gt;[39m
-              [0m☀️ Claro[0m
-            [36m&lt;/button&gt;[39m
-            [36m&lt;span[39m
-              [33mclass[39m=[32m&quot;badge&quot;[39m
-            [36m&gt;[39m
-              [0m3 unidades na base[0m
-            [36m&lt;/span&gt;[39m
-          [36m&lt;/div&gt;[39m
-        [36m&lt;/header&gt;[39m
-        [36m&lt;section[39m
-          [33mclass[39m=[32m&quot;filters&quot;[39m
-        [36m&gt;[39m
-          [36m&lt;div&gt;[39m
-            [36m&lt;label[39m
-              [33mfor[39m=[32m&quot;f-search&quot;[39m
-            [36m&gt;[39m
-              [0mBusca[0m
-            [36m&lt;/label&gt;[39m
-            [36m&lt;input[39m
-              [33mid[39m=[32m&quot;f-search&quot;[39m
-              [33mplaceholder[39m=[32m&quot;Nome, campo, bacia ou operador&quot;[39m
-              [33mvalue[39m=[32m&quot;&quot;[39m
-            [36m/&gt;[39m
-          [36m&lt;/div&gt;[39m
-          [36m&lt;div&gt;[39m
-            [36m&lt;label[39m
-              [33mfor[39m=[32m&quot;f-status&quot;[39m
-            [36m&gt;[39m
-              [0mStatus[0m
-            [36m&lt;/label&gt;[39m
-            [36m&lt;select[39m
-              [33mid[39m=[32m&quot;f-status&quot;[39m
-            [36m&gt;[39m
-              [36m&lt;option[39m
-                [33mvalue[39m=[32m&quot;&quot;[39m
-              [36m&gt;[39m
-                [0mTodos[0m
-              [36m&lt;/option&gt;[39m
-              [36m&lt;option[39m
-                [33mvalue[39m=[32m&quot;operational&quot;[39m
-              [36m&gt;[39m
-                [0mOperacional[0m
-              [36m&lt;/option&gt;[39m
-              [36m&lt;option[39m
-                [33mvalue[39m=[32m&quot;construction&quot;[39m
-              [36m&gt;[39m
-                [0mEm construção[0m
-              [36m&lt;/option&gt;[39m
-              [36m&lt;option[39m
-                [33mvalue[39m=[32m&quot;decommissioned&quot;[39m
-              [36m&gt;[39m
-                [0mDescomissionada[0m
-              [36m&lt;/option&gt;[39m
-            [36m&lt;/select&gt;[39m
-          [36m&lt;/div&gt;[39m
-          [36m&lt;div&gt;[39m
-            [36m&lt;label[39m
-              [33mfor[39m=[32m&quot;f-type&quot;[39m
-            [36m&gt;[39m
-              [0mTipo[0m
-            [36m&lt;/label&gt;[39m
-            [36m&lt;select[39m
-              [33mid[39m=[32m&quot;f-type&quot;[39m
-            [36m&gt;[39m
-              [36m&lt;option[39m
-                [33mvalue[39m=[32m&quot;&quot;[39m
-              [36m&gt;[39m
-                [0mTodos[0m
-              [36m&lt;/option&gt;[39m
-              [36m&lt;option&gt;[39m
-                [0mFPSO[0m
-              [36m&lt;/option&gt;[39m
-            [36m&lt;/select&gt;[39m
-          [36m&lt;/div&gt;[39m
-          [36m&lt;div&gt;[39m
-            [36m&lt;label[39m
-              [33mfor[39m=[32m&quot;f-basin&quot;[39m
-            [36m&gt;[39m
-              [0mBacia[0m
-            [36m&lt;/label&gt;[39m
-            [36m&lt;select[39m
-              [33mid[39m=[32m&quot;f-basin&quot;[39m
-            [36m&gt;[39m
-              [36m&lt;option[39m
-                [33mvalue[39m=[32m&quot;&quot;[39m
-              [36m&gt;[39m
-                [0mTodas[0m
-              [36m&lt;/option&gt;[39m
-              [36m&lt;option&gt;[39m
-                [0mBacia de Campos[0m
-              [36m&lt;/option&gt;[39m
-              [36m&lt;option&gt;[39m
-                [0mBacia de Santos[0m
-              [36m&lt;/option&gt;[39m
-            [36m&lt;/select&gt;[39m
-          [36m&lt;/div&gt;[39m
-          [36m&lt;div&gt;[39m
-            [36m&lt;label[39m
-              [33mfor[39m=[32m&quot;f-field&quot;[39m
-            [36m&gt;[39m
-              [0mCampo[0m
-            [36m&lt;/label&gt;[39m
-            [36m&lt;select[39m
-              [33mid[39m=[32m&quot;f-field&quot;[39m
-            [36m&gt;[39m
-              [36m&lt;option[39m
-                [33mvalue[39m=[32m&quot;&quot;[39m
-              [36m&gt;[39m
-                [0mTodos[0m
-              [36m&lt;/option&gt;[39m
-              [36m&lt;option&gt;[39m
-                [0mBúzios[0m
-              [36m&lt;/option&gt;[39m
-              [36m&lt;option&gt;[39m
-                [0mMarlim Sul[0m
-              [36m&lt;/option&gt;[39m
-            [36m&lt;/select&gt;[39m
-          [36m&lt;/div&gt;[39m
-          [36m&lt;div&gt;[39m
-            [36m&lt;label[39m
-              [33mfor[39m=[32m&quot;f-operator&quot;[39m
-            [36m&gt;[39m
-              [0mOperador[0m
-            [36m&lt;/label&gt;[39m
-            [36m&lt;select[39m
-              [33mid[39m=[32m&quot;f-operator&quot;[39m
-            [36m&gt;[39m
-              [36m&lt;option[39m
-                [33mvalue[39m=[32m&quot;&quot;[39m
-              [36m&gt;[39m
-                [0mTodos[0m
-              [36m&lt;/option&gt;[39m
-              [36m&lt;option&gt;[39m
-                [0mPetrobras[0m
-              [36m&lt;/option&gt;[39m
-            [36m&lt;/select&gt;[39m
-          [36m&lt;/div&gt;[39m
-          [36m&lt;div&gt;[39m
-            [36m&lt;label[39m
-              [33mfor[39m=[32m&quot;f-oil&quot;[39m
-            [36m&gt;[39m
-              [0mÓleo mín. (bpd)[0m
-            [36m&lt;/label&gt;[39m
-            [36m&lt;input[39m
-              [33mid[39m=[32m&quot;f-oil&quot;[39m
-              [33mtype[39m=[32m&quot;number&quot;[39m
-              [33mva..." type="Error">
-Error: expect(element).toHaveTextContent()
-
-Expected element to have text content:
-  P-78
-Received:
-  P-77
-
-Ignored nodes: comments, script, style
-&lt;html
-  data-theme=&quot;dark&quot;
-&gt;
-  &lt;head /&gt;
-  &lt;body&gt;
-    &lt;div&gt;
-      &lt;div
-        class=&quot;app&quot;
-      &gt;
-        &lt;header
-          class=&quot;topbar&quot;
-        &gt;
-          &lt;div&gt;
-            &lt;h1&gt;
-              Comparador de Unidades Petrobrás
-            &lt;/h1&gt;
-            &lt;p&gt;
-              Selecione até 10 unidades para comparar no mapa, cada uma com um pin de cor própria.
-            &lt;/p&gt;
-          &lt;/div&gt;
-          &lt;div
-            style=&quot;display: flex; gap: 10px; align-items: center;&quot;
-          &gt;
-            &lt;div
-              style=&quot;display: flex; gap: 4px; background: rgb(15, 39, 64); padding: 4px; border-radius: 10px;&quot;
-            &gt;
-              &lt;button
-                style=&quot;padding: 8px 14px; border-radius: 8px; background: rgb(0, 133, 66); color: rgb(255, 255, 255); font-size: 13px; font-weight: 600; cursor: pointer; transition: all .2s;&quot;
-              &gt;
-                Marítimas
-              &lt;/button&gt;
-              &lt;button
-                style=&quot;padding: 8px 14px; border-radius: 8px; background: transparent; color: rgb(147, 167, 187); font-size: 13px; font-weight: 400; cursor: pointer; transition: all .2s;&quot;
-              &gt;
-                Terrestres
-              &lt;/button&gt;
-              &lt;button
-                style=&quot;padding: 8px 14px; border-radius: 8px; background: transparent; color: rgb(147, 167, 187); font-size: 13px; font-weight: 400; cursor: pointer; transition: all .2s;&quot;
-              &gt;
-                Refino, Gás e Logística
-              &lt;/button&gt;
-            &lt;/div&gt;
-            &lt;button
-              class=&quot;theme-toggle&quot;
-            &gt;
-              ☀️ Claro
-            &lt;/button&gt;
-            &lt;span
-              class=&quot;badge&quot;
-            &gt;
-              3 unidades na base
-            &lt;/span&gt;
-          &lt;/div&gt;
-        &lt;/header&gt;
-        &lt;section
-          class=&quot;filters&quot;
-        &gt;
-          &lt;div&gt;
-            &lt;label
-              for=&quot;f-search&quot;
-            &gt;
-              Busca
-            &lt;/label&gt;
-            &lt;input
-              id=&quot;f-search&quot;
-              placeholder=&quot;Nome, campo, bacia ou operador&quot;
-              value=&quot;&quot;
-            /&gt;
-          &lt;/div&gt;
-          &lt;div&gt;
-            &lt;label
-              for=&quot;f-status&quot;
-            &gt;
-              Status
-            &lt;/label&gt;
-            &lt;select
-              id=&quot;f-status&quot;
-            &gt;
-              &lt;option
-                value=&quot;&quot;
-              &gt;
-                Todos
-              &lt;/option&gt;
-              &lt;option
-                value=&quot;operational&quot;
-              &gt;
-                Operacional
-              &lt;/option&gt;
-              &lt;option
-                value=&quot;construction&quot;
-              &gt;
-                Em construção
-              &lt;/option&gt;
-              &lt;option
-                value=&quot;decommissioned&quot;
-              &gt;
-                Descomissionada
-              &lt;/option&gt;
-            &lt;/select&gt;
-          &lt;/div&gt;
-          &lt;div&gt;
-            &lt;label
-              for=&quot;f-type&quot;
-            &gt;
-              Tipo
-            &lt;/label&gt;
-            &lt;select
-              id=&quot;f-type&quot;
-            &gt;
-              &lt;option
-                value=&quot;&quot;
-              &gt;
-                Todos
-              &lt;/option&gt;
-              &lt;option&gt;
-                FPSO
-              &lt;/option&gt;
-            &lt;/select&gt;
-          &lt;/div&gt;
-          &lt;div&gt;
-            &lt;label
-              for=&quot;f-basin&quot;
-            &gt;
-              Bacia
-            &lt;/label&gt;
-            &lt;select
-              id=&quot;f-basin&quot;
-            &gt;
-              &lt;option
-                value=&quot;&quot;
-              &gt;
-                Todas
-              &lt;/option&gt;
-              &lt;option&gt;
-                Bacia de Campos
-              &lt;/option&gt;
-              &lt;option&gt;
-                Bacia de Santos
-              &lt;/option&gt;
-            &lt;/select&gt;
-          &lt;/div&gt;
-          &lt;div&gt;
-            &lt;label
-              for=&quot;f-field&quot;
-            &gt;
-              Campo
-            &lt;/label&gt;
-            &lt;select
-              id=&quot;f-field&quot;
-            &gt;
-              &lt;option
-                value=&quot;&quot;
-              &gt;
-                Todos
-              &lt;/option&gt;
-              &lt;option&gt;
-                Búzios
-              &lt;/option&gt;
-              &lt;option&gt;
-                Marlim Sul
-              &lt;/option&gt;
-            &lt;/select&gt;
-          &lt;/div&gt;
-          &lt;div&gt;
-            &lt;label
-              for=&quot;f-operator&quot;
-            &gt;
-              Operador
-            &lt;/label&gt;
-            &lt;select
-              id=&quot;f-operator&quot;
-            &gt;
-              &lt;option
-                value=&quot;&quot;
-              &gt;
-                Todos
-              &lt;/option&gt;
-              &lt;option&gt;
-                Petrobras
-              &lt;/option&gt;
-            &lt;/select&gt;
-          &lt;/div&gt;
-          &lt;div&gt;
-            &lt;label
-              for=&quot;f-oil&quot;
-            &gt;
-              Óleo mín. (bpd)
-            &lt;/label&gt;
-            &lt;input
-              id=&quot;f-oil&quot;
-              type=&quot;number&quot;
-              va...
- ❯ src/__tests__/Maritimas.test.tsx:137:24
- ❯ runWithExpensiveErrorDiagnosticsDisabled node_modules/@testing-library/dom/dist/config.js:47:12
- ❯ checkCallback node_modules/@testing-library/dom/dist/wait-for.js:124:77
- ❯ Timeout.checkRealTimersCallback node_modules/@testing-library/dom/dist/wait-for.js:118:16
-            </failure>
+        <testcase classname="src/__tests__/App.test.tsx" name="Seção 3 — Refino, Gás e Logística &gt; não deve ter IDs duplicados na Seção 3" time="0.000129194">
         </testcase>
     </testsuite>
-    <testsuite name="src/__tests__/Terrestres.test.tsx" timestamp="2026-10-24T07:22:37.829Z" hostname="runnervmdkmh8" tests="7" failures="0" errors="0" skipped="0" time="1.251013494">
-        <testcase classname="src/__tests__/Terrestres.test.tsx" name="Seção 2 — Campos e Unidades Terrestres &gt; deve exibir 10 campos/unidades na Seção 2" time="0.287963218">
+    <testsuite name="src/__tests__/Maritimas.test.tsx" timestamp="2026-10-24T07:27:06.822Z" hostname="runnervmr9t6g" tests="10" failures="0" errors="0" skipped="0" time="0.75825253">
+        <testcase classname="src/__tests__/Maritimas.test.tsx" name="Seção 1 — Plataformas Marítimas &gt; deve exibir 3 plataformas na Seção 1 (mock)" time="0.1047551">
         </testcase>
-        <testcase classname="src/__tests__/Terrestres.test.tsx" name="Seção 2 — Campos e Unidades Terrestres &gt; deve filtrar por bacia" time="0.206561625">
+        <testcase classname="src/__tests__/Maritimas.test.tsx" name="Seção 1 — Plataformas Marítimas &gt; deve filtrar por bacia" time="0.077858256">
         </testcase>
-        <testcase classname="src/__tests__/Terrestres.test.tsx" name="Seção 2 — Campos e Unidades Terrestres &gt; deve filtrar por operador" time="0.187799504">
+        <testcase classname="src/__tests__/Maritimas.test.tsx" name="Seção 1 — Plataformas Marítimas &gt; deve filtrar por campo" time="0.067826655">
         </testcase>
-        <testcase classname="src/__tests__/Terrestres.test.tsx" name="Seção 2 — Campos e Unidades Terrestres &gt; deve filtrar por poços mínimos" time="0.157748934">
+        <testcase classname="src/__tests__/Maritimas.test.tsx" name="Seção 1 — Plataformas Marítimas &gt; deve filtrar por operador" time="0.072031532">
         </testcase>
-        <testcase classname="src/__tests__/Terrestres.test.tsx" name="Seção 2 — Campos e Unidades Terrestres &gt; deve permitir selecionar até 10 campos" time="0.408681673">
+        <testcase classname="src/__tests__/Maritimas.test.tsx" name="Seção 1 — Plataformas Marítimas &gt; deve filtrar por óleo mínimo" time="0.078826152">
         </testcase>
-        <testcase classname="src/__tests__/Terrestres.test.tsx" name="Seção 2 — Campos e Unidades Terrestres &gt; deve conter o Polo Urucu com produção agregada" time="0.000527587">
+        <testcase classname="src/__tests__/Maritimas.test.tsx" name="Seção 1 — Plataformas Marítimas &gt; deve filtrar por gás mínimo" time="0.079115547">
         </testcase>
-        <testcase classname="src/__tests__/Terrestres.test.tsx" name="Seção 2 — Campos e Unidades Terrestres &gt; não deve ter IDs duplicados na Seção 2" time="0.000266419">
+        <testcase classname="src/__tests__/Maritimas.test.tsx" name="Seção 1 — Plataformas Marítimas &gt; deve filtrar por ano mínimo" time="0.047088203">
+        </testcase>
+        <testcase classname="src/__tests__/Maritimas.test.tsx" name="Seção 1 — Plataformas Marítimas &gt; deve filtrar por acomodação mínima" time="0.060126616">
+        </testcase>
+        <testcase classname="src/__tests__/Maritimas.test.tsx" name="Seção 1 — Plataformas Marítimas &gt; deve permitir selecionar até 10 plataformas" time="0.119372553">
+        </testcase>
+        <testcase classname="src/__tests__/Maritimas.test.tsx" name="Seção 1 — Plataformas Marítimas &gt; deve ordenar por óleo (decrescente)" time="0.050011606">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/__tests__/Terrestres.test.tsx" timestamp="2026-10-24T07:27:06.823Z" hostname="runnervmr9t6g" tests="7" failures="0" errors="0" skipped="0" time="0.805781879">
+        <testcase classname="src/__tests__/Terrestres.test.tsx" name="Seção 2 — Campos e Unidades Terrestres &gt; deve exibir 10 campos/unidades na Seção 2" time="0.187415723">
+        </testcase>
+        <testcase classname="src/__tests__/Terrestres.test.tsx" name="Seção 2 — Campos e Unidades Terrestres &gt; deve filtrar por bacia" time="0.146543392">
+        </testcase>
+        <testcase classname="src/__tests__/Terrestres.test.tsx" name="Seção 2 — Campos e Unidades Terrestres &gt; deve filtrar por operador" time="0.121282583">
+        </testcase>
+        <testcase classname="src/__tests__/Terrestres.test.tsx" name="Seção 2 — Campos e Unidades Terrestres &gt; deve filtrar por poços mínimos" time="0.104587012">
+        </testcase>
+        <testcase classname="src/__tests__/Terrestres.test.tsx" name="Seção 2 — Campos e Unidades Terrestres &gt; deve permitir selecionar até 10 campos" time="0.244345657">
+        </testcase>
+        <testcase classname="src/__tests__/Terrestres.test.tsx" name="Seção 2 — Campos e Unidades Terrestres &gt; deve conter o Polo Urucu com produção agregada" time="0.00033294">
+        </testcase>
+        <testcase classname="src/__tests__/Terrestres.test.tsx" name="Seção 2 — Campos e Unidades Terrestres &gt; não deve ter IDs duplicados na Seção 2" time="0.000145518">
         </testcase>
     </testsuite>
 </testsuites>
