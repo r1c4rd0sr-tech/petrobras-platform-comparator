@@ -1,63 +1,63 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuites name="vitest tests" tests="27" failures="0" errors="0" time="2.899">
-    <testsuite name="src/__tests__/App.test.tsx" timestamp="2026-10-24T07:28:45.640Z" hostname="runnervmr9t6g" tests="10" failures="0" errors="0" skipped="0" time="1.47831154">
-        <testcase classname="src/__tests__/App.test.tsx" name="Seção 3 — Refino, Gás e Logística &gt; deve exibir 53 unidades na Seção 3 (12 refinarias + 19 terminais + 1 UTGCAB + 8 UTGNs + 13 ECOMPs)" time="0.322229585">
+<testsuites name="vitest tests" tests="27" failures="0" errors="0" time="2.566">
+    <testsuite name="src/__tests__/App.test.tsx" timestamp="2026-10-24T07:30:54.068Z" hostname="runnervmr9t6g" tests="10" failures="0" errors="0" skipped="0" time="1.418575762">
+        <testcase classname="src/__tests__/App.test.tsx" name="Seção 3 — Refino, Gás e Logística &gt; deve exibir 53 unidades na Seção 3 (12 refinarias + 19 terminais + 1 UTGCAB + 8 UTGNs + 13 ECOMPs)" time="0.448098962">
         </testcase>
-        <testcase classname="src/__tests__/App.test.tsx" name="Seção 3 — Refino, Gás e Logística &gt; deve conter 12 refinarias, 19 terminais, 1 UTGCAB, 8 UTGNs e 13 ECOMPs" time="0.000576322">
+        <testcase classname="src/__tests__/App.test.tsx" name="Seção 3 — Refino, Gás e Logística &gt; deve conter 12 refinarias, 19 terminais, 1 UTGCAB, 8 UTGNs e 13 ECOMPs" time="0.000623182">
         </testcase>
-        <testcase classname="src/__tests__/App.test.tsx" name="Seção 3 — Refino, Gás e Logística &gt; deve filtrar por estado na Seção 3" time="0.342838135">
+        <testcase classname="src/__tests__/App.test.tsx" name="Seção 3 — Refino, Gás e Logística &gt; deve filtrar por estado na Seção 3" time="0.300431162">
         </testcase>
-        <testcase classname="src/__tests__/App.test.tsx" name="Seção 3 — Refino, Gás e Logística &gt; deve filtrar por gás mínimo na Seção 3" time="0.299429144">
+        <testcase classname="src/__tests__/App.test.tsx" name="Seção 3 — Refino, Gás e Logística &gt; deve filtrar por gás mínimo na Seção 3" time="0.231793227">
         </testcase>
-        <testcase classname="src/__tests__/App.test.tsx" name="Seção 3 — Refino, Gás e Logística &gt; deve filtrar por armazenamento mínimo na Seção 3" time="0.172721719">
+        <testcase classname="src/__tests__/App.test.tsx" name="Seção 3 — Refino, Gás e Logística &gt; deve filtrar por armazenamento mínimo na Seção 3" time="0.163976081">
         </testcase>
-        <testcase classname="src/__tests__/App.test.tsx" name="Seção 3 — Refino, Gás e Logística &gt; deve permitir selecionar até 10 unidades na Seção 3" time="0.337285474">
+        <testcase classname="src/__tests__/App.test.tsx" name="Seção 3 — Refino, Gás e Logística &gt; deve permitir selecionar até 10 unidades na Seção 3" time="0.270589847">
         </testcase>
-        <testcase classname="src/__tests__/App.test.tsx" name="Seção 3 — Refino, Gás e Logística &gt; deve exibir a UTGCAB de Cabiúnas com capacidade de 24,6 MMm³/dia" time="0.000427802">
+        <testcase classname="src/__tests__/App.test.tsx" name="Seção 3 — Refino, Gás e Logística &gt; deve exibir a UTGCAB de Cabiúnas com capacidade de 24,6 MMm³/dia" time="0.000407917">
         </testcase>
-        <testcase classname="src/__tests__/App.test.tsx" name="Seção 3 — Refino, Gás e Logística &gt; deve conter 8 UTGNs com capacidade total de ~66,2 MMm³/dia" time="0.000211512">
+        <testcase classname="src/__tests__/App.test.tsx" name="Seção 3 — Refino, Gás e Logística &gt; deve conter 8 UTGNs com capacidade total de ~66,2 MMm³/dia" time="0.00018522">
         </testcase>
-        <testcase classname="src/__tests__/App.test.tsx" name="Seção 3 — Refino, Gás e Logística &gt; deve conter 13 ECOMPs com vazão nominal de 8,00 ou 30,08 MMm³/dia" time="0.001233812">
+        <testcase classname="src/__tests__/App.test.tsx" name="Seção 3 — Refino, Gás e Logística &gt; deve conter 13 ECOMPs com vazão nominal de 8,00 ou 30,08 MMm³/dia" time="0.001010478">
         </testcase>
-        <testcase classname="src/__tests__/App.test.tsx" name="Seção 3 — Refino, Gás e Logística &gt; não deve ter IDs duplicados na Seção 3" time="0.000201828">
-        </testcase>
-    </testsuite>
-    <testsuite name="src/__tests__/Maritimas.test.tsx" timestamp="2026-10-24T07:28:45.642Z" hostname="runnervmr9t6g" tests="10" failures="0" errors="0" skipped="0" time="1.056228955">
-        <testcase classname="src/__tests__/Maritimas.test.tsx" name="Seção 1 — Plataformas Marítimas &gt; deve exibir 3 plataformas na Seção 1 (mock)" time="0.175885597">
-        </testcase>
-        <testcase classname="src/__tests__/Maritimas.test.tsx" name="Seção 1 — Plataformas Marítimas &gt; deve filtrar por bacia" time="0.113307643">
-        </testcase>
-        <testcase classname="src/__tests__/Maritimas.test.tsx" name="Seção 1 — Plataformas Marítimas &gt; deve filtrar por campo" time="0.146959397">
-        </testcase>
-        <testcase classname="src/__tests__/Maritimas.test.tsx" name="Seção 1 — Plataformas Marítimas &gt; deve filtrar por operador" time="0.094211858">
-        </testcase>
-        <testcase classname="src/__tests__/Maritimas.test.tsx" name="Seção 1 — Plataformas Marítimas &gt; deve filtrar por óleo mínimo" time="0.082325652">
-        </testcase>
-        <testcase classname="src/__tests__/Maritimas.test.tsx" name="Seção 1 — Plataformas Marítimas &gt; deve filtrar por gás mínimo" time="0.098579694">
-        </testcase>
-        <testcase classname="src/__tests__/Maritimas.test.tsx" name="Seção 1 — Plataformas Marítimas &gt; deve filtrar por ano mínimo" time="0.090910568">
-        </testcase>
-        <testcase classname="src/__tests__/Maritimas.test.tsx" name="Seção 1 — Plataformas Marítimas &gt; deve filtrar por acomodação mínima" time="0.0778597">
-        </testcase>
-        <testcase classname="src/__tests__/Maritimas.test.tsx" name="Seção 1 — Plataformas Marítimas &gt; deve permitir selecionar até 10 plataformas" time="0.106145249">
-        </testcase>
-        <testcase classname="src/__tests__/Maritimas.test.tsx" name="Seção 1 — Plataformas Marítimas &gt; deve ordenar por óleo (decrescente)" time="0.068423744">
+        <testcase classname="src/__tests__/App.test.tsx" name="Seção 3 — Refino, Gás e Logística &gt; não deve ter IDs duplicados na Seção 3" time="0.000145139">
         </testcase>
     </testsuite>
-    <testsuite name="src/__tests__/Terrestres.test.tsx" timestamp="2026-10-24T07:28:45.644Z" hostname="runnervmr9t6g" tests="7" failures="0" errors="0" skipped="0" time="1.004843807">
-        <testcase classname="src/__tests__/Terrestres.test.tsx" name="Seção 2 — Campos e Unidades Terrestres &gt; deve exibir 10 campos/unidades na Seção 2" time="0.225104163">
+    <testsuite name="src/__tests__/Maritimas.test.tsx" timestamp="2026-10-24T07:30:54.070Z" hostname="runnervmr9t6g" tests="10" failures="0" errors="0" skipped="0" time="0.962855953">
+        <testcase classname="src/__tests__/Maritimas.test.tsx" name="Seção 1 — Plataformas Marítimas &gt; deve exibir 3 plataformas na Seção 1 (mock)" time="0.130395667">
         </testcase>
-        <testcase classname="src/__tests__/Terrestres.test.tsx" name="Seção 2 — Campos e Unidades Terrestres &gt; deve filtrar por bacia" time="0.172832819">
+        <testcase classname="src/__tests__/Maritimas.test.tsx" name="Seção 1 — Plataformas Marítimas &gt; deve filtrar por bacia" time="0.124748911">
         </testcase>
-        <testcase classname="src/__tests__/Terrestres.test.tsx" name="Seção 2 — Campos e Unidades Terrestres &gt; deve filtrar por operador" time="0.14641925">
+        <testcase classname="src/__tests__/Maritimas.test.tsx" name="Seção 1 — Plataformas Marítimas &gt; deve filtrar por campo" time="0.080435705">
         </testcase>
-        <testcase classname="src/__tests__/Terrestres.test.tsx" name="Seção 2 — Campos e Unidades Terrestres &gt; deve filtrar por poços mínimos" time="0.147637028">
+        <testcase classname="src/__tests__/Maritimas.test.tsx" name="Seção 1 — Plataformas Marítimas &gt; deve filtrar por operador" time="0.085144694">
         </testcase>
-        <testcase classname="src/__tests__/Terrestres.test.tsx" name="Seção 2 — Campos e Unidades Terrestres &gt; deve permitir selecionar até 10 campos" time="0.3095545">
+        <testcase classname="src/__tests__/Maritimas.test.tsx" name="Seção 1 — Plataformas Marítimas &gt; deve filtrar por óleo mínimo" time="0.087484533">
         </testcase>
-        <testcase classname="src/__tests__/Terrestres.test.tsx" name="Seção 2 — Campos e Unidades Terrestres &gt; deve conter o Polo Urucu com produção agregada" time="0.001440147">
+        <testcase classname="src/__tests__/Maritimas.test.tsx" name="Seção 1 — Plataformas Marítimas &gt; deve filtrar por gás mínimo" time="0.055808163">
         </testcase>
-        <testcase classname="src/__tests__/Terrestres.test.tsx" name="Seção 2 — Campos e Unidades Terrestres &gt; não deve ter IDs duplicados na Seção 2" time="0.000265402">
+        <testcase classname="src/__tests__/Maritimas.test.tsx" name="Seção 1 — Plataformas Marítimas &gt; deve filtrar por ano mínimo" time="0.073028638">
+        </testcase>
+        <testcase classname="src/__tests__/Maritimas.test.tsx" name="Seção 1 — Plataformas Marítimas &gt; deve filtrar por acomodação mínima" time="0.083723927">
+        </testcase>
+        <testcase classname="src/__tests__/Maritimas.test.tsx" name="Seção 1 — Plataformas Marítimas &gt; deve permitir selecionar até 10 plataformas" time="0.158432839">
+        </testcase>
+        <testcase classname="src/__tests__/Maritimas.test.tsx" name="Seção 1 — Plataformas Marítimas &gt; deve ordenar por óleo (decrescente)" time="0.082234344">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/__tests__/Terrestres.test.tsx" timestamp="2026-10-24T07:30:54.071Z" hostname="runnervmr9t6g" tests="7" failures="0" errors="0" skipped="0" time="1.021710312">
+        <testcase classname="src/__tests__/Terrestres.test.tsx" name="Seção 2 — Campos e Unidades Terrestres &gt; deve exibir 10 campos/unidades na Seção 2" time="0.203882612">
+        </testcase>
+        <testcase classname="src/__tests__/Terrestres.test.tsx" name="Seção 2 — Campos e Unidades Terrestres &gt; deve filtrar por bacia" time="0.23704958">
+        </testcase>
+        <testcase classname="src/__tests__/Terrestres.test.tsx" name="Seção 2 — Campos e Unidades Terrestres &gt; deve filtrar por operador" time="0.164151595">
+        </testcase>
+        <testcase classname="src/__tests__/Terrestres.test.tsx" name="Seção 2 — Campos e Unidades Terrestres &gt; deve filtrar por poços mínimos" time="0.116635103">
+        </testcase>
+        <testcase classname="src/__tests__/Terrestres.test.tsx" name="Seção 2 — Campos e Unidades Terrestres &gt; deve permitir selecionar até 10 campos" time="0.298019642">
+        </testcase>
+        <testcase classname="src/__tests__/Terrestres.test.tsx" name="Seção 2 — Campos e Unidades Terrestres &gt; deve conter o Polo Urucu com produção agregada" time="0.000399314">
+        </testcase>
+        <testcase classname="src/__tests__/Terrestres.test.tsx" name="Seção 2 — Campos e Unidades Terrestres &gt; não deve ter IDs duplicados na Seção 2" time="0.000202136">
         </testcase>
     </testsuite>
 </testsuites>
