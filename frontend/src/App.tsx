@@ -605,10 +605,10 @@ export default function App() {
                       <div style={chartRowStyle}>
                         <div style={chartBoxStyle}>
                           <h4 style={chartTitleStyle}>{isRefino ? "Capacidade de processamento (bpd)" : "Produção de Óleo e BOE"}</h4>
-                          <ResponsiveContainer width="100%" height={isMobile ? 280 : 360}>
+                          <ResponsiveContainer width="100%" height={isMobile ? 300 : 400}>
                             <BarChart data={chartData}>
                               <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
-                              <XAxis dataKey="name" stroke={axisColor} fontSize={11} interval={0} angle={isMobile ? -35 : 0} textAnchor={isMobile ? "end" : "middle"} height={isMobile ? 90 : 50} />
+                              <XAxis dataKey="name" stroke={axisColor} fontSize={11} interval={0} angle={-35} textAnchor="end" height={100} />
                               <YAxis stroke={axisColor} />
                               <Tooltip /><Legend />
                               <Bar dataKey="Óleo" fill="#008542" />
@@ -619,10 +619,10 @@ export default function App() {
                         {isRefino ? (
                           <div style={chartBoxStyle}>
                             <h4 style={chartTitleStyle}>Capacidade de Gás (MMm³/d)</h4>
-                            <ResponsiveContainer width="100%" height={isMobile ? 280 : 360}>
+                            <ResponsiveContainer width="100%" height={isMobile ? 300 : 400}>
                               <BarChart data={chartData}>
                                 <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
-                                <XAxis dataKey="name" stroke={axisColor} fontSize={11} interval={0} angle={isMobile ? -35 : 0} textAnchor={isMobile ? "end" : "middle"} height={isMobile ? 90 : 50} />
+                                <XAxis dataKey="name" stroke={axisColor} fontSize={11} interval={0} angle={-35} textAnchor="end" height={100} />
                                 <YAxis stroke={axisColor} />
                                 <Tooltip /><Legend />
                                 <Bar dataKey="Gás" fill="#f28c28" />
@@ -632,10 +632,10 @@ export default function App() {
                         ) : (
                           <div style={chartBoxStyle}>
                             <h4 style={chartTitleStyle}>Produção de Gás</h4>
-                            <ResponsiveContainer width="100%" height={isMobile ? 280 : 360}>
+                            <ResponsiveContainer width="100%" height={isMobile ? 300 : 400}>
                               <BarChart data={chartData}>
                                 <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
-                                <XAxis dataKey="name" stroke={axisColor} fontSize={11} interval={0} angle={isMobile ? -35 : 0} textAnchor={isMobile ? "end" : "middle"} height={isMobile ? 90 : 50} />
+                                <XAxis dataKey="name" stroke={axisColor} fontSize={11} interval={0} angle={-35} textAnchor="end" height={100} />
                                 <YAxis stroke={axisColor} />
                                 <Tooltip /><Legend />
                                 <Bar dataKey="Gás" fill="#f28c28" />
@@ -648,10 +648,10 @@ export default function App() {
                         <div style={chartRowStyle}>
                           <div style={chartBoxStyle}>
                             <h4 style={chartTitleStyle}>Capacidade de Armazenamento (m³)</h4>
-                            <ResponsiveContainer width="100%" height={isMobile ? 280 : 360}>
+                            <ResponsiveContainer width="100%" height={isMobile ? 300 : 400}>
                               <BarChart data={chartData}>
                                 <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
-                                <XAxis dataKey="name" stroke={axisColor} fontSize={11} interval={0} angle={isMobile ? -35 : 0} textAnchor={isMobile ? "end" : "middle"} height={isMobile ? 90 : 50} />
+                                <XAxis dataKey="name" stroke={axisColor} fontSize={11} interval={0} angle={-35} textAnchor="end" height={100} />
                                 <YAxis stroke={axisColor} />
                                 <Tooltip /><Legend />
                                 <Bar dataKey="Armazenamento" fill="#0072ce" />
@@ -664,10 +664,10 @@ export default function App() {
                         <div style={chartRowStyle}>
                           <div style={chartBoxStyle}>
                             <h4 style={chartTitleStyle}>Poços Produtivos</h4>
-                            <ResponsiveContainer width="100%" height={isMobile ? 280 : 360}>
+                            <ResponsiveContainer width="100%" height={isMobile ? 300 : 400}>
                               <BarChart data={chartData}>
                                 <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
-                                <XAxis dataKey="name" stroke={axisColor} fontSize={11} interval={0} angle={isMobile ? -35 : 0} textAnchor={isMobile ? "end" : "middle"} height={isMobile ? 90 : 50} />
+                                <XAxis dataKey="name" stroke={axisColor} fontSize={11} interval={0} angle={-35} textAnchor="end" height={100} />
                                 <YAxis stroke={axisColor} />
                                 <Tooltip /><Legend />
                                 <Bar dataKey="Poços" fill="#0072ce" />
