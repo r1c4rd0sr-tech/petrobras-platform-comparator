@@ -283,46 +283,46 @@ export default function App() {
       </header>
 
       <section className="filters">
-        <div><label>Busca</label><input value={filters.search} onChange={(e) => set("search", e.target.value)} placeholder="Nome, campo, bacia ou operador" /></div>
-        <div><label>Status</label><select value={filters.status} onChange={(e) => set("status", e.target.value)}><option value="">Todos</option><option value="operational">Operacional</option><option value="construction">Em construção</option><option value="decommissioned">Descomissionada</option></select></div>
-        <div><label>Tipo</label><select value={filters.unit_type} onChange={(e) => set("unit_type", e.target.value)}><option value="">Todos</option>{options.unit_types.map((x) => <option key={x}>{x}</option>)}</select></div>
+        <div><label htmlFor="f-search">Busca</label><input id="f-search" value={filters.search} onChange={(e) => set("search", e.target.value)} placeholder="Nome, campo, bacia ou operador" /></div>
+        <div><label htmlFor="f-status">Status</label><select id="f-status" value={filters.status} onChange={(e) => set("status", e.target.value)}><option value="">Todos</option><option value="operational">Operacional</option><option value="construction">Em construção</option><option value="decommissioned">Descomissionada</option></select></div>
+        <div><label htmlFor="f-type">Tipo</label><select id="f-type" value={filters.unit_type} onChange={(e) => set("unit_type", e.target.value)}><option value="">Todos</option>{options.unit_types.map((x) => <option key={x}>{x}</option>)}</select></div>
 
         {isOffshore && (
           <>
-            <div><label>Bacia</label><select value={filters.basin} onChange={(e) => set("basin", e.target.value)}><option value="">Todas</option>{options.basins.map((x) => <option key={x}>{x}</option>)}</select></div>
-            <div><label>Campo</label><select value={filters.field} onChange={(e) => set("field", e.target.value)}><option value="">Todos</option>{options.fields.map((x) => <option key={x}>{x}</option>)}</select></div>
-            <div><label>Operador</label><select value={filters.operator} onChange={(e) => set("operator", e.target.value)}><option value="">Todos</option>{options.operators.map((x) => <option key={x}>{x}</option>)}</select></div>
-            <div><label>Óleo mín. (bpd)</label><input type="number" value={filters.oil} onChange={(e) => set("oil", e.target.value)} /></div>
-            <div><label>Gás mín. (MMm³/d)</label><input type="number" value={filters.gas} onChange={(e) => set("gas", e.target.value)} /></div>
-            <div><label>Ano mín.</label><input type="number" value={filters.year} onChange={(e) => set("year", e.target.value)} /></div>
-            <div><label>Acomodação mín.</label><input type="number" value={filters.accommodation} onChange={(e) => set("accommodation", e.target.value)} /></div>
-            <div><label>Ordenar por</label><select value={filters.sort} onChange={(e) => set("sort", e.target.value)}><option value="oil">Óleo</option><option value="gas">Gás</option><option value="boed">BOE/d</option><option value="storage_m3">Armazenamento</option><option value="length_m">Comprimento</option><option value="weight_t">Peso</option><option value="distance_to_coast_km">Distância costa</option><option value="year">Ano</option><option value="name">Nome</option></select></div>
+            <div><label htmlFor="f-basin">Bacia</label><select id="f-basin" value={filters.basin} onChange={(e) => set("basin", e.target.value)}><option value="">Todas</option>{options.basins.map((x) => <option key={x}>{x}</option>)}</select></div>
+            <div><label htmlFor="f-field">Campo</label><select id="f-field" value={filters.field} onChange={(e) => set("field", e.target.value)}><option value="">Todos</option>{options.fields.map((x) => <option key={x}>{x}</option>)}</select></div>
+            <div><label htmlFor="f-operator">Operador</label><select id="f-operator" value={filters.operator} onChange={(e) => set("operator", e.target.value)}><option value="">Todos</option>{options.operators.map((x) => <option key={x}>{x}</option>)}</select></div>
+            <div><label htmlFor="f-oil">Óleo mín. (bpd)</label><input id="f-oil" type="number" value={filters.oil} onChange={(e) => set("oil", e.target.value)} /></div>
+            <div><label htmlFor="f-gas">Gás mín. (MMm³/d)</label><input id="f-gas" type="number" value={filters.gas} onChange={(e) => set("gas", e.target.value)} /></div>
+            <div><label htmlFor="f-year">Ano mín.</label><input id="f-year" type="number" value={filters.year} onChange={(e) => set("year", e.target.value)} /></div>
+            <div><label htmlFor="f-accommodation">Acomodação mín.</label><input id="f-accommodation" type="number" value={filters.accommodation} onChange={(e) => set("accommodation", e.target.value)} /></div>
+            <div><label htmlFor="f-sort">Ordenar por</label><select id="f-sort" value={filters.sort} onChange={(e) => set("sort", e.target.value)}><option value="oil">Óleo</option><option value="gas">Gás</option><option value="boed">BOE/d</option><option value="storage_m3">Armazenamento</option><option value="length_m">Comprimento</option><option value="weight_t">Peso</option><option value="distance_to_coast_km">Distância costa</option><option value="year">Ano</option><option value="name">Nome</option></select></div>
           </>
         )}
 
         {isOnshore && (
           <>
-            <div><label>Bacia</label><select value={filters.basin} onChange={(e) => set("basin", e.target.value)}><option value="">Todas</option>{options.basins.map((x) => <option key={x}>{x}</option>)}</select></div>
-            <div><label>Campo</label><select value={filters.field} onChange={(e) => set("field", e.target.value)}><option value="">Todos</option>{options.fields.map((x) => <option key={x}>{x}</option>)}</select></div>
-            <div><label>Operador</label><select value={filters.operator} onChange={(e) => set("operator", e.target.value)}><option value="">Todos</option>{options.operators.map((x) => <option key={x}>{x}</option>)}</select></div>
-            <div><label>Óleo mín. (bpd)</label><input type="number" value={filters.oil} onChange={(e) => set("oil", e.target.value)} /></div>
-            <div><label>Gás mín. (MMm³/d)</label><input type="number" value={filters.gas} onChange={(e) => set("gas", e.target.value)} /></div>
-            <div><label>Ano mín.</label><input type="number" value={filters.year} onChange={(e) => set("year", e.target.value)} /></div>
-            <div><label>Poços mín.</label><input type="number" value={filters.wells} onChange={(e) => set("wells", e.target.value)} /></div>
-            <div><label>Ordenar por</label><select value={filters.sort} onChange={(e) => set("sort", e.target.value)}><option value="oil">Óleo</option><option value="gas">Gás</option><option value="boed">BOE/d</option><option value="wells_productive">Poços</option><option value="year">Ano</option><option value="name">Nome</option></select></div>
+            <div><label htmlFor="f-basin">Bacia</label><select id="f-basin" value={filters.basin} onChange={(e) => set("basin", e.target.value)}><option value="">Todas</option>{options.basins.map((x) => <option key={x}>{x}</option>)}</select></div>
+            <div><label htmlFor="f-field">Campo</label><select id="f-field" value={filters.field} onChange={(e) => set("field", e.target.value)}><option value="">Todos</option>{options.fields.map((x) => <option key={x}>{x}</option>)}</select></div>
+            <div><label htmlFor="f-operator">Operador</label><select id="f-operator" value={filters.operator} onChange={(e) => set("operator", e.target.value)}><option value="">Todos</option>{options.operators.map((x) => <option key={x}>{x}</option>)}</select></div>
+            <div><label htmlFor="f-oil">Óleo mín. (bpd)</label><input id="f-oil" type="number" value={filters.oil} onChange={(e) => set("oil", e.target.value)} /></div>
+            <div><label htmlFor="f-gas">Gás mín. (MMm³/d)</label><input id="f-gas" type="number" value={filters.gas} onChange={(e) => set("gas", e.target.value)} /></div>
+            <div><label htmlFor="f-year">Ano mín.</label><input id="f-year" type="number" value={filters.year} onChange={(e) => set("year", e.target.value)} /></div>
+            <div><label htmlFor="f-wells">Poços mín.</label><input id="f-wells" type="number" value={filters.wells} onChange={(e) => set("wells", e.target.value)} /></div>
+            <div><label htmlFor="f-sort">Ordenar por</label><select id="f-sort" value={filters.sort} onChange={(e) => set("sort", e.target.value)}><option value="oil">Óleo</option><option value="gas">Gás</option><option value="boed">BOE/d</option><option value="wells_productive">Poços</option><option value="year">Ano</option><option value="name">Nome</option></select></div>
           </>
         )}
 
         {isRefino && (
           <>
-            <div><label>Estado</label><select value={filters.state} onChange={(e) => set("state", e.target.value)}><option value="">Todos</option>{options.states.map((x) => <option key={x}>{x}</option>)}</select></div>
-            <div><label>Município</label><select value={filters.municipality} onChange={(e) => set("municipality", e.target.value)}><option value="">Todos</option>{options.municipalities.map((x) => <option key={x}>{x}</option>)}</select></div>
-            <div><label>Operador</label><select value={filters.operator} onChange={(e) => set("operator", e.target.value)}><option value="">Todos</option>{options.operators.map((x) => <option key={x}>{x}</option>)}</select></div>
-            <div><label>Capacidade mín. (bpd)</label><input type="number" value={filters.oil} onChange={(e) => set("oil", e.target.value)} /></div>
-            <div><label>Gás mín. (MMm³/d)</label><input type="number" value={filters.gas} onChange={(e) => set("gas", e.target.value)} /></div>
-            <div><label>Armazenamento mín. (m³)</label><input type="number" value={filters.storage} onChange={(e) => set("storage", e.target.value)} /></div>
-            <div><label>Ano mín.</label><input type="number" value={filters.year} onChange={(e) => set("year", e.target.value)} /></div>
-            <div><label>Ordenar por</label><select value={filters.sort} onChange={(e) => set("sort", e.target.value)}><option value="oil">Capacidade</option><option value="gas">Gás</option><option value="storage_m3">Armazenamento</option><option value="year">Ano</option><option value="name">Nome</option></select></div>
+            <div><label htmlFor="f-state">Estado</label><select id="f-state" value={filters.state} onChange={(e) => set("state", e.target.value)}><option value="">Todos</option>{options.states.map((x) => <option key={x}>{x}</option>)}</select></div>
+            <div><label htmlFor="f-municipality">Município</label><select id="f-municipality" value={filters.municipality} onChange={(e) => set("municipality", e.target.value)}><option value="">Todos</option>{options.municipalities.map((x) => <option key={x}>{x}</option>)}</select></div>
+            <div><label htmlFor="f-operator">Operador</label><select id="f-operator" value={filters.operator} onChange={(e) => set("operator", e.target.value)}><option value="">Todos</option>{options.operators.map((x) => <option key={x}>{x}</option>)}</select></div>
+            <div><label htmlFor="f-oil">Capacidade mín. (bpd)</label><input id="f-oil" type="number" value={filters.oil} onChange={(e) => set("oil", e.target.value)} /></div>
+            <div><label htmlFor="f-gas">Gás mín. (MMm³/d)</label><input id="f-gas" type="number" value={filters.gas} onChange={(e) => set("gas", e.target.value)} /></div>
+            <div><label htmlFor="f-storage">Armazenamento mín. (m³)</label><input id="f-storage" type="number" value={filters.storage} onChange={(e) => set("storage", e.target.value)} /></div>
+            <div><label htmlFor="f-year">Ano mín.</label><input id="f-year" type="number" value={filters.year} onChange={(e) => set("year", e.target.value)} /></div>
+            <div><label htmlFor="f-sort">Ordenar por</label><select id="f-sort" value={filters.sort} onChange={(e) => set("sort", e.target.value)}><option value="oil">Capacidade</option><option value="gas">Gás</option><option value="storage_m3">Armazenamento</option><option value="year">Ano</option><option value="name">Nome</option></select></div>
           </>
         )}
 
