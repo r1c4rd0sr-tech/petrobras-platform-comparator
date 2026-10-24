@@ -184,8 +184,8 @@ body {
 [data-theme="dark"] .charts h3 { color: #e8eef5; }
 [data-theme="dark"] .footer { background: #0f2740; color: #a8c4de; border-color: #1e3a5c; }
 
-/* ===== Responsivo para celular ===== */
-@media (max-width: 768px) {
+/* ===== Responsivo para celular (não afeta desktop/tablets) ===== */
+@media (max-width: 600px) {
   .app { padding: 12px; }
 
   .topbar {
