@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Bar, BarChart, CartesianGrid, Cell, Legend, Pie, PieChart, ResponsiveContainer, Scatter, ScatterChart, Tooltip, XAxis, YAxis, ZAxis } from "recharts";
+import { Bar, BarChart, CartesianGrid, Cell, Legend, Pie, PieChart, PolarAngleAxis, PolarGrid, PolarRadiusAxis, Radar, RadarChart, ResponsiveContainer, Scatter, ScatterChart, Tooltip, XAxis, YAxis, ZAxis } from "recharts";
 import { MapContainer, Marker, Popup, TileLayer, Tooltip as LeafletTooltip } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -270,6 +270,21 @@ export default function App() {
       "Óleo/acomodação": isOffshore && accommodation > 0 ? Math.round((p.oil_bpd ?? 0) / accommodation) : 0,
     };
   });
+
+  // Radar — normaliza cada métrica para 0-100 em relação ao máximo entre as unidades selecionadas
+  const radarData = useMemo(() => {
+    if (selected.length === 0) return [];
+    const metrics = ["Óleo", "Gás", "BOE"] as const;
+    const getMax = (m: string) => Math.max(...selected.map((p) => m === "Óleo" ? (p.oil_bpd ?? 0) : m === "Gás" ? (p.gas_mmd ?? 0) : (p.boed ?? 0)), 1);
+    return metrics.map((m) => {
+      const entry: any = { metric: m };
+      selected.forEach((p) => {
+        const val = m === "Óleo" ? (p.oil_bpd ?? 0) : m === "Gás" ? (p.gas_mmd ?? 0) : (p.boed ?? 0);
+        entry[p.name] = Math.round((val / getMax(m)) * 100);
+      });
+      return entry;
+    });
+  }, [selected]);
 
   const totals = filtered.reduce((acc, p) => ({ oil: acc.oil + (p.oil_bpd ?? 0), gas: acc.gas + (p.gas_mmd ?? 0), boe: acc.boe + (p.boed ?? 0), wells: acc.wells + ((p as any).wells_productive ?? 0), storage: acc.storage + (p.storage_m3 ?? 0) }), { oil: 0, gas: 0, boe: 0, wells: 0, storage: 0 });
 
@@ -569,7 +584,7 @@ export default function App() {
 
           <section className="panel" style={{ marginTop: 18 }}>
             <div className="tabs">
-              {["comparativo", "estatisticas", "graficos"].map((x) => <button key={x} className={`tab ${tab === x ? "active" : ""}`} onClick={() => setTab(x)}>{x === "estatisticas" ? "Estatísticas" : x.charAt(0).toUpperCase() + x.slice(1)}</button>)}
+              {["comparativo", "estatisticas", "graficos", "radar-temporal"].map((x) => <button key={x} className={`tab ${tab === x ? "active" : ""}`} onClick={() => setTab(x)}>{x === "radar-temporal" ? "Radar & Temporal" : x === "estatisticas" ? "Estatísticas" : x.charAt(0).toUpperCase() + x.slice(1)}</button>)}
             </div>
             <div className="panel-body">
               {tab === "comparativo" && (
@@ -830,6 +845,46 @@ export default function App() {
                           </div>
                         </div>
                       )}
+                    </>
+                  )}
+                </div>
+              )}
+              {tab === "radar-temporal" && (
+                <div className="charts">
+                  <h3>Radar & Série Temporal — unidades selecionadas ({selected.length}/10)</h3>
+                  {selected.length === 0 && <p style={{ color: axisColor }}>Selecione unidades na lista à esquerda para ver o radar comparativo e a série temporal.</p>}
+                  {selected.length > 0 && (
+                    <>
+                      <div style={chartRowStyle}>
+                        <div style={chartBoxStyle}>
+                          <h4 style={chartTitleStyle}>Radar comparativo — Óleo, Gás e BOE</h4>
+                          <p style={{ color: axisColor, fontSize: 12, marginTop: 0 }}>Cada eixo é normalizado de 0 a 100 em relação à maior unidade selecionada naquele indicador.</p>
+                          <ResponsiveContainer width="100%" height={isMobile ? 320 : 420}>
+                            <RadarChart data={radarData}>
+                              <PolarGrid stroke={gridColor} />
+                              <PolarAngleAxis dataKey="metric" tick={{ fill: axisColor, fontSize: 12 }} />
+                              <PolarRadiusAxis domain={[0, 100]} tick={{ fill: axisColor, fontSize: 10 }} />
+                              {selected.map((p, i) => (
+                                <Radar key={p.id} name={p.name} dataKey={p.name} stroke={PIN_COLORS[i % PIN_COLORS.length]} fill={PIN_COLORS[i % PIN_COLORS.length]} fillOpacity={0.25} />
+                              ))}
+                              <Legend />
+                              <Tooltip content={<CustomTooltip />} />
+                            </RadarChart>
+                          </ResponsiveContainer>
+                        </div>
+                      </div>
+
+                      <div style={chartRowStyle}>
+                        <div style={chartBoxStyle}>
+                          <h4 style={chartTitleStyle}>Série Temporal</h4>
+                          <p style={{ color: axisColor, fontSize: 13 }}>
+                            A série temporal histórica (produção mensal/anual por unidade) ainda não está disponível no feed atual da ANP. Esta área está preparada para exibir automaticamente a evolução de Óleo, Gás e BOE por unidade assim que esse histórico for incorporado à base.
+                          </p>
+                          <div style={{ background: isDark ? "#123a5c" : "#e8eef4", borderRadius: 8, padding: "14px 18px", color: axisColor, fontSize: 13 }}>
+                            <strong style={{ color: isDark ? "#fff" : "#0c2340" }}>Próxima etapa:</strong> integrar o histórico de produção mensal da ANP para popular este gráfico com a evolução temporal de cada unidade selecionada.
+                          </div>
+                        </div>
+                      </div>
                     </>
                   )}
                 </div>
