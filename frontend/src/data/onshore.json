@@ -9,16 +9,16 @@
     "basin": "Bacia do Solimões",
     "field": "Araracanga",
     "operator": "Petrobras",
-    "latitude": -4.20,
+    "latitude": -4.2,
     "longitude": -63.25,
     "year": null,
     "oil_bpd": null,
     "gas_mmd": null,
     "boed": null,
     "wells_productive": null,
-    "notes": "Campo de petróleo leve e gás natural integrante do Polo Urucu, em Coari (AM). Produção individual a ser complementada com dados da ANP.",
-    "source_url": "https://www.gov.br/anp/pt-br/assuntos/exploracao-e-producao-de-oleo-e-gas/dados-de-e-p",
-    "data_version": "V2.0-onshore"
+    "notes": "Campo de petróleo leve e gás natural integrante do Polo Urucu, em Coari (AM). Produz interligado ao Polo Arara, que em maio de 2025 produziu 7,252 MMm³/dia de gás natural por meio de 33 poços (junto com Arara Azul, Carapanaúba, Cupiúba, Rio Urucu e Leste do Urucu). Produção individual por campo disponível no portal CDP da ANP (produção por poço, com defasagem de 2 meses).",
+    "source_url": "https://www.gov.br/anp/pt-br/centrais-de-conteudo/publicacoes/boletins-anp/boletim-mensal-da-producao-de-petroleo-e-gas-natural",
+    "data_version": "V2.1-onshore"
   },
   {
     "id": 1002,
@@ -31,15 +31,15 @@
     "field": "Arara Azul",
     "operator": "Petrobras",
     "latitude": -4.15,
-    "longitude": -63.20,
+    "longitude": -63.2,
     "year": null,
     "oil_bpd": null,
     "gas_mmd": null,
     "boed": null,
     "wells_productive": null,
-    "notes": "Campo de petróleo leve e gás natural integrante do Polo Urucu, em Coari (AM). Produção individual a ser complementada com dados da ANP.",
-    "source_url": "https://www.gov.br/anp/pt-br/assuntos/exploracao-e-producao-de-oleo-e-gas/dados-de-e-p",
-    "data_version": "V2.0-onshore"
+    "notes": "Campo de petróleo leve e gás natural integrante do Polo Urucu, em Coari (AM). Produz interligado ao Polo Arara, que em maio de 2025 produziu 7,252 MMm³/dia de gás natural por meio de 33 poços (junto com Araracanga, Carapanaúba, Cupiúba, Rio Urucu e Leste do Urucu). Produção individual por campo disponível no portal CDP da ANP.",
+    "source_url": "https://www.gov.br/anp/pt-br/centrais-de-conteudo/publicacoes/boletins-anp/boletim-mensal-da-producao-de-petroleo-e-gas-natural",
+    "data_version": "V2.1-onshore"
   },
   {
     "id": 1003,
@@ -52,15 +52,15 @@
     "field": "Carapanaúba",
     "operator": "Petrobras",
     "latitude": -4.25,
-    "longitude": -63.30,
+    "longitude": -63.3,
     "year": null,
     "oil_bpd": null,
     "gas_mmd": null,
     "boed": null,
     "wells_productive": null,
-    "notes": "Campo de petróleo leve e gás natural integrante do Polo Urucu, em Coari (AM). Produção individual a ser complementada com dados da ANP.",
-    "source_url": "https://www.gov.br/anp/pt-br/assuntos/exploracao-e-producao-de-oleo-e-gas/dados-de-e-p",
-    "data_version": "V2.0-onshore"
+    "notes": "Campo de petróleo leve e gás natural integrante do Polo Urucu, em Coari (AM). Produz interligado ao Polo Arara, que em maio de 2025 produziu 7,252 MMm³/dia de gás natural por meio de 33 poços (junto com Arara Azul, Araracanga, Cupiúba, Rio Urucu e Leste do Urucu). Produção individual por campo disponível no portal CDP da ANP.",
+    "source_url": "https://www.gov.br/anp/pt-br/centrais-de-conteudo/publicacoes/boletins-anp/boletim-mensal-da-producao-de-petroleo-e-gas-natural",
+    "data_version": "V2.1-onshore"
   },
   {
     "id": 1004,
@@ -72,16 +72,16 @@
     "basin": "Bacia do Solimões",
     "field": "Cupiúba",
     "operator": "Petrobras",
-    "latitude": -4.10,
+    "latitude": -4.1,
     "longitude": -63.15,
     "year": null,
     "oil_bpd": null,
     "gas_mmd": null,
     "boed": null,
     "wells_productive": null,
-    "notes": "Campo de petróleo leve e gás natural integrante do Polo Urucu, em Coari (AM). Produção individual a ser complementada com dados da ANP.",
-    "source_url": "https://www.gov.br/anp/pt-br/assuntos/exploracao-e-producao-de-oleo-e-gas/dados-de-e-p",
-    "data_version": "V2.0-onshore"
+    "notes": "Campo de petróleo leve e gás natural integrante do Polo Urucu, em Coari (AM). Produz interligado ao Polo Arara, que em maio de 2025 produziu 7,252 MMm³/dia de gás natural por meio de 33 poços (junto com Arara Azul, Araracanga, Carapanaúba, Rio Urucu e Leste do Urucu). Produção individual por campo disponível no portal CDP da ANP.",
+    "source_url": "https://www.gov.br/anp/pt-br/centrais-de-conteudo/publicacoes/boletins-anp/boletim-mensal-da-producao-de-petroleo-e-gas-natural",
+    "data_version": "V2.1-onshore"
   },
   {
     "id": 1005,
@@ -94,15 +94,15 @@
     "field": "Leste do Urucu",
     "operator": "Petrobras",
     "latitude": -4.05,
-    "longitude": -63.10,
+    "longitude": -63.1,
     "year": 1992,
     "oil_bpd": null,
     "gas_mmd": null,
     "boed": null,
     "wells_productive": 32,
-    "notes": "Campo integrante do Polo Urucu, com 32 poços produtores e produção iniciada em 1992. Toda a produção é processada no Polo Arara. Coordenada aproximada.",
+    "notes": "Campo integrante do Polo Urucu, com 32 poços produtores e produção iniciada em 1992. Toda a produção é processada no Polo Arara, que em maio de 2025 produziu 7,252 MMm³/dia de gás natural por meio de 33 poços (junto com Arara Azul, Araracanga, Carapanaúba, Cupiúba e Rio Urucu). Produção individual por campo disponível no portal CDP da ANP. Coordenada aproximada.",
     "source_url": "https://www.gov.br/anp/pt-br/assuntos/exploracao-e-producao-de-oleo-e-gas/desenvolvimento-e-producao/pd/leste_do_urucu.pdf",
-    "data_version": "V2.0-onshore"
+    "data_version": "V2.1-onshore"
   },
   {
     "id": 1006,
@@ -121,9 +121,9 @@
     "gas_mmd": null,
     "boed": null,
     "wells_productive": null,
-    "notes": "Campo de petróleo leve e gás natural integrante do Polo Urucu, em Coari (AM). Produção individual a ser complementada com dados da ANP.",
-    "source_url": "https://www.gov.br/anp/pt-br/assuntos/exploracao-e-producao-de-oleo-e-gas/dados-de-e-p",
-    "data_version": "V2.0-onshore"
+    "notes": "Campo de petróleo leve e gás natural integrante do Polo Urucu, em Coari (AM). Produz interligado ao Polo Arara, que em maio de 2025 produziu 7,252 MMm³/dia de gás natural por meio de 33 poços (junto com Arara Azul, Araracanga, Carapanaúba, Cupiúba e Leste do Urucu). Produção individual por campo disponível no portal CDP da ANP.",
+    "source_url": "https://www.gov.br/anp/pt-br/centrais-de-conteudo/publicacoes/boletins-anp/boletim-mensal-da-producao-de-petroleo-e-gas-natural",
+    "data_version": "V2.1-onshore"
   },
   {
     "id": 1007,
@@ -135,16 +135,16 @@
     "basin": "Bacia do Solimões",
     "field": "Sudoeste Urucu",
     "operator": "Petrobras",
-    "latitude": -4.30,
+    "latitude": -4.3,
     "longitude": -63.35,
     "year": null,
     "oil_bpd": null,
     "gas_mmd": null,
     "boed": null,
     "wells_productive": null,
-    "notes": "Campo de petróleo leve e gás natural integrante do Polo Urucu, em Coari (AM). Produção individual a ser complementada com dados da ANP.",
-    "source_url": "https://www.gov.br/anp/pt-br/assuntos/exploracao-e-producao-de-oleo-e-gas/dados-de-e-p",
-    "data_version": "V2.0-onshore"
+    "notes": "Campo de petróleo leve e gás natural integrante do Polo Urucu, em Coari (AM). A ANP aprovou a anexação de duas áreas ao campo de Sudoeste Urucu, incorporando as áreas de desenvolvimento dos campos de Carapanaúba e Cupiúba. Produção individual por campo disponível no portal CDP da ANP.",
+    "source_url": "https://www.gov.br/anp/pt-br/centrais-de-conteudo/publicacoes/boletins-anp/boletim-mensal-da-producao-de-petroleo-e-gas-natural",
+    "data_version": "V2.1-onshore"
   },
   {
     "id": 1008,
@@ -165,7 +165,7 @@
     "wells_productive": null,
     "notes": "Maior unidade de processamento de gás natural do Brasil, em Itaboraí (RJ). Capacidade de 21 milhões m³/dia, com dois módulos operacionais desde maio de 2025. Recebe gás do pré-sal via Rota 3.",
     "source_url": "https://agencia.petrobras.com.br/w/petrobras-dobra-capacidade-de-processamento-na-upgn-do-complexo-de-energias-boaventura",
-    "data_version": "V2.0-onshore"
+    "data_version": "V2.1-onshore"
   },
   {
     "id": 1009,
@@ -186,7 +186,7 @@
     "wells_productive": null,
     "notes": "Unidade de Tratamento de Gás Natural em Pojuca (BA), operada pela Petrobras. Capacidade de processamento de 2 milhões m³/dia.",
     "source_url": "https://agencia.petrobras.com.br/w/negocio/petrobras-petroreconcavo-brava-energia-e-origem-energia-ampliam-contratos-da-utg-catu-para-processamento-de-g%C3%A1s-no-longo-prazo",
-    "data_version": "V2.0-onshore"
+    "data_version": "V2.1-onshore"
   },
   {
     "id": 1010,
@@ -205,9 +205,9 @@
     "gas_mmd": null,
     "boed": null,
     "wells_productive": null,
-    "notes": "Campo terrestre da Petrobras em Pilar (SE), na Bacia de Sergipe-Alagoas. Entre os 20 campos terrestres com maior produção do Brasil segundo a ANP.",
+    "notes": "Campo terrestre da Petrobras em Pilar (SE), na Bacia de Sergipe-Alagoas. Entre os 20 campos terrestres com maior produção do Brasil segundo a ANP. Produção individual disponível no portal CDP da ANP (produção por poço, com defasagem de 2 meses).",
     "source_url": "https://www.gov.br/anp/pt-br/centrais-de-conteudo/publicacoes/boletins-anp/arquivos-bmppgn/2025/dezembro.pdf",
-    "data_version": "V2.0-onshore"
+    "data_version": "V2.1-onshore"
   },
   {
     "id": 1011,
@@ -226,8 +226,8 @@
     "gas_mmd": null,
     "boed": null,
     "wells_productive": null,
-    "notes": "Campo terrestre da Petrobras em Canto do Amaro (RN), na Bacia Potiguar. Entre os 20 campos terrestres com maior produção do Brasil segundo a ANP.",
+    "notes": "Campo terrestre da Petrobras em Canto do Amaro (RN), na Bacia Potiguar. Entre os 20 campos terrestres com maior produção do Brasil segundo a ANP. Produção individual disponível no portal CDP da ANP (produção por poço, com defasagem de 2 meses).",
     "source_url": "https://www.gov.br/anp/pt-br/centrais-de-conteudo/publicacoes/boletins-anp/arquivos-bmppgn/2025/dezembro.pdf",
-    "data_version": "V2.0-onshore"
+    "data_version": "V2.1-onshore"
   }
 ]
