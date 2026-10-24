@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Bar, BarChart, CartesianGrid, Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { Bar, BarChart, CartesianGrid, Cell, Legend, Pie, PieChart, ResponsiveContainer, Scatter, ScatterChart, Tooltip, XAxis, YAxis, ZAxis } from "recharts";
 import { MapContainer, Marker, Popup, TileLayer, Tooltip as LeafletTooltip } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -29,6 +29,8 @@ const TOOLTIP_UNIT_MAP: Record<string, string> = {
   "Poços": "",
   "Armazenamento": " m³",
   "Campos": "",
+  "BOE/poço": " /d por poço",
+  "Óleo/acomodação": " bpd por pessoa",
 };
 
 const CustomTooltip = ({ active, payload, label }: any) => {
@@ -42,6 +44,19 @@ const CustomTooltip = ({ active, payload, label }: any) => {
           <span style={{ color: "#ffffff" }}>{entry.name}: <strong style={{ color: "#ffcc29" }}>{Number(entry.value).toLocaleString("pt-BR")}{TOOLTIP_UNIT_MAP[entry.name] ?? ""}</strong></span>
         </p>
       ))}
+    </div>
+  );
+};
+
+const CustomScatterTooltip = ({ active, payload }: any) => {
+  if (!active || !payload || !payload.length) return null;
+  const d = payload[0].payload;
+  return (
+    <div style={{ background: "#0c2340", border: "1px solid #2a4a6b", borderRadius: 8, padding: "10px 14px", boxShadow: "0 4px 14px rgba(0,0,0,.35)", maxWidth: 260 }}>
+      <p style={{ margin: "0 0 8px", fontWeight: 700, fontSize: 13, color: "#ffffff", lineHeight: 1.3 }}>{d.name}</p>
+      <p style={{ margin: "4px 0", fontSize: 12, color: "#ffffff" }}>Óleo: <strong style={{ color: "#ffcc29" }}>{Number(d.x).toLocaleString("pt-BR")} bpd</strong></p>
+      <p style={{ margin: "4px 0", fontSize: 12, color: "#ffffff" }}>Gás: <strong style={{ color: "#ffcc29" }}>{Number(d.y).toLocaleString("pt-BR")} MMm³/d</strong></p>
+      <p style={{ margin: "4px 0", fontSize: 12, color: "#ffffff" }}>BOE: <strong style={{ color: "#ffcc29" }}>{Number(d.z).toLocaleString("pt-BR")} /d</strong></p>
     </div>
   );
 };
@@ -155,7 +170,6 @@ export default function App() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Restaura seleção e modalidade a partir da URL (compartilhamento)
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const mod = params.get("mod");
@@ -235,6 +249,28 @@ export default function App() {
       Armazenamento: p.storage_m3 ?? 0,
     };
   });
+
+  const scatterData = selected.map((p, i) => {
+    const poloRef = isOnshore ? (p as any).producao_polo_gas_mmd : null;
+    return {
+      x: p.oil_bpd ?? 0,
+      y: poloRef != null ? poloRef : (p.gas_mmd ?? 0),
+      z: p.boed ?? 0,
+      name: poloRef != null ? `${p.name} (polo)` : p.name,
+      fill: PIN_COLORS[i % PIN_COLORS.length],
+    };
+  });
+
+  const efficiencyData = selected.map((p) => {
+    const wells = (p as any).wells_productive ?? 0;
+    const accommodation = p.accommodation ?? 0;
+    return {
+      name: p.name,
+      "BOE/poço": isOnshore && wells > 0 ? Math.round((p.boed ?? 0) / wells) : 0,
+      "Óleo/acomodação": isOffshore && accommodation > 0 ? Math.round((p.oil_bpd ?? 0) / accommodation) : 0,
+    };
+  });
+
   const totals = filtered.reduce((acc, p) => ({ oil: acc.oil + (p.oil_bpd ?? 0), gas: acc.gas + (p.gas_mmd ?? 0), boe: acc.boe + (p.boed ?? 0), wells: acc.wells + ((p as any).wells_productive ?? 0), storage: acc.storage + (p.storage_m3 ?? 0) }), { oil: 0, gas: 0, boe: 0, wells: 0, storage: 0 });
 
   const withDepth = filtered.filter((p) => p.water_depth_m != null);
@@ -297,7 +333,6 @@ export default function App() {
   const resetFilters = () => setFilters({ search: "", status: "", unit_type: "", basin: "", field: "", operator: "", state: "", municipality: "", oil: "", gas: "", year: "", accommodation: "", wells: "", storage: "", sort: "oil" });
   const pinColor = (id: number) => PIN_COLORS[selected.findIndex((s) => s.id === id) % PIN_COLORS.length];
 
-  // Exporta o comparativo em CSV (compatível com Excel PT-BR)
   const exportCSV = () => {
     if (selected.length === 0) { window.alert("Selecione pelo menos uma unidade para exportar."); return; }
     const headers = ["Unidade", "Status", "Tipo", ...(isRefino ? ["Estado", "Município"] : ["Bacia", "Campo"]), "Operador", "Óleo (bpd)", "Gás (MMm³/d)", "BOE/d", "Ano", ...(isOffshore ? ["Acomodação", "Armazenamento (m³)", "Comprimento (m)", "Peso (t)", "Distância costa (km)"] : []), ...(isOnshore ? ["Poços produtivos"] : []), ...(isRefino ? ["Armazenamento (m³)"] : [])];
@@ -327,7 +362,6 @@ export default function App() {
     URL.revokeObjectURL(url);
   };
 
-  // Copia link com a seleção embutida na URL
   const shareUrl = () => {
     const params = new URLSearchParams();
     if (selectedIds.length) params.set("sel", selectedIds.join(","));
@@ -753,6 +787,44 @@ export default function App() {
                                 <YAxis stroke={axisColor} />
                                 <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(255,255,255,0.06)" }} /><Legend />
                                 <Bar dataKey="Poços" fill="#0072ce" />
+                              </BarChart>
+                            </ResponsiveContainer>
+                          </div>
+                        </div>
+                      )}
+
+                      <div style={chartRowStyle}>
+                        <div style={chartBoxStyle}>
+                          <h4 style={chartTitleStyle}>Dispersão — Óleo (bpd) vs. Gás (MMm³/d)</h4>
+                          <p style={{ color: axisColor, fontSize: 12, marginTop: 0 }}>Cada ponto é uma unidade; o tamanho do círculo representa o BOE/d.</p>
+                          <ResponsiveContainer width="100%" height={isMobile ? 300 : 400}>
+                            <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
+                              <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
+                              <XAxis type="number" dataKey="x" name="Óleo (bpd)" stroke={axisColor} fontSize={11} />
+                              <YAxis type="number" dataKey="y" name="Gás (MMm³/d)" stroke={axisColor} fontSize={11} />
+                              <ZAxis type="number" dataKey="z" range={[60, 400]} name="BOE/d" />
+                              <Tooltip content={<CustomScatterTooltip />} />
+                              <Scatter data={scatterData} fill="#008542">
+                                {scatterData.map((entry, i) => <Cell key={i} fill={entry.fill} />)}
+                              </Scatter>
+                            </ScatterChart>
+                          </ResponsiveContainer>
+                        </div>
+                      </div>
+
+                      {!isRefino && (
+                        <div style={chartRowStyle}>
+                          <div style={chartBoxStyle}>
+                            <h4 style={chartTitleStyle}>{isOnshore ? "Indicador de eficiência — BOE por poço" : "Indicador de eficiência — Óleo por acomodação"}</h4>
+                            <p style={{ color: axisColor, fontSize: 12, marginTop: 0 }}>{isOnshore ? "BOE/d dividido pelo número de poços produtivos de cada campo." : "Produção de óleo (bpd) dividida pela capacidade de acomodação de cada plataforma."}</p>
+                            <ResponsiveContainer width="100%" height={isMobile ? 300 : 400}>
+                              <BarChart data={efficiencyData}>
+                                <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
+                                <XAxis dataKey="name" stroke={axisColor} fontSize={11} interval={0} angle={-35} textAnchor="end" height={100} />
+                                <YAxis stroke={axisColor} />
+                                <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(255,255,255,0.06)" }} /><Legend />
+                                {isOnshore && <Bar dataKey="BOE/poço" fill="#7a28a0" />}
+                                {isOffshore && <Bar dataKey="Óleo/acomodação" fill="#00a878" />}
                               </BarChart>
                             </ResponsiveContainer>
                           </div>
