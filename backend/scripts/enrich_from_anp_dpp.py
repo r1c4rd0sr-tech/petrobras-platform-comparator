@@ -5,28 +5,30 @@ O que este script faz:
 1. Consulta /api/upstream-empresa/ListarTodasEmpresas para obter o CNPJ da Petrobras.
 2. Consulta /api/upstream-poco/lista-pocos para obter os poços e filtrar os da Petrobras.
 3. Consulta /api/upstream-campo/campo e /api/upstream-bacia/bacias para enriquecer campo e bacia.
-4. Cruza poços com unidades (plataformas/FPSOs) via nome do campo e adiciona novos campos:
-   - well_count: nº de poços da Petrobras no campo da unidade
-   - field_code: código SIGEP do campo
-   - basin_code: código da bacia
-   - anp_wells: lista resumida dos poços vinculados ao campo
-5. NÃO sobrescreve oil_bpd/gas_mmd/boed: a seção de produção depende da confirmação
-   dos endpoints exatos do nó "Producao" no Swagger (não visíveis na listagem pública
-   recuperada). Quando confirmados, preencha PRODUCTION_ENDPOINTS abaixo.
+4. Consulta /api/upstream-campo/campo/ListarProducaoPorCampo (BMP) para obter produção
+   mensal de óleo (m³) e gás (m³) por campo, filtrando pelos CNPJs da Petrobras.
+5. Cruza produção por campo com unidades (plataformas/FPSOs) via nome do campo e:
+   - Adiciona campos novos: anp_oil_m3_monthly, anp_gas_m3_monthly, anp_production_period,
+     field_code, basin_code, well_count, anp_field_status.
+   - Substitui oil_bpd e gas_mmd com taxas diárias derivadas da produção mensal ANP
+     (óleo: m³ -> barris -> /dias do período; gás: m³ -> MMm³ -> /dias do período).
+   - boed não é alterado (não há fator de conversão gás->BOE confiável sem dados adicionais).
 
 Uso:
     python backend/scripts/enrich_from_anp_dpp.py
 """
 from __future__ import annotations
 
+import calendar
 import glob
 import json
+import math
 import os
 import sys
 import time
 import urllib.parse
 import urllib.request
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 BASE_URL = "https://dpp-api.anp.gov.br"
 
@@ -36,18 +38,13 @@ ENDPOINTS = {
     "wells": "/api/upstream-poco/lista-pocos",
     "fields": "/api/upstream-campo/campo",
     "basins": "/api/upstream-bacia/bacias",
-    "installations": "/api/instalacao",
-}
-
-# Endpoints de produção ainda a confirmar no Swagger.
-# Quando confirmados, preencha aqui e a seção apply_production passará a rodar.
-PRODUCTION_ENDPOINTS: Dict[str, str] = {
-    # Exemplo hipotético — NÃO usar até validar no Swagger:
-    # "production": "/api/upstream-producao/producao",
+    "production_by_field": "/api/upstream-campo/campo/ListarProducaoPorCampo",
 }
 
 # CNPJs conhecidos da Petrobras (raiz). Ajuste conforme necessário.
 PETROBRAS_CNPJ_ROOTS = ("33000167",)  # Petrobras S.A.
+
+M3_TO_BBL = 6.2898  # 1 m³ = 6,2898 barris
 
 
 def http_get_json(path: str, params: Optional[Dict[str, Any]] = None, retries: int = 3) -> Any:
@@ -58,7 +55,10 @@ def http_get_json(path: str, params: Optional[Dict[str, Any]] = None, retries: i
     last_error: Optional[Exception] = None
     for attempt in range(1, retries + 1):
         try:
-            req = urllib.request.Request(url, headers={"Accept": "application/json", "User-Agent": "petrobras-platform-comparator/1.0"})
+            req = urllib.request.Request(
+                url,
+                headers={"Accept": "application/json", "User-Agent": "petrobras-platform-comparator/1.0"},
+            )
             with urllib.request.urlopen(req, timeout=60) as resp:
                 return json.loads(resp.read().decode("utf-8"))
         except Exception as exc:  # noqa: BLE001
@@ -80,14 +80,41 @@ def is_petrobras(item: Dict[str, Any]) -> bool:
     return "petrobras" in razao
 
 
-def load_platform_files(data_dir: str) -> List[str]:
-    return sorted(glob.glob(os.path.join(data_dir, "part-*.json")))
+def as_list(payload: Any, *keys: str) -> List[Dict[str, Any]]:
+    if isinstance(payload, list):
+        return payload
+    if isinstance(payload, dict):
+        for key in keys:
+            value = payload.get(key)
+            if isinstance(value, list):
+                return value
+    return []
+
+
+def parse_period(period: Any) -> Tuple[int, int]:
+    """Extrai (ano, mês) de um período no formato 'YYYY-MM' ou similar."""
+    text = str(period or "")
+    for sep in ("-", "/"):
+        if sep in text:
+            parts = text.split(sep)
+            if len(parts) >= 2:
+                try:
+                    return int(parts[0]), int(parts[1])
+                except ValueError:
+                    pass
+    return 0, 0
+
+
+def days_in_period(period: Any) -> int:
+    year, month = parse_period(period)
+    if year and month:
+        return calendar.monthrange(year, month)[1]
+    return 30
 
 
 def build_field_index(fields_payload: Any) -> Dict[str, Dict[str, Any]]:
     index: Dict[str, Dict[str, Any]] = {}
-    items = fields_payload if isinstance(fields_payload, list) else fields_payload.get("dados", fields_payload.get("data", []))
-    for item in items or []:
+    for item in as_list(fields_payload, "dados", "data"):
         name = normalize(item.get("nome") or item.get("Nome") or item.get("nomeCampo"))
         if name:
             index[name] = item
@@ -96,25 +123,36 @@ def build_field_index(fields_payload: Any) -> Dict[str, Dict[str, Any]]:
 
 def build_basin_index(basins_payload: Any) -> Dict[str, Dict[str, Any]]:
     index: Dict[str, Dict[str, Any]] = {}
-    items = basins_payload if isinstance(basins_payload, list) else basins_payload.get("dados", basins_payload.get("data", []))
-    for item in items or []:
+    for item in as_list(basins_payload, "dados", "data"):
         name = normalize(item.get("nome") or item.get("Nome") or item.get("nomeBacia"))
         if name:
             index[name] = item
     return index
 
 
-def extract_wells(wells_payload: Any) -> List[Dict[str, Any]]:
-    if isinstance(wells_payload, list):
-        return wells_payload
-    for key in ("dados", "data", "pocos", "wells"):
-        if isinstance(wells_payload, dict) and isinstance(wells_payload.get(key), list):
-            return wells_payload[key]
-    return []
+def build_production_index(production_payload: Any) -> Dict[str, Dict[str, Any]]:
+    """Índice campo -> registro de produção mais recente da Petrobras."""
+    index: Dict[str, Dict[str, Any]] = {}
+    for item in as_list(production_payload, "dados", "data"):
+        if not is_petrobras(item):
+            continue
+        campo = normalize(item.get("campo") or item.get("Campo") or item.get("nomeCampo"))
+        if not campo:
+            continue
+        current = index.get(campo)
+        if current is None or str(item.get("periodo") or item.get("Periodo") or "") > str(current.get("periodo") or current.get("Periodo") or ""):
+            index[campo] = item
+    return index
 
 
-def apply_enrichment(records: List[Dict[str, Any]], field_index: Dict[str, Dict[str, Any]], basin_index: Dict[str, Dict[str, Any]], wells: List[Dict[str, Any]]) -> int:
-    """Adiciona campos novos às unidades com base em campo/bacia/poços da Petrobras."""
+def apply_enrichment(
+    records: List[Dict[str, Any]],
+    field_index: Dict[str, Dict[str, Any]],
+    basin_index: Dict[str, Dict[str, Any]],
+    wells: List[Dict[str, Any]],
+    production_index: Dict[str, Dict[str, Any]],
+) -> int:
+    """Adiciona campos novos e substitui oil_bpd/gas_mnd com dados ANP quando houver match."""
     wells_by_field: Dict[str, List[Dict[str, Any]]] = {}
     for well in wells:
         if not is_petrobras(well):
@@ -131,12 +169,33 @@ def apply_enrichment(records: List[Dict[str, Any]], field_index: Dict[str, Dict[
             continue
         field_info = field_index.get(campo, {})
         basin_info = basin_index.get(bacia, {})
-        new_fields = {
+        prod = production_index.get(campo)
+
+        new_fields: Dict[str, Any] = {
             "field_code": field_info.get("codigo") or field_info.get("Codigo") or field_info.get("codigoCampo"),
             "basin_code": basin_info.get("codigo") or basin_info.get("Codigo") or basin_info.get("codigoBacia"),
             "well_count": len(wells_by_field.get(campo, [])),
             "anp_field_status": field_info.get("descricaoSituacao") or field_info.get("situacao"),
         }
+
+        if prod:
+            oil_m3 = prod.get("producaoPetrolioRoyalties_m3") or prod.get("producaoPetrolioRoyalties") or 0
+            gas_m3 = prod.get("producaoGasNaturalRoyalties_m3") or prod.get("producaoGasNaturalRoyalties") or 0
+            period = prod.get("periodo") or prod.get("Periodo")
+            days = days_in_period(period)
+            try:
+                oil_m3 = float(oil_m3)
+                gas_m3 = float(gas_m3)
+            except (TypeError, ValueError):
+                oil_m3, gas_m3 = 0.0, 0.0
+            new_fields["anp_oil_m3_monthly"] = oil_m3
+            new_fields["anp_gas_m3_monthly"] = gas_m3
+            new_fields["anp_production_period"] = period
+            if oil_m3 > 0:
+                new_fields["oil_bpd"] = round(oil_m3 * M3_TO_BBL / days, 1)
+            if gas_m3 > 0:
+                new_fields["gas_mmd"] = round(gas_m3 / 1_000_000 / days, 3)
+
         changed = False
         for key, value in new_fields.items():
             if value is not None and rec.get(key) != value:
@@ -147,18 +206,9 @@ def apply_enrichment(records: List[Dict[str, Any]], field_index: Dict[str, Dict[
     return updated
 
 
-def apply_production(records: List[Dict[str, Any]]) -> int:
-    """Reservado para produção: só roda quando PRODUCTION_ENDPOINTS for confirmado."""
-    if not PRODUCTION_ENDPOINTS:
-        print("[aviso] Endpoints de produção ainda não confirmados; oil_bpd/gas_mmd/boed não foram alterados.")
-        return 0
-    # Implementar aqui quando os endpoints de produção forem validados no Swagger.
-    return 0
-
-
 def main() -> None:
     data_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "data", "platforms"))
-    files = load_platform_files(data_dir)
+    files = sorted(glob.glob(os.path.join(data_dir, "part-*.json")))
     if not files:
         print("Nenhum arquivo part-*.json encontrado.")
         sys.exit(1)
@@ -166,22 +216,24 @@ def main() -> None:
     print("Consultando empresas...")
     companies = http_get_json(ENDPOINTS["companies"])
     print("Consultando poços...")
-    wells_payload = http_get_json(ENDPOINTS["wells"])
-    wells = extract_wells(wells_payload)
+    wells = as_list(http_get_json(ENDPOINTS["wells"]), "dados", "data", "pocos", "wells")
     print(f"Poços retornados: {len(wells)}")
 
-    print("Consultando campos e bacias...")
+    print("Consultando campos, bacias e produção (BMP)...")
     fields_payload = http_get_json(ENDPOINTS["fields"])
     basins_payload = http_get_json(ENDPOINTS["basins"])
+    production_payload = http_get_json(ENDPOINTS["production_by_field"])
+
     field_index = build_field_index(fields_payload)
     basin_index = build_basin_index(basins_payload)
+    production_index = build_production_index(production_payload)
+    print(f"Campos com produção da Petrobras: {len(production_index)}")
 
     total_updated = 0
     for path in files:
         with open(path, encoding="utf-8") as fh:
             records = json.load(fh)
-        updated = apply_enrichment(records, field_index, basin_index, wells)
-        updated += apply_production(records)
+        updated = apply_enrichment(records, field_index, basin_index, wells, production_index)
         if updated:
             with open(path, "w", encoding="utf-8") as fh:
                 json.dump(records, fh, ensure_ascii=False, indent=2)
