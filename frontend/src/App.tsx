@@ -255,7 +255,7 @@ export default function App() {
     <div className="app">
       <header className="topbar">
         <div>
-          <h1>Comparador de Plataformas Petrobras</h1>
+          <h1>Comparador de Unidades Petrobrás</h1>
           <p>Selecione até 10 unidades para comparar no mapa, cada uma com um pin de cor própria.</p>
         </div>
         <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
