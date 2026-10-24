@@ -34,7 +34,7 @@ export default function App() {
   const [error, setError] = useState("");
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [tab, setTab] = useState("comparativo");
-  const [theme, setTheme] = useState<"light" | "dark">("light");
+  const [theme, setTheme] = useState<"light" | "dark">("dark");
   const [filters, setFilters] = useState({ search: "", status: "", unit_type: "", basin: "", field: "", operator: "", oil: "", gas: "", year: "", accommodation: "", sort: "oil" });
 
   useEffect(() => {
