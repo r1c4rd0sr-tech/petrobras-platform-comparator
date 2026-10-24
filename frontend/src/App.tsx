@@ -108,6 +108,7 @@ export default function App() {
   const [tab, setTab] = useState("comparativo");
   const [theme, setTheme] = useState<"light" | "dark">("dark");
   const [modality, setModality] = useState<Modality>("maritimas");
+  const [isMobile, setIsMobile] = useState(typeof window !== "undefined" ? window.innerWidth < 768 : false);
   const [filters, setFilters] = useState({ search: "", status: "", unit_type: "", basin: "", field: "", operator: "", state: "", municipality: "", oil: "", gas: "", year: "", accommodation: "", wells: "", storage: "", sort: "oil" });
 
   const [onshoreUnits, setOnshoreUnits] = useState<Platform[]>(onshoreData as unknown as Platform[]);
@@ -123,6 +124,12 @@ export default function App() {
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
   }, [theme]);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   useEffect(() => {
     fetchPlatforms()
@@ -190,6 +197,7 @@ export default function App() {
       Gás: poloRef != null ? poloRef : (p.gas_mmd ?? 0),
       BOE: p.boed ?? 0,
       Poços: (p as any).wells_productive ?? 0,
+      Armazenamento: p.storage_m3 ?? 0,
     };
   });
   const totals = filtered.reduce((acc, p) => ({ oil: acc.oil + (p.oil_bpd ?? 0), gas: acc.gas + (p.gas_mmd ?? 0), boe: acc.boe + (p.boed ?? 0), wells: acc.wells + ((p as any).wells_productive ?? 0), storage: acc.storage + (p.storage_m3 ?? 0) }), { oil: 0, gas: 0, boe: 0, wells: 0, storage: 0 });
@@ -258,13 +266,14 @@ export default function App() {
   const kpiStyle: React.CSSProperties = { background: "linear-gradient(135deg,#0c2340 0%,#123a5c 100%)", borderRadius: 12, padding: "14px 18px", color: "#fff", minWidth: 150, flex: 1 };
   const kpiLabel: React.CSSProperties = { fontSize: 12, opacity: 0.75, display: "block", marginBottom: 4 };
   const kpiValue: React.CSSProperties = { fontSize: 22, fontWeight: 700, display: "block" };
-  const chartBoxStyle: React.CSSProperties = { background: isDark ? "#0f2740" : "#f4f6f8", borderRadius: 12, padding: 16, flex: 1, minWidth: 320 };
+  const chartBoxStyle: React.CSSProperties = { background: isDark ? "#0f2740" : "#f4f6f8", borderRadius: 12, padding: 16, flex: isMobile ? "1 1 100%" : "1 1 320px", minWidth: 0, width: isMobile ? "100%" : "auto" };
   const rankBoxStyle: React.CSSProperties = { background: isDark ? "#0f2740" : "#f4f6f8", borderRadius: 12, padding: 16, flex: 1, minWidth: 280 };
   const chartTitleStyle: React.CSSProperties = { marginTop: 0, color: isDark ? "#fff" : "#0c2340" };
   const gridColor = isDark ? "#22384f" : "#d9e2ea";
   const axisColor = isDark ? "#93a7bb" : "#5b6b7b";
   const rankTextStyle: React.CSSProperties = { color: isDark ? "#cfe0f0" : "#1c2b3a", paddingLeft: 20, margin: 0 };
   const rankStrongColor = isDark ? "#fff" : "#0c2340";
+  const chartRowStyle: React.CSSProperties = { display: "flex", gap: 16, flexWrap: "wrap", marginBottom: 24, flexDirection: isMobile ? "column" : "row" };
 
   return (
     <div className="app">
@@ -273,7 +282,7 @@ export default function App() {
           <h1>Comparador de Unidades Petrobrás</h1>
           <p>Selecione até 10 unidades para comparar no mapa, cada uma com um pin de cor própria.</p>
         </div>
-        <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+        <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
           <div style={{ display: "flex", gap: 4, background: isDark ? "#0f2740" : "#e8eef4", padding: 4, borderRadius: 10 }}>
             {MODALITY_OPTIONS.map(([value, label]) => (
               <button
@@ -472,7 +481,7 @@ export default function App() {
                   </div>
 
                   {isOnshore && (
-                    <div style={{ display: "flex", gap: 16, flexWrap: "wrap", marginBottom: 20 }}>
+                    <div style={chartRowStyle}>
                       <div style={chartBoxStyle}>
                         <h4 style={chartTitleStyle}>Comparação por Polo — campos e poços</h4>
                         <ResponsiveContainer width="100%" height={240}>
@@ -502,7 +511,7 @@ export default function App() {
                     </div>
                   )}
 
-                  <div style={{ display: "flex", gap: 16, flexWrap: "wrap", marginBottom: 20 }}>
+                  <div style={chartRowStyle}>
                     <div style={chartBoxStyle}>
                       <h4 style={chartTitleStyle}>Distribuição por status</h4>
                       <ResponsiveContainer width="100%" height={240}>
@@ -528,7 +537,7 @@ export default function App() {
                     </div>
                   </div>
 
-                  <div style={{ display: "flex", gap: 16, flexWrap: "wrap", marginBottom: 20 }}>
+                  <div style={chartRowStyle}>
                     <div style={chartBoxStyle}>
                       <h4 style={chartTitleStyle}>Top operadores por produção de óleo (bpd)</h4>
                       <ResponsiveContainer width="100%" height={240}>
@@ -555,7 +564,7 @@ export default function App() {
                     </div>
                   </div>
 
-                  <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
+                  <div style={{ display: "flex", gap: 16, flexWrap: "wrap", flexDirection: isMobile ? "column" : "row" }}>
                     <div style={rankBoxStyle}>
                       <h4 style={chartTitleStyle}>{isRefino ? "Top 5 por capacidade" : "Top 5 produtores de óleo"}</h4>
                       <ol style={rankTextStyle}>
@@ -593,13 +602,13 @@ export default function App() {
                   {selected.length === 0 && <p style={{ color: axisColor }}>Selecione {isOnshore ? "campos" : isRefino ? "unidades" : "plataformas"} na lista à esquerda para ver os gráficos comparativos.</p>}
                   {selected.length > 0 && (
                     <>
-                      <div style={{ display: "flex", gap: 16, flexWrap: "wrap", marginBottom: 24 }}>
+                      <div style={chartRowStyle}>
                         <div style={chartBoxStyle}>
                           <h4 style={chartTitleStyle}>{isRefino ? "Capacidade de processamento (bpd)" : "Produção de Óleo e BOE"}</h4>
-                          <ResponsiveContainer width="100%" height={360}>
+                          <ResponsiveContainer width="100%" height={isMobile ? 280 : 360}>
                             <BarChart data={chartData}>
                               <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
-                              <XAxis dataKey="name" stroke={axisColor} fontSize={11} />
+                              <XAxis dataKey="name" stroke={axisColor} fontSize={11} interval={0} angle={isMobile ? -35 : 0} textAnchor={isMobile ? "end" : "middle"} height={isMobile ? 90 : 50} />
                               <YAxis stroke={axisColor} />
                               <Tooltip /><Legend />
                               <Bar dataKey="Óleo" fill="#008542" />
@@ -610,10 +619,10 @@ export default function App() {
                         {isRefino ? (
                           <div style={chartBoxStyle}>
                             <h4 style={chartTitleStyle}>Capacidade de Gás (MMm³/d)</h4>
-                            <ResponsiveContainer width="100%" height={360}>
+                            <ResponsiveContainer width="100%" height={isMobile ? 280 : 360}>
                               <BarChart data={chartData}>
                                 <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
-                                <XAxis dataKey="name" stroke={axisColor} fontSize={11} />
+                                <XAxis dataKey="name" stroke={axisColor} fontSize={11} interval={0} angle={isMobile ? -35 : 0} textAnchor={isMobile ? "end" : "middle"} height={isMobile ? 90 : 50} />
                                 <YAxis stroke={axisColor} />
                                 <Tooltip /><Legend />
                                 <Bar dataKey="Gás" fill="#f28c28" />
@@ -623,10 +632,10 @@ export default function App() {
                         ) : (
                           <div style={chartBoxStyle}>
                             <h4 style={chartTitleStyle}>Produção de Gás</h4>
-                            <ResponsiveContainer width="100%" height={360}>
+                            <ResponsiveContainer width="100%" height={isMobile ? 280 : 360}>
                               <BarChart data={chartData}>
                                 <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
-                                <XAxis dataKey="name" stroke={axisColor} fontSize={11} />
+                                <XAxis dataKey="name" stroke={axisColor} fontSize={11} interval={0} angle={isMobile ? -35 : 0} textAnchor={isMobile ? "end" : "middle"} height={isMobile ? 90 : 50} />
                                 <YAxis stroke={axisColor} />
                                 <Tooltip /><Legend />
                                 <Bar dataKey="Gás" fill="#f28c28" />
@@ -636,13 +645,13 @@ export default function App() {
                         )}
                       </div>
                       {isRefino && (
-                        <div style={{ display: "flex", gap: 16, flexWrap: "wrap", marginBottom: 24 }}>
+                        <div style={chartRowStyle}>
                           <div style={chartBoxStyle}>
                             <h4 style={chartTitleStyle}>Capacidade de Armazenamento (m³)</h4>
-                            <ResponsiveContainer width="100%" height={360}>
+                            <ResponsiveContainer width="100%" height={isMobile ? 280 : 360}>
                               <BarChart data={chartData}>
                                 <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
-                                <XAxis dataKey="name" stroke={axisColor} fontSize={11} />
+                                <XAxis dataKey="name" stroke={axisColor} fontSize={11} interval={0} angle={isMobile ? -35 : 0} textAnchor={isMobile ? "end" : "middle"} height={isMobile ? 90 : 50} />
                                 <YAxis stroke={axisColor} />
                                 <Tooltip /><Legend />
                                 <Bar dataKey="Armazenamento" fill="#0072ce" />
@@ -652,13 +661,13 @@ export default function App() {
                         </div>
                       )}
                       {isOnshore && (
-                        <div style={{ display: "flex", gap: 16, flexWrap: "wrap", marginBottom: 24 }}>
+                        <div style={chartRowStyle}>
                           <div style={chartBoxStyle}>
                             <h4 style={chartTitleStyle}>Poços Produtivos</h4>
-                            <ResponsiveContainer width="100%" height={360}>
+                            <ResponsiveContainer width="100%" height={isMobile ? 280 : 360}>
                               <BarChart data={chartData}>
                                 <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
-                                <XAxis dataKey="name" stroke={axisColor} fontSize={11} />
+                                <XAxis dataKey="name" stroke={axisColor} fontSize={11} interval={0} angle={isMobile ? -35 : 0} textAnchor={isMobile ? "end" : "middle"} height={isMobile ? 90 : 50} />
                                 <YAxis stroke={axisColor} />
                                 <Tooltip /><Legend />
                                 <Bar dataKey="Poços" fill="#0072ce" />
