@@ -1,0 +1,58 @@
+id,slug,name,unit_type,state,municipality,operator,status,year,oil_bpd,gas_mmd,storage_m3,latitude,longitude,source_file
+2001,refinaria-replan,Refinaria de Paulínia (REPLAN),Refinaria,SP,Paulínia,Petrobras,operational,1972,434000,,,,-22.76,-47.15,refinarias.json
+2002,refinaria-reduc,Refinaria Duque de Caxias (REDUC),Refinaria,RJ,Duque de Caxias,Petrobras,operational,1961,239000,,,,-22.75,-43.32,refinarias.json
+2003,refinaria-revap,Refinaria Henrique Lage (REVAP),Refinaria,SP,São José dos Campos,Petrobras,operational,1980,251500,,,,-23.18,-45.88,refinarias.json
+2004,refinaria-rnest,Refinaria Abreu e Lima (RNEST),Refinaria,PE,Ipojuca,Petrobras,operational,2014,230000,,,,-8.4,-35.06,refinarias.json
+2005,refinaria-regap,Refinaria Gabriel Passos (REGAP),Refinaria,MG,Betim,Petrobras,operational,1968,163500,,,,-19.97,-44.2,refinarias.json
+2006,refinaria-repar,Refinaria Presidente Getúlio Vargas (REPAR),Refinaria,PR,Araucária,Petrobras,operational,1977,207563,,,,-25.59,-49.41,refinarias.json
+2007,refinaria-refap,Refinaria Alberto Pasqualini (REFAP),Refinaria,RS,Canoas,Petrobras,operational,1977,201000,,,,-29.92,-51.18,refinarias.json
+2008,refinaria-rpbc,Refinaria Presidente Bernardes (RPBC),Refinaria,SP,Cubatão,Petrobras,operational,1955,178000,,,,-23.89,-46.42,refinarias.json
+2009,refinaria-recap,Refinaria de Capuava (RECAP),Refinaria,SP,Mauá,Petrobras,operational,1954,62500,,,,-23.67,-46.46,refinarias.json
+2010,refinaria-rlam,Refinaria Landulpho Alves (RLAM),Refinaria,BA,São Francisco do Conde,Petrobras,operational,1949,333000,,,,-12.74,-38.68,refinarias.json
+2011,refinaria-lubnor,Lubrificantes e Derivados de Petróleo do Nordeste (LUBNOR),Refinaria,CE,Fortaleza,Petrobras,operational,1966,8000,,,,-3.79,-38.51,refinarias.json
+2012,refinaria-reman,Refinaria Isaac Sabbá (REMAN),Refinaria,AM,Manaus,Petrobras,operational,1956,46000,,,,-3.1,-60.02,refinarias.json
+2013,terminal-sao-sebastiao,Terminal Aquaviário de São Sebastião,Terminal,SP,São Sebastião,Transpetro / Petrobras,operational,,,,2011671,-23.8,-45.4,refinarias.json
+2034,terminal-santos,Terminal Aquaviário de Santos,Terminal,SP,Santos,Transpetro / Petrobras,operational,,,,263134,-23.96,-46.33,refinarias.json
+2014,terminal-ilha-dagua,Terminal Aquaviário da Ilha D'Água,Terminal,RJ,Rio de Janeiro,Transpetro / Petrobras,operational,,,,165056,-22.79,-43.15,refinarias.json
+2015,terminal-campos-eliseos,Terminal Terrestre de Campos Elíseos,Terminal,RJ,Duque de Caxias,Transpetro / Petrobras,operational,,,,545083,-22.75,-43.32,refinarias.json
+2016,terminal-volta-redonda,Terminal Terrestre de Volta Redonda,Terminal,RJ,Volta Redonda,Transpetro / Petrobras,operational,,,,36483,-22.52,-44.03,refinarias.json
+2017,estacao-cabiunas,Estação de Compressão de Cabiúnas,Estação de Compressão,RJ,Macaé,TBG / Petrobras,operational,,,,,-22.2,-41.7,refinarias.json
+2018,estacao-paulinia,Estação de Compressão de Paulínia,Estação de Compressão,SP,Paulínia,TBG / Petrobras,operational,,,,,-22.76,-47.15,refinarias.json
+2019,estacao-araucaria,Estação de Compressão de Araucária,Estação de Compressão,PR,Araucária,TBG / Petrobras,operational,,,,,-25.59,-49.41,refinarias.json
+2020,terminal-angra-dos-reis,Terminal Aquaviário de Angra dos Reis,Terminal,RJ,Angra dos Reis,Transpetro / Petrobras,operational,,,,978046,-23.01,-44.31,terminais-armazenamento.json
+2021,terminal-aracaju,Terminal Aquaviário de Aracaju,Terminal,SE,Aracaju,Transpetro / Petrobras,operational,,,,155788,-10.91,-37.07,terminais-armazenamento.json
+2022,terminal-barra-do-riacho,Terminal Aquaviário de Barra do Riacho,Terminal,ES,Aracruz,Transpetro / Petrobras,operational,,,,89600,-19.8,-40.1,terminais-armazenamento.json
+2023,terminal-baia-de-guanabara,Terminal Aquaviário da Baía de Guanabara,Terminal,RJ,Rio de Janeiro,Transpetro / Petrobras,operational,,30,,,-22.79,-43.15,terminais-armazenamento.json
+2024,terminal-belem,Terminal Aquaviário de Belém,Terminal,PA,Belém,Transpetro / Petrobras,operational,,,,44920,-1.45,-48.5,terminais-armazenamento.json
+2025,terminal-coari,Terminal Aquaviário de Coari,Terminal,AM,Coari,Transpetro / Petrobras,operational,,,,79826,-4.08,-63.14,terminais-armazenamento.json
+2026,terminal-ilha-redonda,Terminal Aquaviário de Ilha Redonda,Terminal,RJ,Duque de Caxias,Transpetro / Petrobras,operational,,,,94400,-22.75,-43.32,terminais-armazenamento.json
+2027,terminal-barueri,Terminal Terrestre de Barueri,Terminal,SP,Barueri,Transpetro / Petrobras,operational,,,,209549,-23.51,-46.88,terminais-armazenamento.json
+2028,terminal-biguacu,Terminal Terrestre de Biguaçu,Terminal,SC,Biguaçu,Transpetro / Petrobras,operational,,,,38361,-27.49,-48.66,terminais-armazenamento.json
+2029,terminal-brasilia,Terminal Terrestre de Brasília,Terminal,DF,Brasília,Transpetro / Petrobras,operational,,,,72351,-15.79,-47.88,terminais-armazenamento.json
+2030,terminal-candeias,Terminal Terrestre de Candeias,Terminal,BA,Candeias,Transpetro / Petrobras,operational,,,,36417,-12.67,-38.55,terminais-armazenamento.json
+2031,terminal-cubatao,Terminal Terrestre de Cubatão,Terminal,SP,Cubatão,Transpetro / Petrobras,operational,,,,113635,-23.89,-46.42,terminais-armazenamento.json
+2032,terminal-guaramirim,Terminal Terrestre de Guaramirim,Terminal,SC,Guaramirim,Transpetro / Petrobras,operational,,,,18993,-26.53,-49.0,terminais-armazenamento.json
+2033,terminal-guararema,Terminal Terrestre de Guararema,Terminal,SP,Guararema,Transpetro / Petrobras,operational,,,,1070964,-23.41,-46.03,terminais-armazenamento.json
+1001,campo-araracanga,Campo de Araracanga,Campo de produção,,,Petrobras,operational,,,,,-4.0,-63.7,onshore.json
+1002,campo-arara-azul,Campo de Arara Azul,Campo de produção,,,Petrobras,operational,,,,,-4.15,-63.2,onshore.json
+1003,campo-carapanauba,Campo de Carapanaúba,Campo de produção,,,Petrobras,operational,,,,,-4.25,-63.3,onshore.json
+1004,campo-cupiuba,Campo de Cupiúba,Campo de produção,,,Petrobras,operational,,,,,-4.1,-63.15,onshore.json
+1005,campo-leste-do-urucu,Campo de Leste do Urucu,Campo de produção,,,Petrobras,operational,1992,,,,,-4.05,-63.1,onshore.json
+1006,campo-rio-urucu,Campo de Rio Urucu,Campo de produção,,,Petrobras,operational,,,,,-4.12,-63.18,onshore.json
+1007,campo-sudoeste-urucu,Campo de Sudoeste Urucu,Campo de produção,,,Petrobras,operational,,,,,-4.3,-63.35,onshore.json
+1008,upgn-boaventura,UPGN do Complexo de Energias Boaventura,UPGN,,,Petrobras,operational,2024,,21,,,-22.75,-42.85,onshore.json
+1009,upgn-catu,UTG Catu,UPGN,,,Petrobras,operational,,2,,,,-12.75,-38.75,onshore.json
+1011,campo-canto-do-amaro,Campo de Canto do Amaro,Campo de produção,,,Petrobras,operational,,,,,-5.15,-36.9,onshore.json
+2035,ecomp-corumba,ECOMP Corumbá,Estação de Compressão,MS,Corumbá,TBG / Petrobras,operational,,,,,-19.01,-57.65,ecomps-gasbol.json
+2036,ecomp-miranda,ECOMP Miranda,Estação de Compressão,MS,Miranda,TBG / Petrobras,operational,,,,,-20.24,-56.37,ecomps-gasbol.json
+2037,ecomp-anastacio,ECOMP Anastácio,Estação de Compressão,MS,Anastácio,TBG / Petrobras,operational,,,,,-20.48,-55.64,ecomps-gasbol.json
+2038,ecomp-campo-grande,ECOMP Campo Grande,Estação de Compressão,MS,Campo Grande,TBG / Petrobras,operational,,,,,-20.44,-54.65,ecomps-gasbol.json
+2039,ecomp-ribas-do-rio-pardo,ECOMP Ribas do Rio Pardo,Estação de Compressão,MS,Ribas do Rio Pardo,TBG / Petrobras,operational,,,,,-21.48,-53.77,ecomps-gasbol.json
+2040,ecomp-tres-lagoas,ECOMP Três Lagoas,Estação de Compressão,MS,Três Lagoas,TBG / Petrobras,operational,,,,,-20.79,-51.69,ecomps-gasbol.json
+2041,ecomp-mirandopolis,ECOMP Mirandópolis,Estação de Compressão,SP,Mirandópolis,TBG / Petrobras,operational,,,,,-21.13,-51.11,ecomps-gasbol.json
+2042,ecomp-penapolis,ECOMP Penápolis,Estação de Compressão,SP,Penápolis,TBG / Petrobras,operational,,,,,-21.42,-50.08,ecomps-gasbol.json
+2047,ecomp-iacanga,ECOMP Iacanga,Estação de Compressão,SP,Iacanga,TBG / Petrobras,operational,,,,,-22.03,-49.05,ecomps-gasbol.json
+2043,ecomp-sao-carlos,ECOMP São Carlos,Estação de Compressão,SP,São Carlos,TBG / Petrobras,operational,,,,,-22.02,-47.89,ecomps-gasbol.json
+2044,ecomp-capao-bonito,ECOMP Capão Bonito,Estação de Compressão,SP,Capão Bonito,TBG / Petrobras,operational,,,,,-24.01,-48.35,ecomps-gasbol.json
+2045,ecomp-biguacu,ECOMP Biguaçu,Estação de Compressão,SC,Biguaçu,TBG / Petrobras,operational,,,,,-27.49,-48.66,ecomps-gasbol.json
+2046,ecomp-sideropolis,ECOMP Siderópolis,Estação de Compressão,SC,Siderópolis,TBG / Petrobras,operational,,,,,-28.58,-49.43,ecomps-gasbol.json
