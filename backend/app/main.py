@@ -24,6 +24,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+@app.get("/api/platforms/live")
+def platforms_live():
+    """Retorna as unidades com produção ANP ao vivo (fallback: base estática)."""
+    return get_live_platforms()
+
+
 app.include_router(platforms.router)
 
 
@@ -39,9 +46,3 @@ def on_startup():
 @app.get("/api/health")
 def health():
     return {"status": "ok"}
-
-
-@app.get("/api/platforms/live")
-def platforms_live():
-    """Retorna as unidades com produção ANP ao vivo (fallback: base estática)."""
-    return get_live_platforms()
