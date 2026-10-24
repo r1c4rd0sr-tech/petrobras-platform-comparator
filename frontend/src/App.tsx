@@ -189,6 +189,7 @@ export default function App() {
       Óleo: p.oil_bpd ?? 0,
       Gás: poloRef != null ? poloRef : (p.gas_mmd ?? 0),
       BOE: p.boed ?? 0,
+      Armazenamento: p.storage_m3 ?? 0,
     };
   });
   const totals = filtered.reduce((acc, p) => ({ oil: acc.oil + (p.oil_bpd ?? 0), gas: acc.gas + (p.gas_mmd ?? 0), boe: acc.boe + (p.boed ?? 0), wells: acc.wells + ((p as any).wells_productive ?? 0), storage: acc.storage + (p.storage_m3 ?? 0) }), { oil: 0, gas: 0, boe: 0, wells: 0, storage: 0 });
@@ -594,7 +595,7 @@ export default function App() {
                     <>
                       <div style={{ display: "flex", gap: 16, flexWrap: "wrap", marginBottom: 24 }}>
                         <div style={chartBoxStyle}>
-                          <h4 style={chartTitleStyle}>{isRefino ? "Capacidade de processamento" : "Produção de Óleo e BOE"}</h4>
+                          <h4 style={chartTitleStyle}>{isRefino ? "Capacidade de processamento (bpd)" : "Produção de Óleo e BOE"}</h4>
                           <ResponsiveContainer width="100%" height={360}>
                             <BarChart data={chartData}>
                               <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
@@ -606,7 +607,20 @@ export default function App() {
                             </BarChart>
                           </ResponsiveContainer>
                         </div>
-                        {!isRefino && (
+                        {isRefino ? (
+                          <div style={chartBoxStyle}>
+                            <h4 style={chartTitleStyle}>Capacidade de Gás (MMm³/d)</h4>
+                            <ResponsiveContainer width="100%" height={360}>
+                              <BarChart data={chartData}>
+                                <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
+                                <XAxis dataKey="name" stroke={axisColor} fontSize={11} />
+                                <YAxis stroke={axisColor} />
+                                <Tooltip /><Legend />
+                                <Bar dataKey="Gás" fill="#f28c28" />
+                              </BarChart>
+                            </ResponsiveContainer>
+                          </div>
+                        ) : (
                           <div style={chartBoxStyle}>
                             <h4 style={chartTitleStyle}>Produção de Gás</h4>
                             <ResponsiveContainer width="100%" height={360}>
@@ -621,6 +635,22 @@ export default function App() {
                           </div>
                         )}
                       </div>
+                      {isRefino && (
+                        <div style={{ display: "flex", gap: 16, flexWrap: "wrap", marginBottom: 24 }}>
+                          <div style={chartBoxStyle}>
+                            <h4 style={chartTitleStyle}>Capacidade de Armazenamento (m³)</h4>
+                            <ResponsiveContainer width="100%" height={360}>
+                              <BarChart data={chartData}>
+                                <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
+                                <XAxis dataKey="name" stroke={axisColor} fontSize={11} />
+                                <YAxis stroke={axisColor} />
+                                <Tooltip /><Legend />
+                                <Bar dataKey="Armazenamento" fill="#0072ce" />
+                              </BarChart>
+                            </ResponsiveContainer>
+                          </div>
+                        </div>
+                      )}
                     </>
                   )}
                 </div>
