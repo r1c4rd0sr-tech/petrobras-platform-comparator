@@ -21,6 +21,12 @@ const MAX_SELECTED = 10;
 
 type Modality = "maritimas" | "terrestres" | "refinarias";
 
+const MODALITY_OPTIONS: [Modality, string][] = [
+  ["maritimas", "Marítimas"],
+  ["terrestres", "Terrestres"],
+  ["refinarias", "Refino e Logística"],
+];
+
 const BASIN_ALIASES: Record<string, string> = {
   "campos basin": "Bacia de Campos",
   "santos basin": "Bacia de Santos",
@@ -259,15 +265,27 @@ export default function App() {
           <p>Selecione até 10 unidades para comparar no mapa, cada uma com um pin de cor própria.</p>
         </div>
         <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-          <select
-            value={modality}
-            onChange={(e) => { setModality(e.target.value as Modality); setSelectedIds([]); }}
-            style={{ padding: "8px 12px", borderRadius: 8, border: "1px solid #2a4a6a", background: isDark ? "#0f2740" : "#fff", color: isDark ? "#fff" : "#0c2340", fontSize: 13 }}
-          >
-            <option value="maritimas">Unidades Marítimas</option>
-            <option value="terrestres">Unidades Terrestres</option>
-            <option value="refinarias">Refinarias, Terminais e Compressão</option>
-          </select>
+          <div style={{ display: "flex", gap: 4, background: isDark ? "#0f2740" : "#e8eef4", padding: 4, borderRadius: 10 }}>
+            {MODALITY_OPTIONS.map(([value, label]) => (
+              <button
+                key={value}
+                onClick={() => { setModality(value); setSelectedIds([]); }}
+                style={{
+                  padding: "8px 14px",
+                  borderRadius: 8,
+                  border: "none",
+                  background: modality === value ? "#008542" : "transparent",
+                  color: modality === value ? "#fff" : (isDark ? "#93a7bb" : "#5b6b7b"),
+                  fontSize: 13,
+                  fontWeight: modality === value ? 600 : 400,
+                  cursor: "pointer",
+                  transition: "all .2s"
+                }}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
           <button className="theme-toggle" onClick={() => setTheme(theme === "light" ? "dark" : "light")}>
             {theme === "light" ? "🌙 Escuro" : "☀️ Claro"}
           </button>
