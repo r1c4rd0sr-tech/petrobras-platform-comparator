@@ -5,6 +5,7 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { fetchPlatforms } from "./api";
 import type { Platform } from "./types";
+import onshoreData from "./data/onshore.json";
 
 const STATUS_LABEL: Record<string, string> = {
   operational: "Operacional",
@@ -15,6 +16,8 @@ const STATUS_LABEL: Record<string, string> = {
 const PIN_COLORS = ["#008542", "#ffcc29", "#0c2340", "#e30613", "#0072ce", "#7a28a0", "#00a878", "#f28c28", "#c2185b", "#5d4037"];
 const STATUS_COLORS = ["#008542", "#ffcc29", "#e30613", "#0072ce", "#f28c28", "#7a28a0", "#00a878", "#c2185b"];
 const MAX_SELECTED = 10;
+
+type Modality = "maritimas" | "terrestres" | "refinarias";
 
 const BASIN_ALIASES: Record<string, string> = {
   "campos basin": "Bacia de Campos",
@@ -59,7 +62,7 @@ const BASIN_ALIASES: Record<string, string> = {
   "são paulo basin": "Bacia de São Paulo",
   "sao paulo basin": "Bacia de São Paulo",
   "curitiba basin": "Bacia de Curitiba",
-  "candiota basin": "Bacia do Candiota",
+  "candiota basin": "Bacia de Candiota",
 };
 
 const normalizeBasin = (name: string | null | undefined) => {
@@ -87,7 +90,11 @@ export default function App() {
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [tab, setTab] = useState("comparativo");
   const [theme, setTheme] = useState<"light" | "dark">("dark");
+  const [modality, setModality] = useState<Modality>("maritimas");
   const [filters, setFilters] = useState({ search: "", status: "", unit_type: "", basin: "", field: "", operator: "", oil: "", gas: "", year: "", accommodation: "", sort: "oil" });
+
+  const onshoreUnits = onshoreData as unknown as Platform[];
+  const activeUnits = modality === "maritimas" ? platforms : modality === "terrestres" ? onshoreUnits : [];
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
@@ -104,15 +111,15 @@ export default function App() {
   }, []);
 
   const options = useMemo(() => ({
-    unit_types: [...new Set(platforms.map((p) => p.unit_type).filter(Boolean))].sort(),
-    basins: [...new Set(platforms.map((p) => p.basin).filter(Boolean) as string[])].sort(),
-    fields: [...new Set(platforms.map((p) => p.field).filter(Boolean) as string[])].sort(),
-    operators: [...new Set(platforms.map((p) => p.operator).filter(Boolean) as string[])].sort(),
-  }), [platforms]);
+    unit_types: [...new Set(activeUnits.map((p) => p.unit_type).filter(Boolean))].sort(),
+    basins: [...new Set(activeUnits.map((p) => p.basin).filter(Boolean) as string[])].sort(),
+    fields: [...new Set(activeUnits.map((p) => p.field).filter(Boolean) as string[])].sort(),
+    operators: [...new Set(activeUnits.map((p) => p.operator).filter(Boolean) as string[])].sort(),
+  }), [activeUnits]);
 
   const filtered = useMemo(() => {
     const q = filters.search.trim().toLowerCase();
-    const rows = platforms.filter((p) => {
+    const rows = activeUnits.filter((p) => {
       const text = [p.name, p.field, p.basin, p.operator, p.unit_type].filter(Boolean).join(" ").toLowerCase();
       return (!q || text.includes(q))
         && (!filters.status || p.status === filters.status)
@@ -130,9 +137,9 @@ export default function App() {
       if (key === "name") return a.name.localeCompare(b.name);
       return (Number(b[key] ?? 0) || 0) - (Number(a[key] ?? 0) || 0);
     });
-  }, [platforms, filters]);
+  }, [activeUnits, filters]);
 
-  const selected = useMemo(() => platforms.filter((p) => selectedIds.includes(p.id)), [platforms, selectedIds]);
+  const selected = useMemo(() => activeUnits.filter((p) => selectedIds.includes(p.id)), [activeUnits, selectedIds]);
   const chartData = selected.map((p) => ({ name: p.name, Óleo: p.oil_bpd ?? 0, Gás: p.gas_mmd ?? 0, BOE: p.boed ?? 0 }));
   const totals = filtered.reduce((acc, p) => ({ oil: acc.oil + (p.oil_bpd ?? 0), gas: acc.gas + (p.gas_mmd ?? 0), boe: acc.boe + (p.boed ?? 0) }), { oil: 0, gas: 0, boe: 0 });
 
@@ -224,10 +231,19 @@ export default function App() {
           <p>Selecione até 10 unidades para comparar no mapa, cada uma com um pin de cor própria.</p>
         </div>
         <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+          <select
+            value={modality}
+            onChange={(e) => { setModality(e.target.value as Modality); setSelectedIds([]); }}
+            style={{ padding: "8px 12px", borderRadius: 8, border: "1px solid #2a4a6a", background: isDark ? "#0f2740" : "#fff", color: isDark ? "#fff" : "#0c2340", fontSize: 13 }}
+          >
+            <option value="maritimas">Unidades Marítimas</option>
+            <option value="terrestres">Unidades Terrestres</option>
+            <option value="refinarias">Refinarias, Terminais e Compressão</option>
+          </select>
           <button className="theme-toggle" onClick={() => setTheme(theme === "light" ? "dark" : "light")}>
             {theme === "light" ? "🌙 Escuro" : "☀️ Claro"}
           </button>
-          <span className="badge">{loading ? "Carregando..." : `${platforms.length} unidades na base`}</span>
+          <span className="badge">{loading ? "Carregando..." : `${activeUnits.length} unidades na base`}</span>
         </div>
       </header>
 
@@ -249,12 +265,16 @@ export default function App() {
       {loading && <div className="loading">Carregando plataformas...</div>}
       {error && <div className="error">{error}</div>}
 
-      {!loading && !error && (
+      {!loading && !error && modality === "refinarias" && (
+        <div className="loading">Em breve: refinarias, terminais e estações de compressão de gás serão adicionados a esta seção.</div>
+      )}
+
+      {!loading && !error && modality !== "refinarias" && (
         <>
           <div className="layout">
             <section className="panel">
               <div className="panel-head">
-                <h2>Plataformas ({filtered.length})</h2>
+                <h2>Unidades ({filtered.length})</h2>
                 <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
                   <span className="pill">Selecionadas: {selected.length}/10</span>
                   <button className="clear-btn" onClick={() => setSelectedIds([])}>Limpar seleção</button>
@@ -327,7 +347,7 @@ export default function App() {
               {tab === "estatisticas" && (
                 <div>
                   <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 20 }}>
-                    <div style={kpiStyle}><span style={kpiLabel}>Unidades filtradas</span><strong style={kpiValue}>{filtered.length}</strong><span style={{ fontSize: 11, opacity: 0.6 }}>{platforms.length} na base total</span></div>
+                    <div style={kpiStyle}><span style={kpiLabel}>Unidades filtradas</span><strong style={kpiValue}>{filtered.length}</strong><span style={{ fontSize: 11, opacity: 0.6 }}>{activeUnits.length} na base total</span></div>
                     <div style={kpiStyle}><span style={kpiLabel}>Óleo total</span><strong style={kpiValue}>{num(totals.oil, " bpd")}</strong></div>
                     <div style={kpiStyle}><span style={kpiLabel}>Gás total</span><strong style={kpiValue}>{num(totals.gas, " MMm³/d")}</strong></div>
                     <div style={kpiStyle}><span style={kpiLabel}>BOE total</span><strong style={kpiValue}>{num(totals.boe, "/d")}</strong></div>
@@ -439,59 +459,6 @@ export default function App() {
                           </ResponsiveContainer>
                         </div>
                       </div>
-
-                      <div style={{ display: "flex", gap: 16, flexWrap: "wrap", marginTop: 24 }}>
-                        <div style={chartBoxStyle}>
-                          <h4 style={chartTitleStyle}>Status das selecionadas</h4>
-                          <ResponsiveContainer width="100%" height={240}>
-                            <PieChart>
-                              <Pie data={selStatusData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={75} label>
-                                {selStatusData.map((_, i) => <Cell key={i} fill={STATUS_COLORS[i % STATUS_COLORS.length]} />)}
-                              </Pie>
-                              <Tooltip /><Legend />
-                            </PieChart>
-                          </ResponsiveContainer>
-                        </div>
-                        <div style={chartBoxStyle}>
-                          <h4 style={chartTitleStyle}>Bacias das selecionadas</h4>
-                          <ResponsiveContainer width="100%" height={240}>
-                            <BarChart data={selBasinData}>
-                              <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
-                              <XAxis dataKey="name" stroke={axisColor} fontSize={11} />
-                              <YAxis stroke={axisColor} />
-                              <Tooltip /><Legend />
-                              <Bar dataKey="value" name="Unidades" fill="#008542" />
-                            </BarChart>
-                          </ResponsiveContainer>
-                        </div>
-                      </div>
-
-                      <div style={{ display: "flex", gap: 16, flexWrap: "wrap", marginTop: 24 }}>
-                        <div style={chartBoxStyle}>
-                          <h4 style={chartTitleStyle}>Operadores das selecionadas (óleo bpd)</h4>
-                          <ResponsiveContainer width="100%" height={240}>
-                            <BarChart data={selOperatorData} layout="vertical">
-                              <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
-                              <XAxis type="number" stroke={axisColor} />
-                              <YAxis type="category" dataKey="name" stroke={axisColor} width={140} fontSize={11} />
-                              <Tooltip /><Legend />
-                              <Bar dataKey="Óleo" fill="#0072ce" />
-                            </BarChart>
-                          </ResponsiveContainer>
-                        </div>
-                        <div style={chartBoxStyle}>
-                          <h4 style={chartTitleStyle}>Tipos de unidade selecionadas</h4>
-                          <ResponsiveContainer width="100%" height={240}>
-                            <BarChart data={selTypeData}>
-                              <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
-                              <XAxis dataKey="name" stroke={axisColor} fontSize={11} />
-                              <YAxis stroke={axisColor} />
-                              <Tooltip /><Legend />
-                              <Bar dataKey="value" name="Unidades" fill="#ffcc29" />
-                            </BarChart>
-                          </ResponsiveContainer>
-                        </div>
-                      </div>
                     </>
                   )}
                 </div>
@@ -500,8 +467,6 @@ export default function App() {
           </section>
         </>
       )}
-
-      <footer className="footer">Base compilada e revisada com fontes públicas ANP, Petrobras e PPSA. Mapa usa Leaflet e OpenStreetMap. Distância até a costa é uma aproximação até o ponto litorâneo de referência mais próximo. Valide dados críticos antes de uso técnico. © 2026 Ricardo S. Rodrigues.</footer>
     </div>
   );
 }
