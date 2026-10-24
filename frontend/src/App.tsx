@@ -7,6 +7,7 @@ import { fetchPlatforms } from "./api";
 import type { Platform } from "./types";
 import onshoreData from "./data/onshore.json";
 import refinariasData from "./data/refinarias.json";
+import terminaisArmazenamentoData from "./data/terminais-armazenamento.json";
 
 const STATUS_LABEL: Record<string, string> = {
   operational: "Operacional",
@@ -96,7 +97,8 @@ export default function App() {
 
   const onshoreUnits = onshoreData as unknown as Platform[];
   const refinariasUnits = refinariasData as unknown as Platform[];
-  const activeUnits = modality === "maritimas" ? platforms : modality === "terrestres" ? onshoreUnits : refinariasUnits;
+  const terminaisArmazenamentoUnits = terminaisArmazenamentoData as unknown as Platform[];
+  const activeUnits = modality === "maritimas" ? platforms : modality === "terrestres" ? onshoreUnits : [...refinariasUnits, ...terminaisArmazenamentoUnits];
   const isOnshore = modality === "terrestres";
   const isOffshore = modality === "maritimas";
 
