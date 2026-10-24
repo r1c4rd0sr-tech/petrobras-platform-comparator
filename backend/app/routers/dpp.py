@@ -37,7 +37,6 @@ def _decode(content: bytes) -> str:
 
 
 def _dict_reader(texto: str):
-    """Detecta o delimitador (; ou ,) e retorna um DictReader."""
     cabecalho = texto.splitlines()[0] if texto else ""
     delim = ";" if cabecalho.count(";") > cabecalho.count(",") else ","
     return csv.DictReader(io.StringIO(texto), delimiter=delim)
@@ -45,7 +44,6 @@ def _dict_reader(texto: str):
 
 @lru_cache(maxsize=64)
 def _csvs_de_zip(url: str) -> tuple[str, ...]:
-    """Baixa o ZIP uma vez e retorna TODOS os CSVs internos como texto (cache)."""
     with httpx.Client(timeout=60, follow_redirects=True) as client:
         resp = client.get(url)
         resp.raise_for_status()
@@ -65,13 +63,14 @@ def _agregar_por_campo(csvs: tuple[str, ...], campo: str) -> dict | None:
     for csv_texto in csvs:
         leitor = _dict_reader(csv_texto)
         for linha in leitor:
-            nome = (linha.get("Campo") or linha.get("CAMPO") or linha.get("campo") or "").strip()
-            if nome.casefold() != alvo:
+            nome = (linha.get("Campo") or "").strip()
+            if not nome or nome.casefold() != alvo:
                 continue
             if periodo is None:
-                periodo = (linha.get("Período") or linha.get("Periodo") or linha.get("PERÍODO") or "").strip()
-            total_oleo += _parse_float(linha.get("Óleo (bbl/dia)") or linha.get("Oleo (bbl/dia)") or "0")
-            total_gas += _parse_float(linha.get("Gás (10^6 m3/dia)") or linha.get("Gas (10^6 m3/dia)") or "0")
+                periodo = (linha.get("Período") or "").strip()
+            # Colunas reais da ANP — valores já em bbl/dia e Mm³/dia
+            total_oleo += _parse_float(linha.get("Óleo (bbl/dia)") or "0")
+            total_gas += _parse_float(linha.get("Gás Natural (Mm³/dia)") or "0")
     if periodo is None:
         return None
     return {"periodo": periodo, "campo": campo, "oleo_bpd": round(total_oleo, 2), "gas_mmd": round(total_gas, 3)}
@@ -86,7 +85,8 @@ async def producao(
 ):
     """Série histórica por campo a partir dos ZIPs de produção por poço da ANP.
 
-    Cada ZIP contém 3 CSVs (Mar, Presal, Terra) — todos são processados.
+    Colunas reais: Campo, Período, Óleo (bbl/dia), Gás Natural (Mm³/dia).
+    Valores já vêm em bbl/dia e Mm³/dia — sem conversão adicional.
     """
     if ano and mes:
         url = _url_zip(ano, mes)
@@ -129,7 +129,6 @@ async def producao(
 
 @router.get("/debug")
 async def debug(ano: int = Query(...), mes: int = Query(..., ge=1, le=12)):
-    """Retorna cabeçalhos e uma linha de amostra de cada CSV do ZIP (diagnóstico)."""
     url = _url_zip(ano, mes)
     try:
         csvs = _csvs_de_zip(url)
