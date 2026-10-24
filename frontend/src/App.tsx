@@ -29,6 +29,12 @@ const MODALITY_OPTIONS: [Modality, string][] = [
   ["refinarias", "Refino, Gás e Logística"],
 ];
 
+const SORT_KEY_MAP: Record<string, keyof Platform> = {
+  oil: "oil_bpd",
+  gas: "gas_mmd",
+  boed: "boed",
+};
+
 const BASIN_ALIASES: Record<string, string> = {
   "campos basin": "Bacia de Campos",
   "santos basin": "Bacia de Santos",
@@ -155,7 +161,7 @@ export default function App() {
         && (!filters.wells || ((p as any).wells_productive ?? 0) >= Number(filters.wells))
         && (!filters.storage || (p.storage_m3 ?? 0) >= Number(filters.storage));
     });
-    const key = filters.sort as keyof Platform;
+    const key = SORT_KEY_MAP[filters.sort] ?? (filters.sort as keyof Platform);
     return rows.sort((a, b) => {
       if (key === "name") return a.name.localeCompare(b.name);
       return (Number(b[key] ?? 0) || 0) - (Number(a[key] ?? 0) || 0);
