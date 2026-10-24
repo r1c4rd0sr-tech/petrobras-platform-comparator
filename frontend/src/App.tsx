@@ -141,7 +141,15 @@ export default function App() {
   }, [activeUnits, filters]);
 
   const selected = useMemo(() => activeUnits.filter((p) => selectedIds.includes(p.id)), [activeUnits, selectedIds]);
-  const chartData = selected.map((p) => ({ name: p.name, Óleo: p.oil_bpd ?? 0, Gás: p.gas_mmd ?? 0, BOE: p.boed ?? 0 }));
+  const chartData = selected.map((p) => {
+    const poloRef = isOnshore ? (p as any).producao_polo_gas_mmd : null;
+    return {
+      name: poloRef != null ? `${p.name} (polo)` : p.name,
+      Óleo: p.oil_bpd ?? 0,
+      Gás: poloRef != null ? poloRef : (p.gas_mmd ?? 0),
+      BOE: p.boed ?? 0,
+    };
+  });
   const totals = filtered.reduce((acc, p) => ({ oil: acc.oil + (p.oil_bpd ?? 0), gas: acc.gas + (p.gas_mmd ?? 0), boe: acc.boe + (p.boed ?? 0), wells: acc.wells + ((p as any).wells_productive ?? 0) }), { oil: 0, gas: 0, boe: 0, wells: 0 });
 
   const withDepth = filtered.filter((p) => p.water_depth_m != null);
@@ -490,6 +498,9 @@ export default function App() {
               {tab === "graficos" && (
                 <div className="charts">
                   <h3>{isOnshore ? "Comparação dos campos selecionados" : "Comparação das plataformas selecionadas"} ({selected.length}/10)</h3>
+                  {isOnshore && selected.some((p) => (p as any).producao_polo_gas_mmd != null) && (
+                    <p style={{ color: axisColor, fontSize: 13 }}>Para os campos do Polo Urucu sem produção individual divulgada, é exibida a produção agregada do Polo Arara (7,252 MMm³/dia), identificada com "(polo)".</p>
+                  )}
                   {selected.length === 0 && <p style={{ color: axisColor }}>Selecione {isOnshore ? "campos" : "plataformas"} na lista à esquerda para ver os gráficos comparativos.</p>}
                   {selected.length > 0 && (
                     <>
