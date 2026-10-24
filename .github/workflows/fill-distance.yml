@@ -1,0 +1,33 @@
+name: Preencher distância até a costa
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "backend/scripts/fill_distance_to_coast.py"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  fill-distance:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Executar enriquecimento
+        run: python backend/scripts/fill_distance_to_coast.py
+      - name: Commit e push das atualizações
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add backend/data/platforms/part-*.json
+          if git diff --cached --quiet; then
+            echo "Nenhuma alteração para commitar."
+          else
+            git commit -m "chore: preenche distance_to_coast_km para unidades com geolocalização estimada"
+            git push
+          fi
