@@ -1,5 +1,6 @@
 import csv
 import io
+import unicodedata
 import zipfile
 from datetime import date
 from functools import lru_cache
@@ -14,11 +15,17 @@ BASE = (
     "arquivos/arquivos-producao-de-petroleo-e-gas-natural-por-poco"
 )
 
-# Janela fixa com ZIPs disponíveis: 2021-01 a 2023-10 (mensal)
 JANELA_FIM_ANO = 2023
 JANELA_FIM_MES = 10
 JANELA_INICIO_ANO = 2021
 JANELA_INICIO_MES = 1
+
+
+def _normalizar(texto: str) -> str:
+    """Remove acentos, lowercase e trim — para matching tolerante."""
+    sem_acento = unicodedata.normalize("NFD", texto)
+    sem_acento = "".join(c for c in sem_acento if unicodedata.category(c) != "Mn")
+    return sem_acento.strip().casefold()
 
 
 def _url_zip(ano: int, mes: int | None) -> str:
@@ -65,12 +72,16 @@ def _agregar_por_campo(csvs: tuple[str, ...], campo: str) -> dict | None:
     total_oleo = 0.0
     total_gas = 0.0
     periodo = None
-    alvo = campo.strip().casefold()
+    alvo = _normalizar(campo)
     for csv_texto in csvs:
         leitor = _dict_reader(csv_texto)
         for linha in leitor:
             nome = (linha.get("Campo") or "").strip()
-            if not nome or nome.casefold() != alvo:
+            if not nome:
+                continue
+            nome_norm = _normalizar(nome)
+            # Match exato normalizado OU contenção (ex.: "Buzios" encontra "Búzios")
+            if nome_norm != alvo and alvo not in nome_norm and nome_norm not in alvo:
                 continue
             if periodo is None:
                 periodo = (linha.get("Período") or "").strip()
@@ -82,7 +93,6 @@ def _agregar_por_campo(csvs: tuple[str, ...], campo: str) -> dict | None:
 
 
 def _janela(meses: int) -> list[tuple[int, int]]:
-    """Retorna os últimos `meses` dentro da janela fixa 2021-01..2023-10, do mais recente para o mais antigo."""
     pares = []
     ano, mes = JANELA_FIM_ANO, JANELA_FIM_MES
     while (ano > JANELA_INICIO_ANO) or (ano == JANELA_INICIO_ANO and mes >= JANELA_INICIO_MES):
@@ -99,14 +109,11 @@ def _janela(meses: int) -> list[tuple[int, int]]:
 @router.get("/producao")
 async def producao(
     campo: str = Query(..., description="Nome do campo de produção"),
-    meses: int = Query(36, ge=1, le=36, description="Meses históricos (máx. 33 — janela 2021-01 a 2023-10)"),
+    meses: int = Query(36, ge=1, le=36, description="Meses históricos (máx. 33)"),
     ano: int | None = Query(None, description="Ano específico para teste pontual"),
     mes: int | None = Query(None, ge=1, le=12, description="Mês específico para teste pontual"),
 ):
-    """Série histórica por campo a partir dos ZIPs de produção por poço da ANP.
-
-    Janela fixa: 2021-01 a 2023-10 (mensal). 2023-11 em diante não possui ZIP público.
-    """
+    """Série histórica por campo — matching tolerante a acentos e variações de nome."""
     if ano and mes:
         url = _url_zip(ano, mes)
         try:
