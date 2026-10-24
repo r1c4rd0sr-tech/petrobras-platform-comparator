@@ -360,9 +360,32 @@ export default function App() {
                   {selected.length === 0 && <p style={{ color: axisColor }}>Selecione plataformas na lista à esquerda para ver os gráficos comparativos.</p>}
                   {selected.length > 0 && (
                     <>
-                      <div style={{ ...chartBoxStyle, marginBottom: 24 }}>
-                        <h4 style={chartTitleStyle}>Produção (óleo, gás e BOE)</h4>
-                        <ResponsiveContainer width="100%" height={360}><BarChart data={chartData}><CartesianGrid strokeDasharray="3 3" stroke={gridColor} /><XAxis dataKey="name" stroke={axisColor} fontSize={11} /><YAxis stroke={axisColor} /><Tooltip /><Legend /><Bar dataKey="Óleo" fill="#008542" /><Bar dataKey="Gás" fill="#f28c28" /><Bar dataKey="BOE" fill="#ffcc29" /></BarChart></ResponsiveContainer>
+                      <div style={{ display: "flex", gap: 16, flexWrap: "wrap", marginBottom: 24 }}>
+                        <div style={chartBoxStyle}>
+                          <h4 style={chartTitleStyle}>Produção de Óleo e BOE</h4>
+                          <ResponsiveContainer width="100%" height={360}>
+                            <BarChart data={chartData}>
+                              <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
+                              <XAxis dataKey="name" stroke={axisColor} fontSize={11} />
+                              <YAxis stroke={axisColor} />
+                              <Tooltip /><Legend />
+                              <Bar dataKey="Óleo" fill="#008542" />
+                              <Bar dataKey="BOE" fill="#ffcc29" />
+                            </BarChart>
+                          </ResponsiveContainer>
+                        </div>
+                        <div style={chartBoxStyle}>
+                          <h4 style={chartTitleStyle}>Produção de Gás</h4>
+                          <ResponsiveContainer width="100%" height={360}>
+                            <BarChart data={chartData}>
+                              <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
+                              <XAxis dataKey="name" stroke={axisColor} fontSize={11} />
+                              <YAxis stroke={axisColor} />
+                              <Tooltip /><Legend />
+                              <Bar dataKey="Gás" fill="#f28c28" />
+                            </BarChart>
+                          </ResponsiveContainer>
+                        </div>
                       </div>
 
                       <div style={{ display: "flex", gap: 16, flexWrap: "wrap", marginTop: 24 }}>
