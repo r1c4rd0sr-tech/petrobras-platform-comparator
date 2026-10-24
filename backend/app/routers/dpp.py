@@ -14,6 +14,12 @@ BASE = (
     "arquivos/arquivos-producao-de-petroleo-e-gas-natural-por-poco"
 )
 
+# Janela fixa com ZIPs disponíveis: 2021-01 a 2023-10 (mensal)
+JANELA_FIM_ANO = 2023
+JANELA_FIM_MES = 10
+JANELA_INICIO_ANO = 2021
+JANELA_INICIO_MES = 1
+
 
 def _url_zip(ano: int, mes: int | None) -> str:
     if ano <= 2020:
@@ -68,7 +74,6 @@ def _agregar_por_campo(csvs: tuple[str, ...], campo: str) -> dict | None:
                 continue
             if periodo is None:
                 periodo = (linha.get("Período") or "").strip()
-            # Colunas reais da ANP — valores já em bbl/dia e Mm³/dia
             total_oleo += _parse_float(linha.get("Óleo (bbl/dia)") or "0")
             total_gas += _parse_float(linha.get("Gás Natural (Mm³/dia)") or "0")
     if periodo is None:
@@ -76,17 +81,31 @@ def _agregar_por_campo(csvs: tuple[str, ...], campo: str) -> dict | None:
     return {"periodo": periodo, "campo": campo, "oleo_bpd": round(total_oleo, 2), "gas_mmd": round(total_gas, 3)}
 
 
+def _janela(meses: int) -> list[tuple[int, int]]:
+    """Retorna os últimos `meses` dentro da janela fixa 2021-01..2023-10, do mais recente para o mais antigo."""
+    pares = []
+    ano, mes = JANELA_FIM_ANO, JANELA_FIM_MES
+    while (ano > JANELA_INICIO_ANO) or (ano == JANELA_INICIO_ANO and mes >= JANELA_INICIO_MES):
+        pares.append((ano, mes))
+        if len(pares) >= meses:
+            break
+        mes -= 1
+        if mes == 0:
+            mes = 12
+            ano -= 1
+    return pares
+
+
 @router.get("/producao")
 async def producao(
     campo: str = Query(..., description="Nome do campo de produção"),
-    meses: int = Query(36, ge=1, le=36, description="Meses históricos (máx. 36)"),
+    meses: int = Query(36, ge=1, le=36, description="Meses históricos (máx. 33 — janela 2021-01 a 2023-10)"),
     ano: int | None = Query(None, description="Ano específico para teste pontual"),
     mes: int | None = Query(None, ge=1, le=12, description="Mês específico para teste pontual"),
 ):
     """Série histórica por campo a partir dos ZIPs de produção por poço da ANP.
 
-    Colunas reais: Campo, Período, Óleo (bbl/dia), Gás Natural (Mm³/dia).
-    Valores já vêm em bbl/dia e Mm³/dia — sem conversão adicional.
+    Janela fixa: 2021-01 a 2023-10 (mensal). 2023-11 em diante não possui ZIP público.
     """
     if ano and mes:
         url = _url_zip(ano, mes)
@@ -102,18 +121,9 @@ async def producao(
         except Exception as e:
             raise HTTPException(status_code=502, detail=f"Falha ao consultar ZIP {ano}-{mes:02d}: {e}")
 
-    hoje = date.today()
     dados = []
     avisos = []
-    for i in range(meses):
-        a = hoje.year
-        m = hoje.month - i
-        while m <= 0:
-            m += 12
-            a -= 1
-        if a >= 2024:
-            avisos.append(f"{a}-{m:02d}: disponível apenas via CDP/ORDS (integração futura)")
-            continue
+    for a, m in _janela(meses):
         url = _url_zip(a, m)
         try:
             csvs = _csvs_de_zip(url)
