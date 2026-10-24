@@ -217,30 +217,6 @@ export default function App() {
     return Object.entries(map).map(([name, v]) => ({ name, ...v }));
   }, [filtered]);
 
-  const selStatusData = useMemo(() => {
-    const map: Record<string, number> = {};
-    selected.forEach((p) => { const k = STATUS_LABEL[p.status] ?? p.status; map[k] = (map[k] ?? 0) + 1; });
-    return Object.entries(map).map(([name, value]) => ({ name, value }));
-  }, [selected]);
-
-  const selBasinData = useMemo(() => {
-    const map: Record<string, number> = {};
-    selected.forEach((p) => { const k = p.basin || (p as any).state || "Não informado"; map[k] = (map[k] ?? 0) + 1; });
-    return Object.entries(map).map(([name, value]) => ({ name, value })).sort((a, b) => b.value - a.value);
-  }, [selected]);
-
-  const selOperatorData = useMemo(() => {
-    const map: Record<string, number> = {};
-    selected.forEach((p) => { const k = p.operator || "Não informado"; map[k] = (map[k] ?? 0) + (p.oil_bpd ?? 0); });
-    return Object.entries(map).map(([name, Óleo]) => ({ name, Óleo })).sort((a, b) => b.Óleo - a.Óleo);
-  }, [selected]);
-
-  const selTypeData = useMemo(() => {
-    const map: Record<string, number> = {};
-    selected.forEach((p) => { const k = p.unit_type || "Não informado"; map[k] = (map[k] ?? 0) + 1; });
-    return Object.entries(map).map(([name, value]) => ({ name, value })).sort((a, b) => b.value - a.value);
-  }, [selected]);
-
   const topOil = useMemo(() => [...filtered].filter((p) => (p.oil_bpd ?? 0) > 0).sort((a, b) => (b.oil_bpd ?? 0) - (a.oil_bpd ?? 0)).slice(0, 5), [filtered]);
   const topDepth = useMemo(() => [...filtered].filter((p) => p.water_depth_m != null).sort((a, b) => (b.water_depth_m ?? 0) - (a.water_depth_m ?? 0)).slice(0, 5), [filtered]);
   const topStorage = useMemo(() => [...filtered].filter((p) => (p.storage_m3 ?? 0) > 0).sort((a, b) => (b.storage_m3 ?? 0) - (a.storage_m3 ?? 0)).slice(0, 5), [filtered]);
