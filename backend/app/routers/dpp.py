@@ -36,6 +36,13 @@ def _decode(content: bytes) -> str:
     return content.decode("utf-8", errors="replace")
 
 
+def _dict_reader(texto: str):
+    """Detecta o delimitador (; ou ,) e retorna um DictReader."""
+    cabecalho = texto.splitlines()[0] if texto else ""
+    delim = ";" if cabecalho.count(";") > cabecalho.count(",") else ","
+    return csv.DictReader(io.StringIO(texto), delimiter=delim)
+
+
 @lru_cache(maxsize=64)
 def _csvs_de_zip(url: str) -> tuple[str, ...]:
     """Baixa o ZIP uma vez e retorna TODOS os CSVs internos como texto (cache)."""
@@ -54,11 +61,12 @@ def _agregar_por_campo(csvs: tuple[str, ...], campo: str) -> dict | None:
     total_oleo = 0.0
     total_gas = 0.0
     periodo = None
+    alvo = campo.strip().casefold()
     for csv_texto in csvs:
-        leitor = csv.DictReader(io.StringIO(csv_texto))
+        leitor = _dict_reader(csv_texto)
         for linha in leitor:
-            nome = (linha.get("Campo") or linha.get("CAMPO") or "").strip()
-            if nome.lower() != campo.strip().lower():
+            nome = (linha.get("Campo") or linha.get("CAMPO") or linha.get("campo") or "").strip()
+            if nome.casefold() != alvo:
                 continue
             if periodo is None:
                 periodo = (linha.get("Período") or linha.get("Periodo") or linha.get("PERÍODO") or "").strip()
@@ -117,3 +125,20 @@ async def producao(
 
     dados.sort(key=lambda r: r["periodo"])
     return {"campo": campo, "meses": meses, "dados": dados, "avisos": avisos}
+
+
+@router.get("/debug")
+async def debug(ano: int = Query(...), mes: int = Query(..., ge=1, le=12)):
+    """Retorna cabeçalhos e uma linha de amostra de cada CSV do ZIP (diagnóstico)."""
+    url = _url_zip(ano, mes)
+    try:
+        csvs = _csvs_de_zip(url)
+    except Exception as e:
+        raise HTTPException(status_code=502, detail=f"Falha ao consultar ZIP: {e}")
+    amostras = []
+    for i, texto in enumerate(csvs):
+        leitor = _dict_reader(texto)
+        cabecalhos = leitor.fieldnames or []
+        primeira = next(iter(leitor), {})
+        amostras.append({"csv_index": i, "colunas": cabecalhos, "amostra": primeira})
+    return {"url": url, "csvs": amostras}
