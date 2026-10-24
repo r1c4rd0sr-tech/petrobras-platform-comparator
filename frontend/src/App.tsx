@@ -1,10 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
-import { useMap } from "react-leaflet";
-import { Bar, BarChart, CartesianGrid, Cell, Legend, Pie, PieChart, PolarAngleAxis, PolarGrid, PolarRadiusAxis, Radar, RadarChart, ResponsiveContainer, Scatter, ScatterChart, Tooltip, XAxis, YAxis, ZAxis } from "recharts";
+import { Bar, BarChart, CartesianGrid, Cell, Legend, Line, LineChart, Pie, PieChart, PolarAngleAxis, PolarGrid, PolarRadiusAxis, Radar, RadarChart, ResponsiveContainer, Scatter, ScatterChart, Tooltip, XAxis, YAxis, ZAxis } from "recharts";
 import { MapContainer, Marker, Popup, TileLayer, Tooltip as LeafletTooltip } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { fetchPlatforms, fetchOnshore, fetchRefinarias, fetchTerminaisArmazenamento, fetchUtgnsGas, fetchEcompsGasbol } from "./api";
+import { fetchPlatforms, fetchOnshore, fetchRefinarias, fetchTerminaisArmazenamento, fetchUtgnsGas, fetchEcompsGasbol, fetchProducaoHistorica } from "./api";
 import { POB_OVERRIDES } from "./pob-overrides";
 import type { Platform } from "./types";
 import onshoreData from "./data/onshore.json";
@@ -41,7 +40,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
       <p style={{ margin: "0 0 8px", fontWeight: 700, fontSize: 13, color: "#ffffff", lineHeight: 1.3 }}>{label}</p>
       {payload.map((entry: any, i: number) => (
         <p key={i} style={{ margin: "4px 0", fontSize: 12, color: "#ffffff", display: "flex", alignItems: "center", gap: 6 }}>
-          <span style={{ width: 10, height: 10, borderRadius: 2, background: entry.color || entry.fill, display: "inline-block", flexShrink: 0 }}></span>
+          <span style={{ width: 10, height: 10, borderRadius: 2, background: entry.color || entry.stroke || entry.fill, display: "inline-block", flexShrink: 0 }}></span>
           <span style={{ color: "#ffffff" }}>{entry.name}: <strong style={{ color: "#ffcc29" }}>{Number(entry.value).toLocaleString("pt-BR")}{TOOLTIP_UNIT_MAP[entry.name] ?? ""}</strong></span>
         </p>
       ))}
@@ -62,7 +61,6 @@ const CustomScatterTooltip = ({ active, payload }: any) => {
   );
 };
 
-// Heatmap de densidade: círculos proporcionais à concentração de unidades próximas
 function DensityHeatmap({ points, visible }: { points: { lat: number; lng: number; density: number }[]; visible: boolean }) {
   const map = useMap();
   useEffect(() => {
@@ -174,6 +172,9 @@ export default function App() {
   const [isMobile, setIsMobile] = useState(typeof window !== "undefined" ? window.innerWidth < 768 : false);
   const [showHeatmap, setShowHeatmap] = useState(false);
   const [filters, setFilters] = useState({ search: "", status: "", unit_type: "", basin: "", field: "", operator: "", state: "", municipality: "", oil: "", gas: "", year: "", accommodation: "", wells: "", storage: "", sort: "oil" });
+  const [historico, setHistorico] = useState<Record<string, any[]>>({});
+  const [historicoLoading, setHistoricoLoading] = useState(false);
+  const [historicoError, setHistoricoError] = useState("");
 
   const [onshoreUnits, setOnshoreUnits] = useState<Platform[]>(onshoreData as unknown as Platform[]);
   const [refinariasUnits, setRefinariasUnits] = useState<Platform[]>(refinariasData as unknown as Platform[]);
@@ -227,6 +228,38 @@ export default function App() {
     fetchEcompsGasbol().then((data) => setEcompsGasbolUnits(data)).catch(() => {});
   }, []);
 
+  // Busca o histórico mensal de produção (BMP/ANP) para os campos das unidades selecionadas
+  useEffect(() => {
+    if (tab !== "radar-temporal" || selected.length === 0) return;
+    const campos = [...new Set(selected.map((p) => p.field).filter(Boolean) as string[])];
+    if (campos.length === 0) return;
+    const pendentes = campos.filter((c) => !historico[c]);
+    if (pendentes.length === 0) return;
+    let cancelado = false;
+    setHistoricoLoading(true);
+    setHistoricoError("");
+    Promise.all(
+      pendentes.map((campo) =>
+        fetchProducaoHistorica(campo)
+          .then((rows) => ({ campo, rows: Array.isArray(rows) ? rows : rows?.dados ?? rows?.itens ?? [] }))
+          .catch(() => ({ campo, rows: [] }))
+      )
+    )
+      .then((resultados) => {
+        if (cancelado) return;
+        setHistorico((prev) => {
+          const next = { ...prev };
+          resultados.forEach(({ campo, rows }) => { next[campo] = rows; });
+          return next;
+        });
+        if (resultados.every((r) => r.rows.length === 0)) {
+          setHistoricoError("Não foi possível obter o histórico de produção para os campos selecionados (verifique a disponibilidade da API DPP/ANP).");
+        }
+      })
+      .finally(() => { if (!cancelado) setHistoricoLoading(false); });
+    return () => { cancelado = true; };
+  }, [tab, selected, historico]);
+
   const options = useMemo(() => ({
     unit_types: [...new Set(activeUnits.map((p) => p.unit_type).filter(Boolean))].sort(),
     basins: [...new Set(activeUnits.map((p) => p.basin).filter(Boolean) as string[])].sort(),
@@ -262,7 +295,6 @@ export default function App() {
     });
   }, [activeUnits, filters]);
 
-  // Pontos de densidade: conta unidades num raio aproximado de 150 km
   const densityPoints = useMemo(() => {
     const pts = filtered.filter((p) => p.latitude != null && p.longitude != null);
     return pts.map((p) => {
@@ -322,6 +354,45 @@ export default function App() {
       return entry;
     });
   }, [selected]);
+
+  // Série temporal: consolida o histórico dos campos selecionados em linhas por período
+  const historicoCampos = useMemo(() => Object.keys(historico).filter((c) => (historico[c] || []).length > 0), [historico]);
+
+  const timeSeriesOil = useMemo(() => {
+    if (historicoCampos.length === 0) return [];
+    const periodos = new Set<string>();
+    historicoCampos.forEach((c) => (historico[c] || []).forEach((r: any) => { const p = r.periodo || r.Periodo || r.dataReferencia; if (p) periodos.add(String(p)); }));
+    return Array.from(periodos).sort().map((periodo) => {
+      const entry: any = { periodo };
+      historicoCampos.forEach((campo) => {
+        const row = (historico[campo] || []).find((r: any) => String(r.periodo || r.Periodo || r.dataReferencia) === periodo);
+        if (row) {
+          const m3 = Number(row.producaoPetroleo ?? row.ProducaoPetroleo ?? row.producaoPetro ?? 0);
+          const dias = Number(row.dias ?? row.Dias ?? 30) || 30;
+          entry[campo] = Math.round((m3 * 6.2898) / dias);
+        }
+      });
+      return entry;
+    });
+  }, [historico, historicoCampos]);
+
+  const timeSeriesGas = useMemo(() => {
+    if (historicoCampos.length === 0) return [];
+    const periodos = new Set<string>();
+    historicoCampos.forEach((c) => (historico[c] || []).forEach((r: any) => { const p = r.periodo || r.Periodo || r.dataReferencia; if (p) periodos.add(String(p)); }));
+    return Array.from(periodos).sort().map((periodo) => {
+      const entry: any = { periodo };
+      historicoCampos.forEach((campo) => {
+        const row = (historico[campo] || []).find((r: any) => String(r.periodo || r.Periodo || r.dataReferencia) === periodo);
+        if (row) {
+          const m3 = Number(row.producaoGasNatural ?? row.ProducaoGasNatural ?? row.producaoGas ?? 0);
+          const dias = Number(row.dias ?? row.Dias ?? 30) || 30;
+          entry[campo] = Number(((m3 / 1_000_000) / dias).toFixed(3));
+        }
+      });
+      return entry;
+    });
+  }, [historico, historicoCampos]);
 
   const totals = filtered.reduce((acc, p) => ({ oil: acc.oil + (p.oil_bpd ?? 0), gas: acc.gas + (p.gas_mmd ?? 0), boe: acc.boe + (p.boed ?? 0), wells: acc.wells + ((p as any).wells_productive ?? 0), storage: acc.storage + (p.storage_m3 ?? 0) }), { oil: 0, gas: 0, boe: 0, wells: 0, storage: 0 });
 
@@ -923,13 +994,45 @@ export default function App() {
 
                       <div style={chartRowStyle}>
                         <div style={chartBoxStyle}>
-                          <h4 style={chartTitleStyle}>Série Temporal</h4>
-                          <p style={{ color: axisColor, fontSize: 13 }}>
-                            A série temporal histórica (produção mensal/anual por unidade) ainda não está disponível no feed atual da ANP. Esta área está preparada para exibir automaticamente a evolução de Óleo, Gás e BOE por unidade assim que esse histórico for incorporado à base.
+                          <h4 style={chartTitleStyle}>Série Temporal — produção mensal por campo (ANP/DPP)</h4>
+                          <p style={{ color: axisColor, fontSize: 12, marginTop: 0 }}>
+                            Fonte: Boletim Mensal de Produção (BMP) da ANP via API "Do Poço ao Posto". Óleo convertido de m³ para bpd; gás convertido de m³ para MMm³/d. Há um atraso de até 2 meses na publicação oficial.
                           </p>
-                          <div style={{ background: isDark ? "#123a5c" : "#e8eef4", borderRadius: 8, padding: "14px 18px", color: axisColor, fontSize: 13 }}>
-                            <strong style={{ color: isDark ? "#fff" : "#0c2340" }}>Próxima etapa:</strong> integrar o histórico de produção mensal da ANP para popular este gráfico com a evolução temporal de cada unidade selecionada.
-                          </div>
+                          {historicoLoading && <p style={{ color: axisColor }}>Carregando histórico de produção...</p>}
+                          {historicoError && <p style={{ color: "#e30613" }}>{historicoError}</p>}
+                          {!historicoLoading && !historicoError && timeSeriesOil.length === 0 && (
+                            <p style={{ color: axisColor }}>Nenhum dado histórico disponível para os campos selecionados.</p>
+                          )}
+                          {timeSeriesOil.length > 0 && (
+                            <>
+                              <h5 style={{ color: isDark ? "#fff" : "#0c2340", marginBottom: 4 }}>Óleo (bpd)</h5>
+                              <ResponsiveContainer width="100%" height={isMobile ? 260 : 320}>
+                                <LineChart data={timeSeriesOil}>
+                                  <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
+                                  <XAxis dataKey="periodo" stroke={axisColor} fontSize={11} />
+                                  <YAxis stroke={axisColor} />
+                                  <Tooltip content={<CustomTooltip />} />
+                                  <Legend />
+                                  {historicoCampos.map((campo, i) => (
+                                    <Line key={campo} type="monotone" dataKey={campo} name={campo} stroke={PIN_COLORS[i % PIN_COLORS.length]} strokeWidth={2} dot={false} />
+                                  ))}
+                                </LineChart>
+                              </ResponsiveContainer>
+                              <h5 style={{ color: isDark ? "#fff" : "#0c2340", margin: "16px 0 4px" }}>Gás (MMm³/d)</h5>
+                              <ResponsiveContainer width="100%" height={isMobile ? 260 : 320}>
+                                <LineChart data={timeSeriesGas}>
+                                  <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
+                                  <XAxis dataKey="periodo" stroke={axisColor} fontSize={11} />
+                                  <YAxis stroke={axisColor} />
+                                  <Tooltip content={<CustomTooltip />} />
+                                  <Legend />
+                                  {historicoCampos.map((campo, i) => (
+                                    <Line key={campo} type="monotone" dataKey={campo} name={campo} stroke={PIN_COLORS[i % PIN_COLORS.length]} strokeWidth={2} dot={false} />
+                                  ))}
+                                </LineChart>
+                              </ResponsiveContainer>
+                            </>
+                          )}
                         </div>
                       </div>
                     </>
