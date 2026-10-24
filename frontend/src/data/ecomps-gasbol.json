@@ -16,7 +16,7 @@
     "longitude": -57.65,
     "notes": "ECOMP 1 de Corumbá, no km 46,6 do Gasoduto Bolívia-Brasil (Gasbol), em Corumbá (MS). 3 turbinas a gás Solar MARS 100 de 15.000 HP (11,19 MW ISO) cada, acionando compressores centrífugos. Coordenada aproximada do município.",
     "source_url": "https://www.tbg.com.br/documents/20124/353690/MD-5000-940-TOE-005-J.pdf/",
-    "data_version": "V2.0-refino"
+    "data_version": "V2.1-refino"
   },
   {
     "id": 2036,
@@ -35,7 +35,7 @@
     "longitude": -56.37,
     "notes": "ECOMP 2 de Miranda, no km 171,0 do Gasoduto Bolívia-Brasil (Gasbol), em Miranda (MS). 3 turbinas a gás Solar MARS 100 de 15.000 HP (11,19 MW ISO) cada, acionando compressores centrífugos. Coordenada aproximada do município.",
     "source_url": "https://www.tbg.com.br/documents/20124/353690/MD-5000-940-TOE-005-J.pdf/",
-    "data_version": "V2.0-refino"
+    "data_version": "V2.1-refino"
   },
   {
     "id": 2037,
@@ -54,7 +54,7 @@
     "longitude": -55.64,
     "notes": "ECOMP 3 de Anastácio, no km 289,1 do Gasoduto Bolívia-Brasil (Gasbol), em Anastácio (MS). 3 turbinas a gás Solar MARS 100 de 15.000 HP (11,19 MW ISO) cada, acionando compressores centrífugos. Coordenada aproximada do município.",
     "source_url": "https://www.tbg.com.br/documents/20124/353690/MD-5000-940-TOE-005-J.pdf/",
-    "data_version": "V2.0-refino"
+    "data_version": "V2.1-refino"
   },
   {
     "id": 2038,
@@ -73,7 +73,7 @@
     "longitude": -54.65,
     "notes": "ECOMP 4 de Campo Grande, no km 394,2 do Gasoduto Bolívia-Brasil (Gasbol), em Campo Grande (MS). 4 turbinas a gás Solar TAURUS 60 de 7.500 HP (5,6 MW ISO) cada, acionando compressores centrífugos. Coordenada aproximada do município.",
     "source_url": "https://www.tbg.com.br/documents/20124/353690/MD-5000-940-TOE-005-J.pdf/",
-    "data_version": "V2.0-refino"
+    "data_version": "V2.1-refino"
   },
   {
     "id": 2039,
@@ -92,7 +92,7 @@
     "longitude": -53.77,
     "notes": "ECOMP 5 de Ribas do Rio Pardo, no km 522,5 do Gasoduto Bolívia-Brasil (Gasbol), em Ribas do Rio Pardo (MS). 2 turbinas a gás Solar MARS 100 de 15.000 HP (11,19 MW ISO) cada, acionando compressores centrífugos. Coordenada aproximada do município.",
     "source_url": "https://www.tbg.com.br/documents/20124/353690/MD-5000-940-TOE-005-J.pdf/",
-    "data_version": "V2.0-refino"
+    "data_version": "V2.1-refino"
   },
   {
     "id": 2040,
@@ -111,7 +111,7 @@
     "longitude": -51.69,
     "notes": "ECOMP 6 de Três Lagoas, no km 651,1 do Gasoduto Bolívia-Brasil (Gasbol), em Três Lagoas (MS). 2 turbinas a gás Solar MARS 100 de 15.000 HP (11,19 MW ISO) cada, acionando compressores centrífugos. Coordenada aproximada do município.",
     "source_url": "https://www.tbg.com.br/documents/20124/353690/MD-5000-940-TOE-005-J.pdf/",
-    "data_version": "V2.0-refino"
+    "data_version": "V2.1-refino"
   },
   {
     "id": 2041,
@@ -130,7 +130,7 @@
     "longitude": -51.11,
     "notes": "ECOMP 7 de Mirandópolis, no km 779,5 do Gasoduto Bolívia-Brasil (Gasbol), em Mirandópolis (SP). 2 turbinas a gás Solar MARS 100 de 15.000 HP (11,19 MW ISO) cada, acionando compressores centrífugos. Coordenada aproximada do município.",
     "source_url": "https://www.tbg.com.br/documents/20124/353690/MD-5000-940-TOE-005-J.pdf/",
-    "data_version": "V2.0-refino"
+    "data_version": "V2.1-refino"
   },
   {
     "id": 2042,
@@ -149,10 +149,10 @@
     "longitude": -50.08,
     "notes": "ECOMP 8 de Penápolis, no km 896,6 do Gasoduto Bolívia-Brasil (Gasbol), em Penápolis (SP). 4 turbinas a gás Solar TAURUS 60 de 7.500 HP (5,6 MW ISO) cada, acionando compressores centrífugos. Coordenada aproximada do município.",
     "source_url": "https://www.tbg.com.br/documents/20124/353690/MD-5000-940-TOE-005-J.pdf/",
-    "data_version": "V2.0-refino"
+    "data_version": "V2.1-refino"
   },
   {
-    "id": 2042,
+    "id": 2047,
     "slug": "ecomp-iacanga",
     "name": "ECOMP Iacanga",
     "unit_type": "Estação de Compressão",
@@ -168,7 +168,7 @@
     "longitude": -49.05,
     "notes": "ECOMP 9 de Iacanga, no km 1018,4 do Gasoduto Bolívia-Brasil (Gasbol), em Iacanga (SP). 2 turbinas a gás Solar MARS 100 de 15.000 HP (11,19 MW ISO) cada, acionando compressores centrífugos. Coordenada aproximada do município.",
     "source_url": "https://www.tbg.com.br/documents/20124/353690/MD-5000-940-TOE-005-J.pdf/",
-    "data_version": "V2.0-refino"
+    "data_version": "V2.1-refino"
   },
   {
     "id": 2043,
@@ -187,7 +187,7 @@
     "longitude": -47.89,
     "notes": "ECOMP 10 de São Carlos, no km 1141,1 do Gasoduto Bolívia-Brasil (Gasbol), em São Carlos (SP). 2 turbinas a gás Solar MARS 100 de 15.000 HP (11,19 MW ISO) cada, acionando compressores centrífugos. Coordenada aproximada do município.",
     "source_url": "https://www.tbg.com.br/documents/20124/353690/MD-5000-940-TOE-005-J.pdf/",
-    "data_version": "V2.0-refino"
+    "data_version": "V2.1-refino"
   },
   {
     "id": 2044,
@@ -206,7 +206,7 @@
     "longitude": -48.35,
     "notes": "ECOMP 12 de Capão Bonito, no km 260,1 do Trecho Sul do Gasoduto Bolívia-Brasil (Gasbol), em Capão Bonito (SP). 3 turbinas a gás Solar TAURUS 60 de 7.500 HP (5,6 MW ISO) cada, acionando compressores centrífugos. Coordenada aproximada do município.",
     "source_url": "https://www.tbg.com.br/documents/20124/353690/MD-5000-940-TOE-005-J.pdf/",
-    "data_version": "V2.0-refino"
+    "data_version": "V2.1-refino"
   },
   {
     "id": 2045,
@@ -225,7 +225,7 @@
     "longitude": -48.66,
     "notes": "ECOMP 14 de Biguaçu, no km 757,4 do Trecho Sul do Gasoduto Bolívia-Brasil (Gasbol), em Biguaçu (SC). 3 motores a gás Waukesha de 1.000 HP cada, acionando compressores alternativos. Ampliação em andamento. Coordenada aproximada do município.",
     "source_url": "https://www.tbg.com.br/documents/20124/353690/MD-5000-940-TOE-005-J.pdf/",
-    "data_version": "V2.0-refino"
+    "data_version": "V2.1-refino"
   },
   {
     "id": 2046,
@@ -244,6 +244,6 @@
     "longitude": -49.43,
     "notes": "ECOMP 15 de Siderópolis, no km 937,4 do Trecho Sul do Gasoduto Bolívia-Brasil (Gasbol), em Siderópolis (SC). 4 motores a gás Waukesha de 1.360 HP cada, acionando compressores alternativos. Coordenada aproximada do município.",
     "source_url": "https://www.tbg.com.br/documents/20124/353690/MD-5000-940-TOE-005-J.pdf/",
-    "data_version": "V2.0-refino"
+    "data_version": "V2.1-refino"
   }
 ]
