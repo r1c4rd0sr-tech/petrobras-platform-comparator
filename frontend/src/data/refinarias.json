@@ -1,22 +1,22 @@
 [
   {
     "id": 2017,
-    "slug": "estacao-cabiunas",
-    "name": "Estação de Compressão de Cabiúnas",
-    "unit_type": "Estação de Compressão",
+    "slug": "utgcab-cabiunas",
+    "name": "Unidade de Tratamento de Gás de Cabiúnas (UTGCAB)",
+    "unit_type": "Unidade de Tratamento de Gás",
     "state": "RJ",
     "municipality": "Macaé",
-    "operator": "TBG / Petrobras",
+    "operator": "Petrobras",
     "status": "operational",
     "year": null,
     "oil_bpd": null,
-    "gas_mmd": null,
+    "gas_mmd": 24.6,
     "storage_m3": null,
     "latitude": -22.2,
     "longitude": -41.7,
-    "notes": "Estação de Cabiúnas, em Macaé (RJ). Ponto de recebimento e medição do gás natural produzido nas plataformas offshore da Bacia de Campos, conectado à malha TBG (Gasoduto Bolívia-Brasil). Não integra as 15 estações de compressão (ECOMPs) do Gasbol — funciona como estação de recebimento/medição. Coordenada aproximada.",
-    "source_url": "https://www.tbg.com.br/informa%C3%A7%C3%B5es-t%C3%A9cnicas-do-gasoduto",
-    "data_version": "V1.9-refino"
+    "notes": "Unidade de Tratamento de Gás de Cabiúnas (UTGCAB), em Macaé (RJ). Maior unidade de tratamento de gás do Brasil, com capacidade de processamento de 24,6 milhões m³/dia. Processa o gás produzido nas plataformas offshore da Bacia de Campos, gerando GLP, gás natural, C5+ (condensado) e LGN. Atende a ~30% da demanda nacional de gás. Coordenada aproximada.",
+    "source_url": "https://agencia.petrobras.com.br/w/unidade-de-tratamento-de-gas-da-petrobras-e-a-maior-do-brasil",
+    "data_version": "V2.2-refino"
   },
   {
     "id": 2018,
@@ -35,7 +35,7 @@
     "longitude": -47.15,
     "notes": "ECOMP 11 de Paulínia, no km 1264 do Gasoduto Bolívia-Brasil (Gasbol), em Paulínia (SP). 3 turbinas a gás Solar MARS 100 de 15.000 HP (11,19 MW ISO) cada, acionando compressores centrífugos MHI 5V-3. Vazão nominal do sistema: 30,08 MM m³/dia. Turbogerador modular instalado para confiabilidade energética e redução de emissões. Coordenada aproximada do município.",
     "source_url": "https://www.tbg.com.br/documents/20124/472224/MD-5000-940-TOE-005-K.pdf/736784dd-0e23-7b20-0ddd-dc1d056a3ecf?t=1690822801076",
-    "data_version": "V1.9-refino"
+    "data_version": "V2.2-refino"
   },
   {
     "id": 2019,
@@ -54,7 +54,7 @@
     "longitude": -49.41,
     "notes": "ECOMP 13 de Araucária, no km 478,4 do Gasoduto Bolívia-Brasil (Gasbol), em Araucária (PR). 4 motores a gás Waukesha L7042 GSI de 1.200 HP cada, acionando compressores centrífugos. Ampliação em andamento para transferir capacidade de saída ao extremo sul do Gasbol. Coordenada aproximada do município.",
     "source_url": "https://www.tbg.com.br/documents/20124/472224/MD-5000-940-TOE-005-K.pdf/736784dd-0e23-7b20-0ddd-dc1d056a3ecf?t=1690822801076",
-    "data_version": "V1.9-refino"
+    "data_version": "V2.2-refino"
   },
   {
     "id": 2001,
@@ -73,7 +73,7 @@
     "longitude": -47.15,
     "notes": "Maior refinaria da Petrobras em capacidade de processamento: 69 mil m³/dia (aproximadamente 434 mil barris/dia), atendendo a 30% do território brasileiro. Localizada em Paulínia (SP). Coordenada aproximada do município.",
     "source_url": "https://petrobras.com.br/quem-somos/refino",
-    "data_version": "V1.9-refino"
+    "data_version": "V2.2-refino"
   },
   {
     "id": 2002,
@@ -92,7 +92,7 @@
     "longitude": -43.32,
     "notes": "Uma das maiores refinarias do Brasil em capacidade instalada, com 239 mil barris/dia. Responsável por 80% da produção de lubrificantes e parafinas do país. Localizada em Duque de Caxias (RJ). Coordenada aproximada do município.",
     "source_url": "https://petrobras.com.br/quem-somos/refino",
-    "data_version": "V1.9-refino"
+    "data_version": "V2.2-refino"
   },
   {
     "id": 2003,
@@ -111,7 +111,7 @@
     "longitude": -45.88,
     "notes": "Refinaria Henrique Lage, em São José dos Campos (SP), com área total de 10 milhões m². Segunda refinaria da Petrobras em volume de processamento: 40 mil m³/dia (aproximadamente 251,5 mil barris/dia). Coordenada aproximada do município.",
     "source_url": "https://petrobras.com.br/quem-somos/refino",
-    "data_version": "V1.9-refino"
+    "data_version": "V2.2-refino"
   },
   {
     "id": 2004,
@@ -130,7 +130,7 @@
     "longitude": -35.06,
     "notes": "Refinaria Abreu e Lima, em Ipojuca (PE). Capacidade atual de 230 mil barris/dia, com expansão prevista para 260 mil barris/dia até 2028 com o Trem 2. Coordenada aproximada do município.",
     "source_url": "https://petrobras.com.br/quem-somos/refino",
-    "data_version": "V1.9-refino"
+    "data_version": "V2.2-refino"
   },
   {
     "id": 2005,
@@ -149,7 +149,7 @@
     "longitude": -44.2,
     "notes": "Refinaria Gabriel Passos, em Betim (MG). Capacidade de processamento de 26 mil m³/dia (aproximadamente 163,5 mil barris/dia), com estudos para elevar a até 40 mil m³/dia. Coordenada aproximada do município.",
     "source_url": "https://petrobras.com.br/quem-somos/refino",
-    "data_version": "V1.9-refino"
+    "data_version": "V2.2-refino"
   },
   {
     "id": 2006,
@@ -168,7 +168,7 @@
     "longitude": -49.41,
     "notes": "Refinaria Presidente Getúlio Vargas, em Araucária (PR), quinta maior refinaria do Brasil, responsável por aproximadamente 12% da produção nacional de derivados de petróleo. Capacidade de 33 mil m³/dia (207.563 barris/dia). Coordenada aproximada do município.",
     "source_url": "https://petrobras.com.br/en/quem-somos/refinaria-presidente-getulio-vargas",
-    "data_version": "V1.9-refino"
+    "data_version": "V2.2-refino"
   },
   {
     "id": 2007,
@@ -187,7 +187,7 @@
     "longitude": -51.18,
     "notes": "Refinaria Alberto Pasqualini, em Canoas (RS), com área de 580 hectares. Processa 32 mil m³/dia (aproximadamente 201 mil barris/dia), com foco na produção de óleo diesel para o mercado regional. Coordenada aproximada do município.",
     "source_url": "https://petrobras.com.br/quem-somos/refino",
-    "data_version": "V1.9-refino"
+    "data_version": "V2.2-refino"
   },
   {
     "id": 2008,
@@ -206,7 +206,7 @@
     "longitude": -46.42,
     "notes": "Refinaria Presidente Bernardes, em Cubatão (SP), unidade com alta capacidade de conversão. Capacidade instalada de 178 mil barris/dia (28.300 m³/dia), responsável por 11% da produção de derivados da Petrobras. Coordenada aproximada do município.",
     "source_url": "https://petrobras.com.br/quem-somos/refinaria-presidente-bernardes",
-    "data_version": "V1.9-refino"
+    "data_version": "V2.2-refino"
   },
   {
     "id": 2009,
@@ -225,7 +225,7 @@
     "longitude": -46.46,
     "notes": "Refinaria de Capuava, em Mauá (SP). Capacidade de processamento de 10.000 m³/dia (aproximadamente 62,5 mil barris/dia). Coordenada aproximada do município.",
     "source_url": "https://petrobras.com.br/quem-somos/refinaria-capuava",
-    "data_version": "V1.9-refino"
+    "data_version": "V2.2-refino"
   },
   {
     "id": 2010,
@@ -244,7 +244,7 @@
     "longitude": -38.68,
     "notes": "Refinaria Landulpho Alves (Mataripe), em São Francisco do Conde (BA), primeira refinaria do Brasil. Capacidade de produção de 333 mil barris/dia. Coordenada aproximada do município.",
     "source_url": "https://petrobras.com.br/quem-somos/refino",
-    "data_version": "V1.9-refino"
+    "data_version": "V2.2-refino"
   },
   {
     "id": 2011,
@@ -263,7 +263,7 @@
     "longitude": -38.51,
     "notes": "Unidade de lubrificantes e derivados de petróleo do Nordeste, em Fortaleza (CE). Capacidade instalada de 8 mil barris/dia (1.300 m³/dia), com foco em asfaltos e óleos lubrificantes. Coordenada aproximada do município.",
     "source_url": "https://petrobras.com.br/quem-somos/refinarinaria-lubrificantes-derivados-nordeste",
-    "data_version": "V1.9-refino"
+    "data_version": "V2.2-refino"
   },
   {
     "id": 2012,
@@ -282,7 +282,7 @@
     "longitude": -60.02,
     "notes": "Refinaria Isaac Sabbá, em Manaus (AM). Capacidade de processamento de 46 mil barris/dia, atendendo principalmente à região Norte. Coordenada aproximada do município.",
     "source_url": "https://petrobras.com.br/quem-somos/refino",
-    "data_version": "V1.9-refino"
+    "data_version": "V2.2-refino"
   },
   {
     "id": 2013,
@@ -301,7 +301,7 @@
     "longitude": -45.4,
     "notes": "Terminal Aquaviário de São Sebastião (TEBAR). 41 tanques nas Glebas A, C e D, com capacidade estática de ~1,6 milhão m³ (1.585.345 m³ petróleo + 426.326 m³ derivados). Píer com 4 berços (PP1-PP4). Capacidade de movimentação de ~56 milhões t/ano de petróleo e derivados. Produtos: petróleo, derivados claros (385.057 m³), derivados escuros (42.062 m³), água oleosa e bunker. Atende REPLAN, REVAP, RECAP e RPBC.",
     "source_url": "https://transpetro.com.br/transpetro-institucional/nossas-atividades/dutos-e-terminais/terminais-aquaviarios/sao-sebastiao-sp.htm",
-    "data_version": "V1.9-refino"
+    "data_version": "V2.2-refino"
   },
   {
     "id": 2034,
@@ -320,7 +320,7 @@
     "longitude": -46.33,
     "notes": "Terminal Aquaviário de Santos (SP). 10 esferas de GLP e tanques com capacidade nominal de 263.134 m³. Regula o estoque de derivados, transfere e recebe de navios, abastece de bunker os navios no Porto de Santos e conecta-se à RPBC e ao Terminal Terrestre de Cubatão.",
     "source_url": "https://transpetro.com.br/transpetro-institucional/nossas-atividades/dutos-e-terminais/terminais-aquaviarios/santos-sp.htm",
-    "data_version": "V1.9-refino"
+    "data_version": "V2.2-refino"
   },
   {
     "id": 2014,
@@ -339,7 +339,7 @@
     "longitude": -43.15,
     "notes": "Terminal Aquaviário da Ilha D'Água (TABG), na Ilha do Governador, Rio de Janeiro (RJ). 18 tanques de derivados, álcool e biodiesel, com capacidade nominal de 165.056 m³. Coordenada aproximada.",
     "source_url": "https://transpetro.com.br/transpetro-institucional/nossas-atividades/dutos-e-terminais/terminais-aquaviarios/ilha-d-agua-rj.htm",
-    "data_version": "V1.9-refino"
+    "data_version": "V2.2-refino"
   },
   {
     "id": 2015,
@@ -358,7 +358,7 @@
     "longitude": -43.32,
     "notes": "Terminal Terrestre de Campos Elíseos (Tecam), em Duque de Caxias (RJ). Recebe, estoca, trata e transporta petróleo nacional e importado + derivados. Recebe petróleo de Angra dos Reis, Cabiúnas e Ilha D'Água; abastece a REGAP. Opera o duto Ocera 16\" (etanol entre Tecam, REDUC e TABG). 3 tanques de derivados/álcool/biodiesel (68.000 m³) + 7 tanques de petróleo (484.000 m³), totalizando ~552.000 m³.",
     "source_url": "https://transpetro.com.br/transpetro-institucional/nossas-atividades/dutos-e-terminais/terminais-terrestres/campos-eliseos-rj.htm",
-    "data_version": "V1.9-refino"
+    "data_version": "V2.2-refino"
   },
   {
     "id": 2016,
@@ -377,6 +377,6 @@
     "longitude": -44.03,
     "notes": "Terminal Terrestre de Volta Redonda (RJ). Fornece álcool, diesel e gasolina para o grupo de companhias distribuidoras. Recebe óleo combustível por caminhões-tanque e realiza o bombeamento para a CSN. 9 tanques de derivados, álcool e biodiesel com capacidade nominal de 28.137 m³. Coordenada aproximada do município.",
     "source_url": "https://transpetro.com.br/transpetro-institucional/nossas-atividades/dutos-e-terminais/terminais-terrestres/volta-redonda-rj.htm",
-    "data_version": "V1.9-refino"
+    "data_version": "V2.2-refino"
   }
 ]
