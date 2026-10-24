@@ -3,7 +3,7 @@ import { Bar, BarChart, CartesianGrid, Cell, Legend, Pie, PieChart, ResponsiveCo
 import { MapContainer, Marker, Popup, TileLayer, Tooltip as LeafletTooltip } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { fetchPlatforms } from "./api";
+import { fetchPlatforms, fetchOnshore, fetchRefinarias, fetchTerminaisArmazenamento, fetchUtgnsGas, fetchEcompsGasbol } from "./api";
 import type { Platform } from "./types";
 import onshoreData from "./data/onshore.json";
 import refinariasData from "./data/refinarias.json";
@@ -109,11 +109,11 @@ export default function App() {
   const [modality, setModality] = useState<Modality>("maritimas");
   const [filters, setFilters] = useState({ search: "", status: "", unit_type: "", basin: "", field: "", operator: "", state: "", municipality: "", oil: "", gas: "", year: "", accommodation: "", wells: "", storage: "", sort: "oil" });
 
-  const onshoreUnits = onshoreData as unknown as Platform[];
-  const refinariasUnits = refinariasData as unknown as Platform[];
-  const terminaisArmazenamentoUnits = terminaisArmazenamentoData as unknown as Platform[];
-  const utgnsGasUnits = utgnsGasData as unknown as Platform[];
-  const ecompsGasbolUnits = ecompsGasbolData as unknown as Platform[];
+  const [onshoreUnits, setOnshoreUnits] = useState<Platform[]>(onshoreData as unknown as Platform[]);
+  const [refinariasUnits, setRefinariasUnits] = useState<Platform[]>(refinariasData as unknown as Platform[]);
+  const [terminaisArmazenamentoUnits, setTerminaisArmazenamentoUnits] = useState<Platform[]>(terminaisArmazenamentoData as unknown as Platform[]);
+  const [utgnsGasUnits, setUtgnsGasUnits] = useState<Platform[]>(utgnsGasData as unknown as Platform[]);
+  const [ecompsGasbolUnits, setEcompsGasbolUnits] = useState<Platform[]>(ecompsGasbolData as unknown as Platform[]);
   const activeUnits = modality === "maritimas" ? platforms : modality === "terrestres" ? onshoreUnits : [...refinariasUnits, ...terminaisArmazenamentoUnits, ...utgnsGasUnits, ...ecompsGasbolUnits];
   const isOnshore = modality === "terrestres";
   const isOffshore = modality === "maritimas";
@@ -131,6 +131,14 @@ export default function App() {
       })
       .catch(() => setError("Não foi possível carregar os dados da API. Recarregue em alguns instantes."))
       .finally(() => setLoading(false));
+  }, []);
+
+  useEffect(() => {
+    fetchOnshore().then((data) => setOnshoreUnits(data)).catch(() => {});
+    fetchRefinarias().then((data) => setRefinariasUnits(data)).catch(() => {});
+    fetchTerminaisArmazenamento().then((data) => setTerminaisArmazenamentoUnits(data)).catch(() => {});
+    fetchUtgnsGas().then((data) => setUtgnsGasUnits(data)).catch(() => {});
+    fetchEcompsGasbol().then((data) => setEcompsGasbolUnits(data)).catch(() => {});
   }, []);
 
   const options = useMemo(() => ({
