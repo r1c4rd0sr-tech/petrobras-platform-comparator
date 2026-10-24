@@ -99,7 +99,7 @@ export default function App() {
   const [tab, setTab] = useState("comparativo");
   const [theme, setTheme] = useState<"light" | "dark">("dark");
   const [modality, setModality] = useState<Modality>("maritimas");
-  const [filters, setFilters] = useState({ search: "", status: "", unit_type: "", basin: "", field: "", operator: "", oil: "", gas: "", year: "", accommodation: "", sort: "oil" });
+  const [filters, setFilters] = useState({ search: "", status: "", unit_type: "", basin: "", field: "", operator: "", state: "", municipality: "", oil: "", gas: "", year: "", accommodation: "", wells: "", storage: "", sort: "oil" });
 
   const onshoreUnits = onshoreData as unknown as Platform[];
   const refinariasUnits = refinariasData as unknown as Platform[];
@@ -107,6 +107,7 @@ export default function App() {
   const activeUnits = modality === "maritimas" ? platforms : modality === "terrestres" ? onshoreUnits : [...refinariasUnits, ...terminaisArmazenamentoUnits];
   const isOnshore = modality === "terrestres";
   const isOffshore = modality === "maritimas";
+  const isRefino = modality === "refinarias";
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
@@ -127,22 +128,28 @@ export default function App() {
     basins: [...new Set(activeUnits.map((p) => p.basin).filter(Boolean) as string[])].sort(),
     fields: [...new Set(activeUnits.map((p) => p.field).filter(Boolean) as string[])].sort(),
     operators: [...new Set(activeUnits.map((p) => p.operator).filter(Boolean) as string[])].sort(),
+    states: [...new Set(activeUnits.map((p) => (p as any).state).filter(Boolean) as string[])].sort(),
+    municipalities: [...new Set(activeUnits.map((p) => (p as any).municipality).filter(Boolean) as string[])].sort(),
   }), [activeUnits]);
 
   const filtered = useMemo(() => {
     const q = filters.search.trim().toLowerCase();
     const rows = activeUnits.filter((p) => {
-      const text = [p.name, p.field, p.basin, p.operator, p.unit_type].filter(Boolean).join(" ").toLowerCase();
+      const text = [p.name, p.field, p.basin, p.operator, p.unit_type, (p as any).state, (p as any).municipality].filter(Boolean).join(" ").toLowerCase();
       return (!q || text.includes(q))
         && (!filters.status || p.status === filters.status)
         && (!filters.unit_type || p.unit_type === filters.unit_type)
         && (!filters.basin || p.basin === filters.basin)
         && (!filters.field || p.field === filters.field)
         && (!filters.operator || p.operator === filters.operator)
+        && (!filters.state || (p as any).state === filters.state)
+        && (!filters.municipality || (p as any).municipality === filters.municipality)
         && (!filters.oil || (p.oil_bpd ?? 0) >= Number(filters.oil))
         && (!filters.gas || (p.gas_mmd ?? 0) >= Number(filters.gas))
         && (!filters.year || (p.year ?? 0) >= Number(filters.year))
-        && (!filters.accommodation || (p.accommodation ?? 0) >= Number(filters.accommodation));
+        && (!filters.accommodation || (p.accommodation ?? 0) >= Number(filters.accommodation))
+        && (!filters.wells || ((p as any).wells_productive ?? 0) >= Number(filters.wells))
+        && (!filters.storage || (p.storage_m3 ?? 0) >= Number(filters.storage));
     });
     const key = filters.sort as keyof Platform;
     return rows.sort((a, b) => {
@@ -161,7 +168,7 @@ export default function App() {
       BOE: p.boed ?? 0,
     };
   });
-  const totals = filtered.reduce((acc, p) => ({ oil: acc.oil + (p.oil_bpd ?? 0), gas: acc.gas + (p.gas_mmd ?? 0), boe: acc.boe + (p.boed ?? 0), wells: acc.wells + ((p as any).wells_productive ?? 0) }), { oil: 0, gas: 0, boe: 0, wells: 0 });
+  const totals = filtered.reduce((acc, p) => ({ oil: acc.oil + (p.oil_bpd ?? 0), gas: acc.gas + (p.gas_mmd ?? 0), boe: acc.boe + (p.boed ?? 0), wells: acc.wells + ((p as any).wells_productive ?? 0), storage: acc.storage + (p.storage_m3 ?? 0) }), { oil: 0, gas: 0, boe: 0, wells: 0, storage: 0 });
 
   const withDepth = filtered.filter((p) => p.water_depth_m != null);
   const avgDepth = withDepth.length ? withDepth.reduce((s, p) => s + (p.water_depth_m ?? 0), 0) / withDepth.length : 0;
@@ -176,7 +183,7 @@ export default function App() {
 
   const basinData = useMemo(() => {
     const map: Record<string, { count: number; oil: number }> = {};
-    filtered.forEach((p) => { const k = p.basin || "Não informado"; if (!map[k]) map[k] = { count: 0, oil: 0 }; map[k].count++; map[k].oil += p.oil_bpd ?? 0; });
+    filtered.forEach((p) => { const k = p.basin || (p as any).state || "Não informado"; if (!map[k]) map[k] = { count: 0, oil: 0 }; map[k].count++; map[k].oil += p.oil_bpd ?? 0; });
     return Object.entries(map).map(([name, v]) => ({ name, Unidades: v.count, Óleo: v.oil })).sort((a, b) => b.Unidades - a.Unidades).slice(0, 6);
   }, [filtered]);
 
@@ -214,7 +221,7 @@ export default function App() {
 
   const selBasinData = useMemo(() => {
     const map: Record<string, number> = {};
-    selected.forEach((p) => { const k = p.basin || "Não informado"; map[k] = (map[k] ?? 0) + 1; });
+    selected.forEach((p) => { const k = p.basin || (p as any).state || "Não informado"; map[k] = (map[k] ?? 0) + 1; });
     return Object.entries(map).map(([name, value]) => ({ name, value })).sort((a, b) => b.value - a.value);
   }, [selected]);
 
@@ -232,6 +239,7 @@ export default function App() {
 
   const topOil = useMemo(() => [...filtered].filter((p) => (p.oil_bpd ?? 0) > 0).sort((a, b) => (b.oil_bpd ?? 0) - (a.oil_bpd ?? 0)).slice(0, 5), [filtered]);
   const topDepth = useMemo(() => [...filtered].filter((p) => p.water_depth_m != null).sort((a, b) => (b.water_depth_m ?? 0) - (a.water_depth_m ?? 0)).slice(0, 5), [filtered]);
+  const topStorage = useMemo(() => [...filtered].filter((p) => (p.storage_m3 ?? 0) > 0).sort((a, b) => (b.storage_m3 ?? 0) - (a.storage_m3 ?? 0)).slice(0, 5), [filtered]);
 
   const toggle = (id: number) => {
     if (selectedIds.includes(id)) {
@@ -243,6 +251,7 @@ export default function App() {
     }
   };
   const set = (key: keyof typeof filters, value: string) => setFilters((f) => ({ ...f, [key]: value }));
+  const resetFilters = () => setFilters({ search: "", status: "", unit_type: "", basin: "", field: "", operator: "", state: "", municipality: "", oil: "", gas: "", year: "", accommodation: "", wells: "", storage: "", sort: isRefino ? "oil" : "oil" });
   const pinColor = (id: number) => PIN_COLORS[selected.findIndex((s) => s.id === id) % PIN_COLORS.length];
 
   const isDark = theme === "dark";
@@ -269,7 +278,7 @@ export default function App() {
             {MODALITY_OPTIONS.map(([value, label]) => (
               <button
                 key={value}
-                onClick={() => { setModality(value); setSelectedIds([]); }}
+                onClick={() => { setModality(value); setSelectedIds([]); resetFilters(); }}
                 style={{
                   padding: "8px 14px",
                   borderRadius: 8,
@@ -297,15 +306,46 @@ export default function App() {
         <div><label>Busca</label><input value={filters.search} onChange={(e) => set("search", e.target.value)} placeholder="Nome, campo, bacia ou operador" /></div>
         <div><label>Status</label><select value={filters.status} onChange={(e) => set("status", e.target.value)}><option value="">Todos</option><option value="operational">Operacional</option><option value="construction">Em construção</option><option value="decommissioned">Descomissionada</option></select></div>
         <div><label>Tipo</label><select value={filters.unit_type} onChange={(e) => set("unit_type", e.target.value)}><option value="">Todos</option>{options.unit_types.map((x) => <option key={x}>{x}</option>)}</select></div>
-        <div><label>Bacia</label><select value={filters.basin} onChange={(e) => set("basin", e.target.value)}><option value="">Todas</option>{options.basins.map((x) => <option key={x}>{x}</option>)}</select></div>
-        <div><label>Campo</label><select value={filters.field} onChange={(e) => set("field", e.target.value)}><option value="">Todos</option>{options.fields.map((x) => <option key={x}>{x}</option>)}</select></div>
-        <div><label>Operador</label><select value={filters.operator} onChange={(e) => set("operator", e.target.value)}><option value="">Todos</option>{options.operators.map((x) => <option key={x}>{x}</option>)}</select></div>
-        <div><label>Óleo mín. (bpd)</label><input type="number" value={filters.oil} onChange={(e) => set("oil", e.target.value)} /></div>
-        <div><label>Gás mín. (MMm³/d)</label><input type="number" value={filters.gas} onChange={(e) => set("gas", e.target.value)} /></div>
-        <div><label>Ano mín.</label><input type="number" value={filters.year} onChange={(e) => set("year", e.target.value)} /></div>
-        {isOffshore && <div><label>Acomodação mín.</label><input type="number" value={filters.accommodation} onChange={(e) => set("accommodation", e.target.value)} /></div>}
-        <div><label>Ordenar por</label><select value={filters.sort} onChange={(e) => set("sort", e.target.value)}><option value="oil">Óleo</option><option value="gas">Gás</option><option value="boed">BOE/d</option><option value="storage_m3">Armazenamento</option><option value="length_m">Comprimento</option><option value="weight_t">Peso</option><option value="distance_to_coast_km">Distância costa</option><option value="year">Ano</option><option value="name">Nome</option></select></div>
-        <button onClick={() => setFilters({ search: "", status: "", unit_type: "", basin: "", field: "", operator: "", oil: "", gas: "", year: "", accommodation: "", sort: "oil" })}>Limpar filtros</button>
+
+        {isOffshore && (
+          <>
+            <div><label>Bacia</label><select value={filters.basin} onChange={(e) => set("basin", e.target.value)}><option value="">Todas</option>{options.basins.map((x) => <option key={x}>{x}</option>)}</select></div>
+            <div><label>Campo</label><select value={filters.field} onChange={(e) => set("field", e.target.value)}><option value="">Todos</option>{options.fields.map((x) => <option key={x}>{x}</option>)}</select></div>
+            <div><label>Operador</label><select value={filters.operator} onChange={(e) => set("operator", e.target.value)}><option value="">Todos</option>{options.operators.map((x) => <option key={x}>{x}</option>)}</select></div>
+            <div><label>Óleo mín. (bpd)</label><input type="number" value={filters.oil} onChange={(e) => set("oil", e.target.value)} /></div>
+            <div><label>Gás mín. (MMm³/d)</label><input type="number" value={filters.gas} onChange={(e) => set("gas", e.target.value)} /></div>
+            <div><label>Ano mín.</label><input type="number" value={filters.year} onChange={(e) => set("year", e.target.value)} /></div>
+            <div><label>Acomodação mín.</label><input type="number" value={filters.accommodation} onChange={(e) => set("accommodation", e.target.value)} /></div>
+            <div><label>Ordenar por</label><select value={filters.sort} onChange={(e) => set("sort", e.target.value)}><option value="oil">Óleo</option><option value="gas">Gás</option><option value="boed">BOE/d</option><option value="storage_m3">Armazenamento</option><option value="length_m">Comprimento</option><option value="weight_t">Peso</option><option value="distance_to_coast_km">Distância costa</option><option value="year">Ano</option><option value="name">Nome</option></select></div>
+          </>
+        )}
+
+        {isOnshore && (
+          <>
+            <div><label>Bacia</label><select value={filters.basin} onChange={(e) => set("basin", e.target.value)}><option value="">Todas</option>{options.basins.map((x) => <option key={x}>{x}</option>)}</select></div>
+            <div><label>Campo</label><select value={filters.field} onChange={(e) => set("field", e.target.value)}><option value="">Todos</option>{options.fields.map((x) => <option key={x}>{x}</option>)}</select></div>
+            <div><label>Operador</label><select value={filters.operator} onChange={(e) => set("operator", e.target.value)}><option value="">Todos</option>{options.operators.map((x) => <option key={x}>{x}</option>)}</select></div>
+            <div><label>Óleo mín. (bpd)</label><input type="number" value={filters.oil} onChange={(e) => set("oil", e.target.value)} /></div>
+            <div><label>Gás mín. (MMm³/d)</label><input type="number" value={filters.gas} onChange={(e) => set("gas", e.target.value)} /></div>
+            <div><label>Ano mín.</label><input type="number" value={filters.year} onChange={(e) => set("year", e.target.value)} /></div>
+            <div><label>Poços mín.</label><input type="number" value={filters.wells} onChange={(e) => set("wells", e.target.value)} /></div>
+            <div><label>Ordenar por</label><select value={filters.sort} onChange={(e) => set("sort", e.target.value)}><option value="oil">Óleo</option><option value="gas">Gás</option><option value="boed">BOE/d</option><option value="wells_productive">Poços</option><option value="year">Ano</option><option value="name">Nome</option></select></div>
+          </>
+        )}
+
+        {isRefino && (
+          <>
+            <div><label>Estado</label><select value={filters.state} onChange={(e) => set("state", e.target.value)}><option value="">Todos</option>{options.states.map((x) => <option key={x}>{x}</option>)}</select></div>
+            <div><label>Município</label><select value={filters.municipality} onChange={(e) => set("municipality", e.target.value)}><option value="">Todos</option>{options.municipalities.map((x) => <option key={x}>{x}</option>)}</select></div>
+            <div><label>Operador</label><select value={filters.operator} onChange={(e) => set("operator", e.target.value)}><option value="">Todos</option>{options.operators.map((x) => <option key={x}>{x}</option>)}</select></div>
+            <div><label>Capacidade mín. (bpd)</label><input type="number" value={filters.oil} onChange={(e) => set("oil", e.target.value)} /></div>
+            <div><label>Armazenamento mín. (m³)</label><input type="number" value={filters.storage} onChange={(e) => set("storage", e.target.value)} /></div>
+            <div><label>Ano mín.</label><input type="number" value={filters.year} onChange={(e) => set("year", e.target.value)} /></div>
+            <div><label>Ordenar por</label><select value={filters.sort} onChange={(e) => set("sort", e.target.value)}><option value="oil">Capacidade</option><option value="storage_m3">Armazenamento</option><option value="year">Ano</option><option value="name">Nome</option></select></div>
+          </>
+        )}
+
+        <button onClick={resetFilters}>Limpar filtros</button>
       </section>
 
       {loading && <div className="loading">Carregando plataformas...</div>}
@@ -316,7 +356,7 @@ export default function App() {
           <div className="layout">
             <section className="panel">
               <div className="panel-head">
-                <h2>{isOnshore ? "Campos e Unidades" : modality === "refinarias" ? "Refinarias, Terminais e Compressão" : "Plataformas"} ({filtered.length})</h2>
+                <h2>{isOnshore ? "Campos e Unidades" : isRefino ? "Refinarias, Terminais e Compressão" : "Plataformas"} ({filtered.length})</h2>
                 <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
                   <span className="pill">Selecionadas: {selected.length}/10</span>
                   <button className="clear-btn" onClick={() => setSelectedIds([])}>Limpar seleção</button>
@@ -327,26 +367,45 @@ export default function App() {
                   <article key={p.id} className={`card ${selectedIds.includes(p.id) ? "selected" : ""}`}>
                     <div className="card-top"><h4>{p.name}</h4><span className={`pill ${p.status}`}>{STATUS_LABEL[p.status] ?? p.status}</span></div>
                     <div className="meta">
-                      <span>Tipo: {p.unit_type || "—"}</span><span>Bacia: {p.basin || "—"}</span>
-                      <span>Campo: {p.field || "—"}</span><span>Operador: {p.operator || "—"}</span>
+                      <span>Tipo: {p.unit_type || "—"}</span>
+                      {isRefino ? (
+                        <>
+                          <span>Estado: {(p as any).state || "—"}</span>
+                          <span>Município: {(p as any).municipality || "—"}</span>
+                        </>
+                      ) : (
+                        <>
+                          <span>Bacia: {p.basin || "—"}</span>
+                          <span>Campo: {p.field || "—"}</span>
+                        </>
+                      )}
+                      <span>Operador: {p.operator || "—"}</span>
                       <span>Ano: {p.year || "—"}</span>
                       {isOffshore && <span>Costa: {num(p.distance_to_coast_km, " km")}</span>}
                       <span>Lat: {p.latitude ?? "—"}</span><span>Lon: {p.longitude ?? "—"}</span>
                     </div>
                     <div className="metrics">
-                      <span className="metric">Óleo<b>{num(p.oil_bpd, " bpd")}</b></span>
-                      <span className="metric">Gás<b>{num(p.gas_mmd, " MMm³/d")}</b></span>
-                      <span className="metric">BOE<b>{num(p.boed, "/d")}</b></span>
-                      {isOffshore ? (
+                      {isRefino ? (
+                        <>
+                          <span className="metric">Capacidade<b>{num(p.oil_bpd, " bpd")}</b></span>
+                          <span className="metric">Armazenamento<b>{num(p.storage_m3, " m³")}</b></span>
+                        </>
+                      ) : (
+                        <>
+                          <span className="metric">Óleo<b>{num(p.oil_bpd, " bpd")}</b></span>
+                          <span className="metric">Gás<b>{num(p.gas_mmd, " MMm³/d")}</b></span>
+                          <span className="metric">BOE<b>{num(p.boed, "/d")}</b></span>
+                        </>
+                      )}
+                      {isOffshore && (
                         <>
                           <span className="metric">Acomodação<b>{num(p.accommodation)}</b></span>
                           <span className="metric">Armazenamento<b>{num(p.storage_m3, " m³")}</b></span>
                           <span className="metric">Comprimento<b>{num(p.length_m, " m")}</b></span>
                           <span className="metric">Peso<b>{num(p.weight_t, " t")}</b></span>
                         </>
-                      ) : isOnshore ? (
-                        <span className="metric">Poços<b>{num((p as any).wells_productive)}</b></span>
-                      ) : null}
+                      )}
+                      {isOnshore && <span className="metric">Poços<b>{num((p as any).wells_productive)}</b></span>}
                     </div>
                     <button className={`select-btn ${selectedIds.includes(p.id) ? "active" : ""}`} onClick={() => toggle(p.id)}>{selectedIds.includes(p.id) ? "Remover do comparativo" : "Selecionar para comparativo"}</button>
                   </article>
@@ -363,7 +422,7 @@ export default function App() {
                   return (
                     <Marker key={p.id} position={[p.latitude!, p.longitude!]} icon={pinIcon(color)}>
                       <LeafletTooltip>{p.name}</LeafletTooltip>
-                      <Popup><strong>{p.name}</strong><br />{STATUS_LABEL[p.status] ?? p.status}<br />{p.unit_type}<br />Operador: {p.operator || "—"}<br />Campo: {p.field || "—"}<br />Óleo: {num(p.oil_bpd, " bpd")}<br />Gás: {num(p.gas_mmd, " MMm³/d")}</Popup>
+                      <Popup><strong>{p.name}</strong><br />{STATUS_LABEL[p.status] ?? p.status}<br />{p.unit_type}<br />Operador: {p.operator || "—"}<br />{isRefino ? `Estado: ${(p as any).state || "—"}` : `Campo: ${p.field || "—"}`}<br />Óleo: {num(p.oil_bpd, " bpd")}<br />Gás: {num(p.gas_mmd, " MMm³/d")}</Popup>
                     </Marker>
                   );
                 })}
@@ -388,8 +447,8 @@ export default function App() {
             <div className="panel-body">
               {tab === "comparativo" && (
                 <div className="table-wrap">
-                  <table className="table"><thead><tr><th>Plataforma</th><th>Status</th><th>Tipo</th><th>Bacia</th><th>Campo</th><th>Operador</th><th>Óleo</th><th>Gás (MMm³/d)</th><th>BOE/d</th><th>Ano</th>{isOffshore && <><th>Acomodação</th><th>Armazenamento</th><th>Comprimento</th><th>Peso</th><th>Distância costa (km)</th></>}{isOnshore && <th>Poços produtivos</th>}</tr></thead><tbody>
-                    {selected.map((p) => <tr key={p.id}><td>{p.name}</td><td>{STATUS_LABEL[p.status] ?? p.status}</td><td>{p.unit_type}</td><td>{p.basin || "—"}</td><td>{p.field || "—"}</td><td>{p.operator || "—"}</td><td>{num(p.oil_bpd)}</td><td>{num(p.gas_mmd, " MMm³/d")}</td><td>{num(p.boed)}</td><td>{p.year || "—"}</td>{isOffshore && <><td>{num(p.accommodation)}</td><td>{num(p.storage_m3)}</td><td>{num(p.length_m)}</td><td>{num(p.weight_t)}</td><td>{num(p.distance_to_coast_km, " km")}</td></>}{isOnshore && <td>{num((p as any).wells_productive)}</td>}</tr>)}
+                  <table className="table"><thead><tr><th>Unidade</th><th>Status</th><th>Tipo</th>{isRefino ? <><th>Estado</th><th>Município</th></> : <><th>Bacia</th><th>Campo</th></>}<th>Operador</th><th>Óleo</th><th>Gás (MMm³/d)</th><th>BOE/d</th><th>Ano</th>{isOffshore && <><th>Acomodação</th><th>Armazenamento</th><th>Comprimento</th><th>Peso</th><th>Distância costa (km)</th></>}{isOnshore && <th>Poços produtivos</th>}{isRefino && <th>Armazenamento (m³)</th>}</tr></thead><tbody>
+                    {selected.map((p) => <tr key={p.id}><td>{p.name}</td><td>{STATUS_LABEL[p.status] ?? p.status}</td><td>{p.unit_type}</td>{isRefino ? <><td>{(p as any).state || "—"}</td><td>{(p as any).municipality || "—"}</td></> : <><td>{p.basin || "—"}</td><td>{p.field || "—"}</td></>}<td>{p.operator || "—"}</td><td>{num(p.oil_bpd)}</td><td>{num(p.gas_mmd, " MMm³/d")}</td><td>{num(p.boed)}</td><td>{p.year || "—"}</td>{isOffshore && <><td>{num(p.accommodation)}</td><td>{num(p.storage_m3)}</td><td>{num(p.length_m)}</td><td>{num(p.weight_t)}</td><td>{num(p.distance_to_coast_km, " km")}</td></>}{isOnshore && <td>{num((p as any).wells_productive)}</td>}{isRefino && <td>{num(p.storage_m3)}</td>}</tr>)}
                   </tbody></table>
                 </div>
               )}
@@ -397,17 +456,17 @@ export default function App() {
                 <div>
                   <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 20 }}>
                     <div style={kpiStyle}><span style={kpiLabel}>Unidades filtradas</span><strong style={kpiValue}>{filtered.length}</strong><span style={{ fontSize: 11, opacity: 0.6 }}>{activeUnits.length} na base total</span></div>
-                    <div style={kpiStyle}><span style={kpiLabel}>Óleo total</span><strong style={kpiValue}>{num(totals.oil, " bpd")}</strong></div>
-                    <div style={kpiStyle}><span style={kpiLabel}>Gás total</span><strong style={kpiValue}>{num(totals.gas, " MMm³/d")}</strong></div>
-                    <div style={kpiStyle}><span style={kpiLabel}>BOE total</span><strong style={kpiValue}>{num(totals.boe, "/d")}</strong></div>
-                    {isOnshore ? (
-                      <div style={kpiStyle}><span style={kpiLabel}>Poços produtivos</span><strong style={kpiValue}>{num(totals.wells)}</strong></div>
-                    ) : isOffshore ? (
+                    <div style={kpiStyle}><span style={kpiLabel}>{isRefino ? "Capacidade total" : "Óleo total"}</span><strong style={kpiValue}>{num(totals.oil, " bpd")}</strong></div>
+                    {!isRefino && <div style={kpiStyle}><span style={kpiLabel}>Gás total</span><strong style={kpiValue}>{num(totals.gas, " MMm³/d")}</strong></div>}
+                    {!isRefino && <div style={kpiStyle}><span style={kpiLabel}>BOE total</span><strong style={kpiValue}>{num(totals.boe, "/d")}</strong></div>}
+                    {isRefino && <div style={kpiStyle}><span style={kpiLabel}>Armazenamento total</span><strong style={kpiValue}>{num(totals.storage, " m³")}</strong></div>}
+                    {isOnshore && <div style={kpiStyle}><span style={kpiLabel}>Poços produtivos</span><strong style={kpiValue}>{num(totals.wells)}</strong></div>}
+                    {isOffshore && (
                       <>
                         <div style={kpiStyle}><span style={kpiLabel}>Profundidade média</span><strong style={kpiValue}>{num(Math.round(avgDepth), " m")}</strong><span style={{ fontSize: 11, opacity: 0.6 }}>máx: {num(maxDepth, " m")}</span></div>
                         <div style={kpiStyle}><span style={kpiLabel}>Acomodação total</span><strong style={kpiValue}>{num(totalAccommodation)}</strong><span style={{ fontSize: 11, opacity: 0.6 }}>pessoas</span></div>
                       </>
-                    ) : null}
+                    )}
                   </div>
 
                   {isOnshore && (
@@ -454,7 +513,7 @@ export default function App() {
                       </ResponsiveContainer>
                     </div>
                     <div style={chartBoxStyle}>
-                      <h4 style={chartTitleStyle}>Top bacias por nº de unidades</h4>
+                      <h4 style={chartTitleStyle}>{isRefino ? "Top estados por nº de unidades" : "Top bacias por nº de unidades"}</h4>
                       <ResponsiveContainer width="100%" height={240}>
                         <BarChart data={basinData}>
                           <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
@@ -496,7 +555,7 @@ export default function App() {
 
                   <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
                     <div style={rankBoxStyle}>
-                      <h4 style={chartTitleStyle}>Top 5 produtores de óleo</h4>
+                      <h4 style={chartTitleStyle}>{isRefino ? "Top 5 por capacidade" : "Top 5 produtores de óleo"}</h4>
                       <ol style={rankTextStyle}>
                         {topOil.map((p) => <li key={p.id} style={{ marginBottom: 6 }}><strong style={{ color: rankStrongColor }}>{p.name}</strong> — {num(p.oil_bpd, " bpd")}</li>)}
                         {topOil.length === 0 && <li>Nenhuma unidade com produção de óleo nos filtros atuais.</li>}
@@ -511,21 +570,30 @@ export default function App() {
                         </ol>
                       </div>
                     )}
+                    {isRefino && (
+                      <div style={rankBoxStyle}>
+                        <h4 style={chartTitleStyle}>Top 5 por armazenamento</h4>
+                        <ol style={rankTextStyle}>
+                          {topStorage.map((p) => <li key={p.id} style={{ marginBottom: 6 }}><strong style={{ color: rankStrongColor }}>{p.name}</strong> — {num(p.storage_m3, " m³")}</li>)}
+                          {topStorage.length === 0 && <li>Nenhum terminal com armazenamento nos filtros atuais.</li>}
+                        </ol>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
               {tab === "graficos" && (
                 <div className="charts">
-                  <h3>{isOnshore ? "Comparação dos campos selecionados" : modality === "refinarias" ? "Comparação das unidades selecionadas" : "Comparação das plataformas selecionadas"} ({selected.length}/10)</h3>
+                  <h3>{isOnshore ? "Comparação dos campos selecionados" : isRefino ? "Comparação das unidades selecionadas" : "Comparação das plataformas selecionadas"} ({selected.length}/10)</h3>
                   {isOnshore && selected.some((p) => (p as any).producao_polo_gas_mmd != null) && (
                     <p style={{ color: axisColor, fontSize: 13 }}>Para os campos do Polo Urucu sem produção individual divulgada, é exibida a produção agregada do Polo Arara (7,252 MMm³/dia), identificada com "(polo)".</p>
                   )}
-                  {selected.length === 0 && <p style={{ color: axisColor }}>Selecione {isOnshore ? "campos" : modality === "refinarias" ? "unidades" : "plataformas"} na lista à esquerda para ver os gráficos comparativos.</p>}
+                  {selected.length === 0 && <p style={{ color: axisColor }}>Selecione {isOnshore ? "campos" : isRefino ? "unidades" : "plataformas"} na lista à esquerda para ver os gráficos comparativos.</p>}
                   {selected.length > 0 && (
                     <>
                       <div style={{ display: "flex", gap: 16, flexWrap: "wrap", marginBottom: 24 }}>
                         <div style={chartBoxStyle}>
-                          <h4 style={chartTitleStyle}>Produção de Óleo e BOE</h4>
+                          <h4 style={chartTitleStyle}>{isRefino ? "Capacidade de processamento" : "Produção de Óleo e BOE"}</h4>
                           <ResponsiveContainer width="100%" height={360}>
                             <BarChart data={chartData}>
                               <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
@@ -533,22 +601,24 @@ export default function App() {
                               <YAxis stroke={axisColor} />
                               <Tooltip /><Legend />
                               <Bar dataKey="Óleo" fill="#008542" />
-                              <Bar dataKey="BOE" fill="#ffcc29" />
+                              {!isRefino && <Bar dataKey="BOE" fill="#ffcc29" />}
                             </BarChart>
                           </ResponsiveContainer>
                         </div>
-                        <div style={chartBoxStyle}>
-                          <h4 style={chartTitleStyle}>Produção de Gás</h4>
-                          <ResponsiveContainer width="100%" height={360}>
-                            <BarChart data={chartData}>
-                              <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
-                              <XAxis dataKey="name" stroke={axisColor} fontSize={11} />
-                              <YAxis stroke={axisColor} />
-                              <Tooltip /><Legend />
-                              <Bar dataKey="Gás" fill="#f28c28" />
-                            </BarChart>
-                          </ResponsiveContainer>
-                        </div>
+                        {!isRefino && (
+                          <div style={chartBoxStyle}>
+                            <h4 style={chartTitleStyle}>Produção de Gás</h4>
+                            <ResponsiveContainer width="100%" height={360}>
+                              <BarChart data={chartData}>
+                                <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
+                                <XAxis dataKey="name" stroke={axisColor} fontSize={11} />
+                                <YAxis stroke={axisColor} />
+                                <Tooltip /><Legend />
+                                <Bar dataKey="Gás" fill="#f28c28" />
+                              </BarChart>
+                            </ResponsiveContainer>
+                          </div>
+                        )}
                       </div>
                     </>
                   )}
