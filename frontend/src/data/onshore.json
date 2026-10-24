@@ -26,7 +26,7 @@
     "location": "Coari, Amazonas",
     "notes": "Maior província terrestre de óleo e gás do Brasil, em Coari (AM), a cerca de 650 km de Manaus. Produção total de aproximadamente 105 mil boe/dia, com cerca de 75 poços produtivos. Envia entre 5 e 6 milhões m³/dia de gás natural para Manaus.",
     "source_url": "https://petrobras.com.br/quem-somos/exploracao-e-producao",
-    "data_version": "V1.1-onshore"
+    "data_version": "V1.2-onshore"
   },
   {
     "id": 1002,
@@ -55,7 +55,7 @@
     "location": "Itaboraí, Rio de Janeiro",
     "notes": "Maior unidade de processamento de gás natural do Brasil, em Itaboraí (RJ). Capacidade de 21 milhões m³/dia, com dois módulos operacionais desde maio de 2025. Recebe gás do pré-sal via Rota 3.",
     "source_url": "https://agencia.petrobras.com.br/w/petrobras-dobra-capacidade-de-processamento-na-upgn-do-complexo-de-energias-boaventura",
-    "data_version": "V1.1-onshore"
+    "data_version": "V1.2-onshore"
   },
   {
     "id": 1003,
@@ -84,36 +84,7 @@
     "location": "Pojuca, Bahia",
     "notes": "Unidade de Tratamento de Gás Natural (UTG Catu) em Pojuca (BA), operada pela Petrobras. Capacidade de processamento de 2 milhões m³/dia. Infraestrutura essencial para escoar e tratar o gás natural produzido nos campos terrestres da Bahia, com contratos de longo prazo com PetroReconcavo, Brava Energia e Origem Energia. Coordenada aproximada do município de Pojuca.",
     "source_url": "https://agencia.petrobras.com.br/w/negocio/petrobras-petroreconcavo-brava-energia-e-origem-energia-ampliam-contratos-da-utg-catu-para-processamento-de-g%C3%A1s-no-longo-prazo",
-    "data_version": "V1.1-onshore"
-  },
-  {
-    "id": 1004,
-    "slug": "campo-carmopolis",
-    "name": "Campo de Carmópolis",
-    "status": "operational",
-    "unit_type": "Campo de produção",
-    "basin": "Bacia de Sergipe-Alagoas",
-    "field": "Carmópolis",
-    "operator": "Petrobras",
-    "latitude": -10.65,
-    "longitude": -36.85,
-    "water_depth_m": null,
-    "distance_to_coast_km": null,
-    "year": 1963,
-    "service_life_years": null,
-    "oil_bpd": null,
-    "gas_mmd": null,
-    "boed": null,
-    "water_injection_bpd": null,
-    "storage_m3": null,
-    "accommodation": null,
-    "length_m": null,
-    "width_m": null,
-    "weight_t": null,
-    "location": "Carmópolis, Sergipe",
-    "notes": "Um dos campos terrestres mais antigos e importantes da Petrobras, descoberto em 1963 em Carmópolis (SE), na Bacia de Sergipe-Alagoas. Está entre os 20 campos terrestres com maior produção do Brasil segundo a ANP. Produção detalhada a ser complementada.",
-    "source_url": "https://www.gov.br/anp/pt-br/centrais-de-conteudo/publicacoes/boletins-anp/arquivos-bmppgn/2025/dezembro.pdf",
-    "data_version": "V1.1-onshore"
+    "data_version": "V1.2-onshore"
   },
   {
     "id": 1005,
@@ -142,7 +113,7 @@
     "location": "Pilar, Sergipe",
     "notes": "Campo terrestre da Petrobras em Pilar (SE), na Bacia de Sergipe-Alagoas. Está entre os 20 campos terrestres com maior produção do Brasil segundo a ANP. Produção detalhada a ser complementada.",
     "source_url": "https://www.gov.br/anp/pt-br/centrais-de-conteudo/publicacoes/boletins-anp/arquivos-bmppgn/2025/dezembro.pdf",
-    "data_version": "V1.1-onshore"
+    "data_version": "V1.2-onshore"
   },
   {
     "id": 1006,
@@ -171,35 +142,6 @@
     "location": "Canto do Amaro, Rio Grande do Norte",
     "notes": "Campo terrestre da Petrobras em Canto do Amaro (RN), na Bacia Potiguar. Está entre os 20 campos terrestres com maior produção do Brasil segundo a ANP. Produção detalhada a ser complementada.",
     "source_url": "https://www.gov.br/anp/pt-br/centrais-de-conteudo/publicacoes/boletins-anp/arquivos-bmppgn/2025/dezembro.pdf",
-    "data_version": "V1.1-onshore"
-  },
-  {
-    "id": 1007,
-    "slug": "campo-miranga",
-    "name": "Campo de Miranga",
-    "status": "operational",
-    "unit_type": "Campo de produção",
-    "basin": "Bacia do Recôncavo",
-    "field": "Miranga",
-    "operator": "Petrobras",
-    "latitude": -12.3,
-    "longitude": -38.9,
-    "water_depth_m": null,
-    "distance_to_coast_km": null,
-    "year": null,
-    "service_life_years": null,
-    "oil_bpd": null,
-    "gas_mmd": null,
-    "boed": null,
-    "water_injection_bpd": null,
-    "storage_m3": null,
-    "accommodation": null,
-    "length_m": null,
-    "width_m": null,
-    "weight_t": null,
-    "location": "Miranga, Bahia",
-    "notes": "Campo terrestre da Petrobras em Miranga (BA), na Bacia do Recôncavo. Está entre os 20 campos terrestres com maior produção do Brasil segundo a ANP. Produção detalhada a ser complementada.",
-    "source_url": "https://www.gov.br/anp/pt-br/centrais-de-conteudo/publicacoes/boletins-anp/arquivos-bmppgn/2025/dezembro.pdf",
-    "data_version": "V1.1-onshore"
+    "data_version": "V1.2-onshore"
   }
 ]
