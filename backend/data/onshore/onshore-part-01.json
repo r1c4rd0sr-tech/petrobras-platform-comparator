@@ -1,0 +1,38 @@
+[
+  {
+    "slug": "polo-urucu",
+    "name": "Polo Urucu (Província Petrolífera de Urucu)",
+    "unit_type": "polo_producao",
+    "state": "AM",
+    "municipality": "Coari",
+    "basin": "Bacia do Solimões",
+    "operator": "Petrobras",
+    "status": "operacional",
+    "year_start": 1988,
+    "oil_bpd": null,
+    "gas_mmd": 6.0,
+    "boed": 105000.0,
+    "wells_productive": 75,
+    "notes": "Maior província terrestre de óleo e gás do Brasil, localizada em Coari (AM), a cerca de 650 km de Manaus. Produção total de aproximadamente 105 mil boe/dia, com cerca de 75 poços produtivos (de 100 perfurados). Envia diariamente entre 5 e 6 milhões m³ de gás natural para Manaus, além de GLP transportado por gasoduto de 285 km até Coari e depois por embarcação pelo Rio Solimões. A Petrobras planeja perfurar 22 novos poços a partir de 2026, com investimento de R$ 2,5 bilhões. Coordenada aproximada do centro do polo.",
+    "source_url": "https://petrobras.com.br/quem-somos/exploracao-e-producao",
+    "data_version": "V1.0-onshore"
+  },
+  {
+    "slug": "upgn-boaventura",
+    "name": "UPGN do Complexo de Energias Boaventura (ex-GasLub/Comperj)",
+    "unit_type": "upgn",
+    "state": "RJ",
+    "municipality": "Itaboraí",
+    "basin": "Bacia de Santos (gás recebido via Rota 3)",
+    "operator": "Petrobras",
+    "status": "operacional",
+    "year_start": 2024,
+    "oil_bpd": null,
+    "gas_mmd": 21.0,
+    "boed": null,
+    "wells_productive": null,
+    "notes": "Maior unidade de processamento de gás natural do Brasil, localizada em Itaboraí (RJ). Capacidade total de 21 milhões m³/dia de processamento de gás, atingida em maio de 2025 com a entrada do segundo módulo (o primeiro módulo iniciou operação comercial em novembro de 2024). Recebe gás rico do pré-sal da Bacia de Santos via Gasoduto Rota 3 (campos de Tupi, Búzios, Sapinhoá, entre outros). Produz gás natural, GLP (gás de cozinha) e C5+ (matéria-prima petroquímica). Coordenada aproximada do município de Itaboraí.",
+    "source_url": "https://agencia.petrobras.com.br/w/petrobras-dobra-capacidade-de-processamento-na-upgn-do-complexo-de-energias-boaventura",
+    "data_version": "V1.0-onshore"
+  }
+]
