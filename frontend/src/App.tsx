@@ -267,8 +267,8 @@ export default function App() {
             <div className="panel-body">
               {tab === "comparativo" && (
                 <div className="table-wrap">
-                  <table className="table"><thead><tr><th>Plataforma</th><th>Status</th><th>Tipo</th><th>Bacia</th><th>Campo</th><th>Operador</th><th>Óleo</th><th>Gás</th><th>BOE/d</th><th>Ano</th><th>Acomodação</th><th>Armazenamento</th><th>Comprimento</th><th>Peso</th><th>Distância costa</th></tr></thead><tbody>
-                    {selected.map((p) => <tr key={p.id}><td>{p.name}</td><td>{STATUS_LABEL[p.status] ?? p.status}</td><td>{p.unit_type}</td><td>{p.basin || "—"}</td><td>{p.field || "—"}</td><td>{p.operator || "—"}</td><td>{num(p.oil_bpd)}</td><td>{num(p.gas_mmd)}</td><td>{num(p.boed)}</td><td>{p.year || "—"}</td><td>{num(p.accommodation)}</td><td>{num(p.storage_m3)}</td><td>{num(p.length_m)}</td><td>{num(p.weight_t)}</td><td>{num(p.distance_to_coast_km)}</td></tr>)}
+                  <table className="table"><thead><tr><th>Plataforma</th><th>Status</th><th>Tipo</th><th>Bacia</th><th>Campo</th><th>Operador</th><th>Óleo</th><th>Gás (MMm³/d)</th><th>BOE/d</th><th>Ano</th><th>Acomodação</th><th>Armazenamento</th><th>Comprimento</th><th>Peso</th><th>Distância costa</th></tr></thead><tbody>
+                    {selected.map((p) => <tr key={p.id}><td>{p.name}</td><td>{STATUS_LABEL[p.status] ?? p.status}</td><td>{p.unit_type}</td><td>{p.basin || "—"}</td><td>{p.field || "—"}</td><td>{p.operator || "—"}</td><td>{num(p.oil_bpd)}</td><td>{num(p.gas_mmd, " MMm³/d")}</td><td>{num(p.boed)}</td><td>{p.year || "—"}</td><td>{num(p.accommodation)}</td><td>{num(p.storage_m3)}</td><td>{num(p.length_m)}</td><td>{num(p.weight_t)}</td><td>{num(p.distance_to_coast_km)}</td></tr>)}
                   </tbody></table>
                 </div>
               )}
