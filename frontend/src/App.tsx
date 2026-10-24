@@ -16,6 +16,21 @@ const PIN_COLORS = ["#008542", "#ffcc29", "#0c2340", "#e30613", "#0072ce", "#7a2
 const STATUS_COLORS = ["#008542", "#ffcc29", "#e30613", "#0072ce", "#f28c28", "#7a28a0", "#00a878", "#c2185b"];
 const MAX_SELECTED = 10;
 
+const BASIN_ALIASES: Record<string, string> = {
+  "campos basin": "Bacia de Campos",
+  "santos basin": "Bacia de Santos",
+  "espírito santo basin": "Bacia de Espírito Santo",
+  "espirito santo basin": "Bacia de Espírito Santo",
+  "ceará basin": "Bacia do Ceará",
+  "ceara basin": "Bacia do Ceará",
+};
+
+const normalizeBasin = (name: string | null | undefined) => {
+  if (!name) return name as string | null | undefined;
+  const key = name.trim().toLowerCase();
+  return BASIN_ALIASES[key] ?? name;
+};
+
 const num = (value: number | null | undefined, suffix = "") =>
   value === null || value === undefined || Number.isNaN(value) ? "—" : value.toLocaleString("pt-BR") + suffix;
 
@@ -44,7 +59,7 @@ export default function App() {
   useEffect(() => {
     fetchPlatforms()
       .then((data) => {
-        setPlatforms(data);
+        setPlatforms(data.map((p) => ({ ...p, basin: normalizeBasin(p.basin) })));
         setSelectedIds([]);
       })
       .catch(() => setError("Não foi possível carregar os dados da API. Recarregue em alguns instantes."))
