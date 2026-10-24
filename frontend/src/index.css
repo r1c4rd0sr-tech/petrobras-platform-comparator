@@ -183,3 +183,53 @@ body {
 [data-theme="dark"] .table th, [data-theme="dark"] .table td { border-color: #1e3a5c; }
 [data-theme="dark"] .charts h3 { color: #e8eef5; }
 [data-theme="dark"] .footer { background: #0f2740; color: #a8c4de; border-color: #1e3a5c; }
+
+/* ===== Responsivo para celular ===== */
+@media (max-width: 768px) {
+  .app { padding: 12px; }
+
+  .topbar {
+    flex-direction: column; align-items: flex-start; gap: 10px;
+    padding: 16px; border-radius: 12px; margin-bottom: 12px;
+  }
+  .topbar h1 { font-size: 18px; }
+  .topbar p { font-size: 12px; }
+  .topbar > div:last-child { width: 100%; justify-content: space-between; }
+  .badge { font-size: 12px; padding: 6px 10px; }
+  .theme-toggle { padding: 6px 12px; font-size: 13px; }
+
+  .filters { grid-template-columns: 1fr; padding: 12px; gap: 10px; margin-bottom: 12px; }
+  .filters input, .filters select { font-size: 16px; padding: 10px 12px; }
+  .filters button { width: 100%; padding: 12px; font-size: 15px; }
+
+  .layout { gap: 12px; }
+
+  .panel-head { flex-direction: column; align-items: flex-start; gap: 8px; padding: 12px; }
+  .panel-head h2 { font-size: 15px; }
+  .panel-body { padding: 12px; }
+
+  .panel-body.list { grid-template-columns: 1fr; max-height: none; gap: 10px; }
+  .card { padding: 12px; }
+  .card-top h4 { font-size: 14px; }
+  .metrics { grid-template-columns: 1fr; }
+  .select-btn { padding: 12px; font-size: 15px; }
+
+  .map { height: 380px; }
+  .map-legend { padding: 8px 12px; font-size: 11px; }
+
+  .tabs { padding: 10px 12px 0; gap: 6px; }
+  .tab { padding: 10px 12px; font-size: 13px; flex: 1 1 auto; text-align: center; }
+
+  .table { font-size: 12px; }
+  .table th, .table td { padding: 6px 8px; }
+
+  .charts h3 { font-size: 15px; }
+  .footer { padding: 10px 12px; font-size: 11px; }
+}
+
+@media (max-width: 480px) {
+  .app { padding: 8px; }
+  .topbar h1 { font-size: 16px; }
+  .map { height: 320px; }
+  .stats { grid-template-columns: 1fr; }
+}
