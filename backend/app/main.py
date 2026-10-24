@@ -5,9 +5,10 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from .database import Base, engine
 from .routers import platforms
+from .services.anp_live import get_live_platforms
 from .services.data_import import import_platforms_from_json
 
-app = FastAPI(title="Petrobras Platform Comparator API", version="0.1.0")
+app = FastAPI(title="Petrobras Platform Comparator API", version="0.2.0")
 
 allowed_origins = os.getenv(
     "CORS_ORIGINS",
@@ -38,3 +39,9 @@ def on_startup():
 @app.get("/api/health")
 def health():
     return {"status": "ok"}
+
+
+@app.get("/api/platforms/live")
+def platforms_live():
+    """Retorna as unidades com produção ANP ao vivo (fallback: base estática)."""
+    return get_live_platforms()
