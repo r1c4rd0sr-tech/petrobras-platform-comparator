@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useMap } from "react-leaflet";
 import { Bar, BarChart, CartesianGrid, Cell, Legend, Line, LineChart, Pie, PieChart, PolarAngleAxis, PolarGrid, PolarRadiusAxis, Radar, RadarChart, ResponsiveContainer, Scatter, ScatterChart, Tooltip, XAxis, YAxis, ZAxis } from "recharts";
 import { MapContainer, Marker, Popup, TileLayer, Tooltip as LeafletTooltip } from "react-leaflet";
 import L from "leaflet";
@@ -175,6 +176,7 @@ export default function App() {
   const [historico, setHistorico] = useState<Record<string, any[]>>({});
   const [historicoLoading, setHistoricoLoading] = useState(false);
   const [historicoError, setHistoricoError] = useState("");
+  const camposBuscados = useRef<Set<string>>(new Set());
 
   const [onshoreUnits, setOnshoreUnits] = useState<Platform[]>(onshoreData as unknown as Platform[]);
   const [refinariasUnits, setRefinariasUnits] = useState<Platform[]>(refinariasData as unknown as Platform[]);
@@ -228,14 +230,15 @@ export default function App() {
     fetchEcompsGasbol().then((data) => setEcompsGasbolUnits(data)).catch(() => {});
   }, []);
 
-  // Busca o histórico mensal de produção (BMP/ANP) para os campos das unidades selecionadas
+  // Busca o histórico mensal de produção (BMP/ANP) para os campos das unidades selecionadas.
+  // Usa um ref de guarda para evitar refetch/loop de re-render.
   useEffect(() => {
     if (tab !== "radar-temporal" || selected.length === 0) return;
     const campos = [...new Set(selected.map((p) => p.field).filter(Boolean) as string[])];
-    if (campos.length === 0) return;
-    const pendentes = campos.filter((c) => !historico[c]);
+    const pendentes = campos.filter((c) => c && !camposBuscados.current.has(c));
     if (pendentes.length === 0) return;
     let cancelado = false;
+    pendentes.forEach((c) => camposBuscados.current.add(c));
     setHistoricoLoading(true);
     setHistoricoError("");
     Promise.all(
@@ -258,7 +261,7 @@ export default function App() {
       })
       .finally(() => { if (!cancelado) setHistoricoLoading(false); });
     return () => { cancelado = true; };
-  }, [tab, selected, historico]);
+  }, [tab, selected]);
 
   const options = useMemo(() => ({
     unit_types: [...new Set(activeUnits.map((p) => p.unit_type).filter(Boolean))].sort(),
@@ -355,20 +358,19 @@ export default function App() {
     });
   }, [selected]);
 
-  // Série temporal: consolida o histórico dos campos selecionados em linhas por período
   const historicoCampos = useMemo(() => Object.keys(historico).filter((c) => (historico[c] || []).length > 0), [historico]);
 
   const timeSeriesOil = useMemo(() => {
     if (historicoCampos.length === 0) return [];
     const periodos = new Set<string>();
-    historicoCampos.forEach((c) => (historico[c] || []).forEach((r: any) => { const p = r.periodo || r.Periodo || r.dataReferencia; if (p) periodos.add(String(p)); }));
+    historicoCampos.forEach((c) => (historico[c] || []).forEach((r: any) => { const p = r?.periodo ?? r?.Periodo ?? r?.dataReferencia; if (p) periodos.add(String(p)); }));
     return Array.from(periodos).sort().map((periodo) => {
       const entry: any = { periodo };
       historicoCampos.forEach((campo) => {
-        const row = (historico[campo] || []).find((r: any) => String(r.periodo || r.Periodo || r.dataReferencia) === periodo);
+        const row = (historico[campo] || []).find((r: any) => String(r?.periodo ?? r?.Periodo ?? r?.dataReferencia) === periodo);
         if (row) {
-          const m3 = Number(row.producaoPetroleo ?? row.ProducaoPetroleo ?? row.producaoPetro ?? 0);
-          const dias = Number(row.dias ?? row.Dias ?? 30) || 30;
+          const m3 = Number(row?.producaoPetroleo ?? row?.ProducaoPetroleo ?? row?.producaoPetro ?? 0) || 0;
+          const dias = Number(row?.dias ?? row?.Dias ?? 30) || 30;
           entry[campo] = Math.round((m3 * 6.2898) / dias);
         }
       });
@@ -379,14 +381,14 @@ export default function App() {
   const timeSeriesGas = useMemo(() => {
     if (historicoCampos.length === 0) return [];
     const periodos = new Set<string>();
-    historicoCampos.forEach((c) => (historico[c] || []).forEach((r: any) => { const p = r.periodo || r.Periodo || r.dataReferencia; if (p) periodos.add(String(p)); }));
+    historicoCampos.forEach((c) => (historico[c] || []).forEach((r: any) => { const p = r?.periodo ?? r?.Periodo ?? r?.dataReferencia; if (p) periodos.add(String(p)); }));
     return Array.from(periodos).sort().map((periodo) => {
       const entry: any = { periodo };
       historicoCampos.forEach((campo) => {
-        const row = (historico[campo] || []).find((r: any) => String(r.periodo || r.Periodo || r.dataReferencia) === periodo);
+        const row = (historico[campo] || []).find((r: any) => String(r?.periodo ?? r?.Periodo ?? r?.dataReferencia) === periodo);
         if (row) {
-          const m3 = Number(row.producaoGasNatural ?? row.ProducaoGasNatural ?? row.producaoGas ?? 0);
-          const dias = Number(row.dias ?? row.Dias ?? 30) || 30;
+          const m3 = Number(row?.producaoGasNatural ?? row?.ProducaoGasNatural ?? row?.producaoGas ?? 0) || 0;
+          const dias = Number(row?.dias ?? row?.Dias ?? 30) || 30;
           entry[campo] = Number(((m3 / 1_000_000) / dias).toFixed(3));
         }
       });
