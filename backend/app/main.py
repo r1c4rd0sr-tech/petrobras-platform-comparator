@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .database import Base, engine
-from .routers import platforms
+from .routers import data, platforms
 from .services.data_import import import_platforms_from_json
 
 app = FastAPI(title="Petrobras Platform Comparator API", version="0.1.0")
@@ -24,6 +24,7 @@ app.add_middleware(
 )
 
 app.include_router(platforms.router)
+app.include_router(data.router)
 
 
 @app.on_event("startup")
