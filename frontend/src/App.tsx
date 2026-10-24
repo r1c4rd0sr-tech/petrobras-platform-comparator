@@ -6,6 +6,7 @@ import "leaflet/dist/leaflet.css";
 import { fetchPlatforms } from "./api";
 import type { Platform } from "./types";
 import onshoreData from "./data/onshore.json";
+import refinariasData from "./data/refinarias.json";
 
 const STATUS_LABEL: Record<string, string> = {
   operational: "Operacional",
@@ -94,8 +95,10 @@ export default function App() {
   const [filters, setFilters] = useState({ search: "", status: "", unit_type: "", basin: "", field: "", operator: "", oil: "", gas: "", year: "", accommodation: "", sort: "oil" });
 
   const onshoreUnits = onshoreData as unknown as Platform[];
-  const activeUnits = modality === "maritimas" ? platforms : modality === "terrestres" ? onshoreUnits : [];
+  const refinariasUnits = refinariasData as unknown as Platform[];
+  const activeUnits = modality === "maritimas" ? platforms : modality === "terrestres" ? onshoreUnits : refinariasUnits;
   const isOnshore = modality === "terrestres";
+  const isOffshore = modality === "maritimas";
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
@@ -280,7 +283,7 @@ export default function App() {
         <div><label>Óleo mín. (bpd)</label><input type="number" value={filters.oil} onChange={(e) => set("oil", e.target.value)} /></div>
         <div><label>Gás mín. (MMm³/d)</label><input type="number" value={filters.gas} onChange={(e) => set("gas", e.target.value)} /></div>
         <div><label>Ano mín.</label><input type="number" value={filters.year} onChange={(e) => set("year", e.target.value)} /></div>
-        {!isOnshore && <div><label>Acomodação mín.</label><input type="number" value={filters.accommodation} onChange={(e) => set("accommodation", e.target.value)} /></div>}
+        {isOffshore && <div><label>Acomodação mín.</label><input type="number" value={filters.accommodation} onChange={(e) => set("accommodation", e.target.value)} /></div>}
         <div><label>Ordenar por</label><select value={filters.sort} onChange={(e) => set("sort", e.target.value)}><option value="oil">Óleo</option><option value="gas">Gás</option><option value="boed">BOE/d</option><option value="storage_m3">Armazenamento</option><option value="length_m">Comprimento</option><option value="weight_t">Peso</option><option value="distance_to_coast_km">Distância costa</option><option value="year">Ano</option><option value="name">Nome</option></select></div>
         <button onClick={() => setFilters({ search: "", status: "", unit_type: "", basin: "", field: "", operator: "", oil: "", gas: "", year: "", accommodation: "", sort: "oil" })}>Limpar filtros</button>
       </section>
@@ -288,16 +291,12 @@ export default function App() {
       {loading && <div className="loading">Carregando plataformas...</div>}
       {error && <div className="error">{error}</div>}
 
-      {!loading && !error && modality === "refinarias" && (
-        <div className="loading">Em breve: refinarias, terminais e estações de compressão de gás serão adicionados a esta seção.</div>
-      )}
-
-      {!loading && !error && modality !== "refinarias" && (
+      {!loading && !error && (
         <>
           <div className="layout">
             <section className="panel">
               <div className="panel-head">
-                <h2>{isOnshore ? "Campos e Unidades" : "Plataformas"} ({filtered.length})</h2>
+                <h2>{isOnshore ? "Campos e Unidades" : modality === "refinarias" ? "Refinarias, Terminais e Compressão" : "Plataformas"} ({filtered.length})</h2>
                 <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
                   <span className="pill">Selecionadas: {selected.length}/10</span>
                   <button className="clear-btn" onClick={() => setSelectedIds([])}>Limpar seleção</button>
@@ -311,23 +310,23 @@ export default function App() {
                       <span>Tipo: {p.unit_type || "—"}</span><span>Bacia: {p.basin || "—"}</span>
                       <span>Campo: {p.field || "—"}</span><span>Operador: {p.operator || "—"}</span>
                       <span>Ano: {p.year || "—"}</span>
-                      {!isOnshore && <span>Costa: {num(p.distance_to_coast_km, " km")}</span>}
+                      {isOffshore && <span>Costa: {num(p.distance_to_coast_km, " km")}</span>}
                       <span>Lat: {p.latitude ?? "—"}</span><span>Lon: {p.longitude ?? "—"}</span>
                     </div>
                     <div className="metrics">
                       <span className="metric">Óleo<b>{num(p.oil_bpd, " bpd")}</b></span>
                       <span className="metric">Gás<b>{num(p.gas_mmd, " MMm³/d")}</b></span>
                       <span className="metric">BOE<b>{num(p.boed, "/d")}</b></span>
-                      {isOnshore ? (
-                        <span className="metric">Poços<b>{num((p as any).wells_productive)}</b></span>
-                      ) : (
+                      {isOffshore ? (
                         <>
                           <span className="metric">Acomodação<b>{num(p.accommodation)}</b></span>
                           <span className="metric">Armazenamento<b>{num(p.storage_m3, " m³")}</b></span>
                           <span className="metric">Comprimento<b>{num(p.length_m, " m")}</b></span>
                           <span className="metric">Peso<b>{num(p.weight_t, " t")}</b></span>
                         </>
-                      )}
+                      ) : isOnshore ? (
+                        <span className="metric">Poços<b>{num((p as any).wells_productive)}</b></span>
+                      ) : null}
                     </div>
                     <button className={`select-btn ${selectedIds.includes(p.id) ? "active" : ""}`} onClick={() => toggle(p.id)}>{selectedIds.includes(p.id) ? "Remover do comparativo" : "Selecionar para comparativo"}</button>
                   </article>
@@ -369,8 +368,8 @@ export default function App() {
             <div className="panel-body">
               {tab === "comparativo" && (
                 <div className="table-wrap">
-                  <table className="table"><thead><tr><th>Plataforma</th><th>Status</th><th>Tipo</th><th>Bacia</th><th>Campo</th><th>Operador</th><th>Óleo</th><th>Gás (MMm³/d)</th><th>BOE/d</th><th>Ano</th>{!isOnshore && <><th>Acomodação</th><th>Armazenamento</th><th>Comprimento</th><th>Peso</th><th>Distância costa (km)</th></>}{isOnshore && <th>Poços produtivos</th>}</tr></thead><tbody>
-                    {selected.map((p) => <tr key={p.id}><td>{p.name}</td><td>{STATUS_LABEL[p.status] ?? p.status}</td><td>{p.unit_type}</td><td>{p.basin || "—"}</td><td>{p.field || "—"}</td><td>{p.operator || "—"}</td><td>{num(p.oil_bpd)}</td><td>{num(p.gas_mmd, " MMm³/d")}</td><td>{num(p.boed)}</td><td>{p.year || "—"}</td>{!isOnshore && <><td>{num(p.accommodation)}</td><td>{num(p.storage_m3)}</td><td>{num(p.length_m)}</td><td>{num(p.weight_t)}</td><td>{num(p.distance_to_coast_km, " km")}</td></>}{isOnshore && <td>{num((p as any).wells_productive)}</td>}</tr>)}
+                  <table className="table"><thead><tr><th>Plataforma</th><th>Status</th><th>Tipo</th><th>Bacia</th><th>Campo</th><th>Operador</th><th>Óleo</th><th>Gás (MMm³/d)</th><th>BOE/d</th><th>Ano</th>{isOffshore && <><th>Acomodação</th><th>Armazenamento</th><th>Comprimento</th><th>Peso</th><th>Distância costa (km)</th></>}{isOnshore && <th>Poços produtivos</th>}</tr></thead><tbody>
+                    {selected.map((p) => <tr key={p.id}><td>{p.name}</td><td>{STATUS_LABEL[p.status] ?? p.status}</td><td>{p.unit_type}</td><td>{p.basin || "—"}</td><td>{p.field || "—"}</td><td>{p.operator || "—"}</td><td>{num(p.oil_bpd)}</td><td>{num(p.gas_mmd, " MMm³/d")}</td><td>{num(p.boed)}</td><td>{p.year || "—"}</td>{isOffshore && <><td>{num(p.accommodation)}</td><td>{num(p.storage_m3)}</td><td>{num(p.length_m)}</td><td>{num(p.weight_t)}</td><td>{num(p.distance_to_coast_km, " km")}</td></>}{isOnshore && <td>{num((p as any).wells_productive)}</td>}</tr>)}
                   </tbody></table>
                 </div>
               )}
@@ -383,12 +382,12 @@ export default function App() {
                     <div style={kpiStyle}><span style={kpiLabel}>BOE total</span><strong style={kpiValue}>{num(totals.boe, "/d")}</strong></div>
                     {isOnshore ? (
                       <div style={kpiStyle}><span style={kpiLabel}>Poços produtivos</span><strong style={kpiValue}>{num(totals.wells)}</strong></div>
-                    ) : (
+                    ) : isOffshore ? (
                       <>
                         <div style={kpiStyle}><span style={kpiLabel}>Profundidade média</span><strong style={kpiValue}>{num(Math.round(avgDepth), " m")}</strong><span style={{ fontSize: 11, opacity: 0.6 }}>máx: {num(maxDepth, " m")}</span></div>
                         <div style={kpiStyle}><span style={kpiLabel}>Acomodação total</span><strong style={kpiValue}>{num(totalAccommodation)}</strong><span style={{ fontSize: 11, opacity: 0.6 }}>pessoas</span></div>
                       </>
-                    )}
+                    ) : null}
                   </div>
 
                   {isOnshore && (
@@ -483,7 +482,7 @@ export default function App() {
                         {topOil.length === 0 && <li>Nenhuma unidade com produção de óleo nos filtros atuais.</li>}
                       </ol>
                     </div>
-                    {!isOnshore && (
+                    {isOffshore && (
                       <div style={rankBoxStyle}>
                         <h4 style={chartTitleStyle}>Top 5 por profundidade</h4>
                         <ol style={rankTextStyle}>
@@ -497,11 +496,11 @@ export default function App() {
               )}
               {tab === "graficos" && (
                 <div className="charts">
-                  <h3>{isOnshore ? "Comparação dos campos selecionados" : "Comparação das plataformas selecionadas"} ({selected.length}/10)</h3>
+                  <h3>{isOnshore ? "Comparação dos campos selecionados" : modality === "refinarias" ? "Comparação das unidades selecionadas" : "Comparação das plataformas selecionadas"} ({selected.length}/10)</h3>
                   {isOnshore && selected.some((p) => (p as any).producao_polo_gas_mmd != null) && (
                     <p style={{ color: axisColor, fontSize: 13 }}>Para os campos do Polo Urucu sem produção individual divulgada, é exibida a produção agregada do Polo Arara (7,252 MMm³/dia), identificada com "(polo)".</p>
                   )}
-                  {selected.length === 0 && <p style={{ color: axisColor }}>Selecione {isOnshore ? "campos" : "plataformas"} na lista à esquerda para ver os gráficos comparativos.</p>}
+                  {selected.length === 0 && <p style={{ color: axisColor }}>Selecione {isOnshore ? "campos" : modality === "refinarias" ? "unidades" : "plataformas"} na lista à esquerda para ver os gráficos comparativos.</p>}
                   {selected.length > 0 && (
                     <>
                       <div style={{ display: "flex", gap: 16, flexWrap: "wrap", marginBottom: 24 }}>
