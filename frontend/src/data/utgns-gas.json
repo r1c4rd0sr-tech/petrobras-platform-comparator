@@ -16,7 +16,7 @@
     "longitude": -40.07,
     "notes": "Unidade de Tratamento de Gás de Cacimbas (UTGC), em Linhares (ES). Capacidade de processamento de 18,1 milhões m³/dia. Recebe e processa gás dos campos de Peroá, Canapu, Cangoá e Golfinho (Bacia do Espírito Santo) e do Parque das Baleias, produzindo gás natural especificado, C5+ (gasolina natural) e GLP. Inaugurada em 2006.",
     "source_url": "https://comunicaespiritosanto.petrobras.com.br/unidade-de-tratamento-de-gas-de-cacimbas-utgc-1",
-    "data_version": "V2.3-refino"
+    "data_version": "V2.5-refino"
   },
   {
     "id": 2049,
@@ -35,7 +35,7 @@
     "longitude": -63.14,
     "notes": "Unidade de Tratamento de Gás de Urucu, em Coari (AM). Capacidade de processamento de 12,2 milhões m³/dia. Integra o Polo Urucu, processando o gás produzido nos campos de Urucu.",
     "source_url": "https://eixos.com.br/energia/estrategicos-na-transicao-energetica-gas-e-energia-minguam-na-petrobras/",
-    "data_version": "V2.3-refino"
+    "data_version": "V2.5-refino"
   },
   {
     "id": 2050,
@@ -54,7 +54,7 @@
     "longitude": -36.32,
     "notes": "Unidade de Tratamento de Gás de Guamaré (UTG Guamaré I, II e III), em Guamaré (RN). Capacidade de processamento de 5,7 milhões m³/dia.",
     "source_url": "https://eixos.com.br/energia/estrategicos-na-transicao-energetica-gas-e-energia-minguam-na-petrobras/",
-    "data_version": "V2.3-refino"
+    "data_version": "V2.5-refino"
   },
   {
     "id": 2051,
@@ -73,10 +73,10 @@
     "longitude": -37.07,
     "notes": "Unidade de Tratamento de Gás de Atalaia, em Aracaju (SE). Capacidade de processamento de 3 milhões m³/dia.",
     "source_url": "https://eixos.com.br/energia/estrategicos-na-transicao-energetica-gas-e-energia-minguam-na-petrobras/",
-    "data_version": "V2.3-refino"
+    "data_version": "V2.5-refino"
   },
   {
-    "id": 2051,
+    "id": 2055,
     "slug": "utg-candeias",
     "name": "Unidade de Tratamento de Gás de Candeias (UTG Candeias)",
     "unit_type": "Unidade de Tratamento de Gás",
@@ -92,7 +92,7 @@
     "longitude": -38.55,
     "notes": "Unidade de Tratamento de Gás de Candeias, em São Francisco do Conde (BA). Capacidade de processamento de 2,9 milhões m³/dia.",
     "source_url": "https://eixos.com.br/energia/estrategicos-na-transicao-energetica-gas-e-energia-minguam-na-petrobras/",
-    "data_version": "V2.3-refino"
+    "data_version": "V2.5-refino"
   },
   {
     "id": 2052,
@@ -111,7 +111,7 @@
     "longitude": -40.65,
     "notes": "Unidade de Tratamento de Gás Sul (UTGSul), em Anchieta (ES). Capacidade de processamento de 2,5 milhões m³/dia.",
     "source_url": "https://eixos.com.br/energia/estrategicos-na-transicao-energetica-gas-e-energia-minguam-na-petrobras/",
-    "data_version": "V2.3-refino"
+    "data_version": "V2.5-refino"
   },
   {
     "id": 2053,
@@ -130,7 +130,7 @@
     "longitude": -35.96,
     "notes": "Unidade de Tratamento de Gás de Pilar, em Pilar (AL). Capacidade de processamento de 1,8 milhão m³/dia.",
     "source_url": "https://eixos.com.br/energia/estrategicos-na-transicao-energetica-gas-e-energia-minguam-na-petrobras/",
-    "data_version": "V2.3-refino"
+    "data_version": "V2.5-refino"
   },
   {
     "id": 2054,
@@ -149,6 +149,6 @@
     "longitude": -45.41,
     "notes": "Unidade de Tratamento de Gás de Caraguatatuba (UTGCA), em Caraguatatuba (SP). Capacidade de processamento de 20 milhões m³/dia. Opera com autorização especial da ANP para entregar GN ao mercado com teor mínimo de metano de 80%.",
     "source_url": "https://eixos.com.br/energia/estrategicos-na-transicao-energetica-gas-e-energia-minguam-na-petrobras/",
-    "data_version": "V2.3-refino"
+    "data_version": "V2.5-refino"
   }
 ]
