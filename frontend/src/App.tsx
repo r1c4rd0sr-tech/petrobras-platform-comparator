@@ -4,7 +4,7 @@ import { Bar, BarChart, CartesianGrid, Cell, Legend, Pie, PieChart, PolarAngleAx
 import { MapContainer, Marker, Popup, TileLayer, Tooltip as LeafletTooltip } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { fetchPlatforms, fetchOnshore, fetchRefinarias, fetchTerminaisArmazenamento, fetchUtgnsGas, fetchEcompsGasbol } from "./api";
+import { fetchPlatforms, fetchOnshore, fetchRefinarias, fetchTerminaisArmazenamento, fetchUtgnsGas, fetchEcompsGasbol, fetchProducaoHistorica } from "./api";
 import { POB_OVERRIDES } from "./pob-overrides";
 import type { Platform } from "./types";
 import onshoreData from "./data/onshore.json";
@@ -173,6 +173,9 @@ export default function App() {
   const [isMobile, setIsMobile] = useState(typeof window !== "undefined" ? window.innerWidth < 768 : false);
   const [showHeatmap, setShowHeatmap] = useState(false);
   const [filters, setFilters] = useState({ search: "", status: "", unit_type: "", basin: "", field: "", operator: "", state: "", municipality: "", oil: "", gas: "", year: "", accommodation: "", wells: "", storage: "", sort: "oil" });
+  const [dppTest, setDppTest] = useState<any>(null);
+  const [dppTestStatus, setDppTestStatus] = useState<"idle" | "loading" | "ok" | "erro">("idle");
+  const [dppTestError, setDppTestError] = useState("");
 
   const [onshoreUnits, setOnshoreUnits] = useState<Platform[]>(onshoreData as unknown as Platform[]);
   const [refinariasUnits, setRefinariasUnits] = useState<Platform[]>(refinariasData as unknown as Platform[]);
@@ -382,6 +385,24 @@ export default function App() {
   const set = (key: keyof typeof filters, value: string) => setFilters((f) => ({ ...f, [key]: value }));
   const resetFilters = () => setFilters({ search: "", status: "", unit_type: "", basin: "", field: "", operator: "", state: "", municipality: "", oil: "", gas: "", year: "", accommodation: "", wells: "", storage: "", sort: "oil" });
   const pinColor = (id: number) => PIN_COLORS[selected.findIndex((s) => s.id === id) % PIN_COLORS.length];
+
+  const testarDpp = async () => {
+    const campo = selected[0]?.field;
+    if (!campo) { window.alert("Selecione uma unidade com campo informado para testar a API DPP."); return; }
+    setDppTestStatus("loading");
+    setDppTestError("");
+    setDppTest(null);
+    try {
+      const raw = await fetchProducaoHistorica(campo);
+      console.log("[DPP] Resposta bruta para campo:", campo, raw);
+      setDppTest(raw);
+      setDppTestStatus("ok");
+    } catch (e: any) {
+      console.error("[DPP] Erro na consulta:", e);
+      setDppTestError(e?.message || "Erro desconhecido");
+      setDppTestStatus("erro");
+    }
+  };
 
   const exportCSV = () => {
     if (selected.length === 0) { window.alert("Selecione pelo menos uma unidade para exportar."); return; }
@@ -921,10 +942,19 @@ export default function App() {
 
                       <div style={chartRowStyle}>
                         <div style={chartBoxStyle}>
-                          <h4 style={chartTitleStyle}>Série Temporal</h4>
+                          <h4 style={chartTitleStyle}>Série Temporal — teste da API DPP/ANP</h4>
                           <p style={{ color: axisColor, fontSize: 12, marginTop: 0 }}>
-                            A série temporal de produção mensal por campo (fonte: BMP/ANP via API "Do Poço ao Posto") será exibida aqui após a conclusão da integração.
+                            Etapa 1 da reintegração: valide a conectividade e o formato da resposta da API "Do Poço ao Posto" para o campo da primeira unidade selecionada ({selected[0]?.field || "—"}). A resposta bruta é registrada no console do navegador (F12 → Console).
                           </p>
+                          <button style={{ ...actionBtnStyle, background: "#008542", color: "#fff" }} onClick={testarDpp} disabled={dppTestStatus === "loading"}>
+                            {dppTestStatus === "loading" ? "Consultando..." : "🧪 Testar API DPP"}
+                          </button>
+                          {dppTestStatus === "erro" && <p style={{ color: "#e30613", marginTop: 8 }}>Erro: {dppTestError}</p>}
+                          {dppTestStatus === "ok" && (
+                            <pre style={{ background: isDark ? "#0a1f33" : "#e8eef4", color: isDark ? "#cfe0f0" : "#1c2b3a", padding: 12, borderRadius: 8, fontSize: 11, maxHeight: 300, overflow: "auto", marginTop: 12 }}>
+                              {JSON.stringify(dppTest, null, 2).slice(0, 3000)}
+                            </pre>
+                          )}
                         </div>
                       </div>
                     </>
