@@ -616,6 +616,10 @@ export default function App() {
           </section>
         </>
       )}
+
+      <footer className="footer">
+        <p>© 2026 Ricardo S. Rodrigues — Chave AXIF</p>
+      </footer>
     </div>
   );
 }
