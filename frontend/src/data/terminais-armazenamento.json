@@ -11,11 +11,12 @@
     "year": null,
     "oil_bpd": null,
     "gas_mmd": null,
+    "storage_m3": null,
     "latitude": -23.01,
     "longitude": -44.31,
-    "notes": "Terminal aquaviário da Transpetro em Angra dos Reis (RJ), operado por meio de píeres, monoboias ou quadro de boias. Coordenada aproximada do município.",
+    "notes": "Terminal aquaviário da Transpetro em Angra dos Reis (RJ), operado por meio de píeres, monoboias ou quadro de boias. Capacidade de armazenamento a ser complementada. Coordenada aproximada do município.",
     "source_url": "https://transpetro.com.br/transpetro-institucional/nossas-atividades/dutos-e-terminais/terminais-aquaviarios.htm",
-    "data_version": "V1.3-refino"
+    "data_version": "V1.4-refino"
   },
   {
     "id": 2021,
@@ -29,11 +30,12 @@
     "year": null,
     "oil_bpd": null,
     "gas_mmd": null,
+    "storage_m3": null,
     "latitude": -10.91,
     "longitude": -37.07,
-    "notes": "Terminal aquaviário da Transpetro em Aracaju (SE), operado por meio de píeres, monoboias ou quadro de boias. Coordenada aproximada do município.",
+    "notes": "Terminal aquaviário da Transpetro em Aracaju (SE), operado por meio de píeres, monoboias ou quadro de boias. Capacidade de armazenamento a ser complementada. Coordenada aproximada do município.",
     "source_url": "https://transpetro.com.br/transpetro-institucional/nossas-atividades/dutos-e-terminais/terminais-aquaviarios.htm",
-    "data_version": "V1.3-refino"
+    "data_version": "V1.4-refino"
   },
   {
     "id": 2022,
@@ -47,11 +49,12 @@
     "year": null,
     "oil_bpd": null,
     "gas_mmd": null,
+    "storage_m3": 89600.0,
     "latitude": -19.8,
     "longitude": -40.1,
-    "notes": "Terminal aquaviário da Transpetro em Barra do Riacho, Aracruz (ES), operado por meio de píeres, monoboias ou quadro de boias. Coordenada aproximada do município.",
-    "source_url": "https://transpetro.com.br/transpetro-institucional/nossas-atividades/dutos-e-terminais/terminais-aquaviarios.htm",
-    "data_version": "V1.3-refino"
+    "notes": "Terminal aquaviário da Transpetro em Barra do Riacho, Aracruz (ES). Capacidade de armazenamento de 89.600 m³ em seis tanques e três esferas. Coordenada aproximada do município.",
+    "source_url": "https://transpetro.com.br/data/files/FF/F0/22/AB/086A9610DB926A9691AAF9C2/Relatorio_Transpetro_2007_portugues.pdf",
+    "data_version": "V1.4-refino"
   },
   {
     "id": 2023,
@@ -64,12 +67,13 @@
     "status": "operational",
     "year": null,
     "oil_bpd": null,
-    "gas_mmd": null,
+    "gas_mmd": 30.0,
+    "storage_m3": null,
     "latitude": -22.79,
     "longitude": -43.15,
-    "notes": "Terminal aquaviário da Transpetro na Baía de Guanabara (TABG), Rio de Janeiro (RJ), operado por meio de píeres, monoboias ou quadro de boias. Coordenada aproximada.",
-    "source_url": "https://transpetro.com.br/transpetro-institucional/nossas-atividades/dutos-e-terminais/terminais-aquaviarios.htm",
-    "data_version": "V1.3-refino"
+    "notes": "Terminal Flexível de Regaseificação de GNL da Baía de Guanabara (RJ), com capacidade para transferir até 30 milhões de m³/dia de gás natural para a malha de gasodutos Sudeste. Capacidade de armazenamento a ser complementada. Coordenada aproximada.",
+    "source_url": "https://transpetro.com.br/transpetro-institucional/nossas-atividades/dutos-e-terminais/terminais-aquaviarios/baia-de-guanabara-rj.htm",
+    "data_version": "V1.4-refino"
   },
   {
     "id": 2024,
@@ -83,11 +87,12 @@
     "year": null,
     "oil_bpd": null,
     "gas_mmd": null,
+    "storage_m3": 44920.0,
     "latitude": -1.45,
     "longitude": -48.5,
-    "notes": "Terminal aquaviário da Transpetro em Belém (PA), operado por meio de píeres, monoboias ou quadro de boias. Coordenada aproximada do município.",
-    "source_url": "https://transpetro.com.br/transpetro-institucional/nossas-atividades/dutos-e-terminais/terminais-aquaviarios.htm",
-    "data_version": "V1.3-refino"
+    "notes": "Terminal aquaviário da Transpetro em Belém (PA). Capacidade nominal de armazenamento de 44.920 m³. Coordenada aproximada do município.",
+    "source_url": "https://transpetro.com.br/data/files/FF/F0/22/AB/086A9610DB926A9691AAF9C2/Relatorio_Transpetro_2007_portugues.pdf",
+    "data_version": "V1.4-refino"
   },
   {
     "id": 2025,
@@ -101,11 +106,12 @@
     "year": null,
     "oil_bpd": null,
     "gas_mmd": null,
+    "storage_m3": null,
     "latitude": -4.08,
     "longitude": -63.14,
-    "notes": "Terminal aquaviário da Transpetro em Coari (AM), operado por meio de píeres, monoboias ou quadro de boias. Coordenada aproximada do município.",
+    "notes": "Terminal aquaviário da Transpetro em Coari (AM), operado por meio de píeres, monoboias ou quadro de boias. Capacidade de armazenamento a ser complementada. Coordenada aproximada do município.",
     "source_url": "https://transpetro.com.br/transpetro-institucional/nossas-atividades/dutos-e-terminais/terminais-aquaviarios.htm",
-    "data_version": "V1.3-refino"
+    "data_version": "V1.4-refino"
   },
   {
     "id": 2026,
@@ -119,11 +125,12 @@
     "year": null,
     "oil_bpd": null,
     "gas_mmd": null,
+    "storage_m3": 94400.0,
     "latitude": -22.75,
     "longitude": -43.32,
-    "notes": "Terminal aquaviário da Transpetro em Ilha Redonda, Duque de Caxias (RJ), operado por meio de píeres, monoboias ou quadro de boias. Coordenada aproximada do município.",
-    "source_url": "https://transpetro.com.br/transpetro-institucional/nossas-atividades/dutos-e-terminais/terminais-aquaviarios.htm",
-    "data_version": "V1.3-refino"
+    "notes": "Terminal aquaviário da Transpetro em Ilha Redonda, Duque de Caxias (RJ). Capacidade nominal de armazenamento de 94,4 mil m³ (GLP). Coordenada aproximada do município.",
+    "source_url": "https://transpetro.com.br/transpetro-institucional/nossas-atividades/dutos-e-terminais/terminais-aquaviarios/ilha-redonda-rj.htm",
+    "data_version": "V1.4-refino"
   },
   {
     "id": 2027,
@@ -137,11 +144,12 @@
     "year": null,
     "oil_bpd": null,
     "gas_mmd": null,
+    "storage_m3": 209549.0,
     "latitude": -23.51,
     "longitude": -46.88,
-    "notes": "Terminal terrestre da Transpetro em Barueri (SP), funcionando como entreposto para os diferentes modais de transporte. Coordenada aproximada do município.",
+    "notes": "Terminal terrestre da Transpetro em Barueri (SP). Capacidade nominal de 199.979 m³ em 22 tanques (derivados, álcool e biodiesel) mais 9.570 m³ em 3 esferas de GLP, totalizando 209.549 m³. Coordenada aproximada do município.",
     "source_url": "https://transpetro.com.br/transpetro-institucional/nossas-atividades/dutos-e-terminais/terminais-terrestres.htm",
-    "data_version": "V1.3-refino"
+    "data_version": "V1.4-refino"
   },
   {
     "id": 2028,
@@ -155,11 +163,12 @@
     "year": null,
     "oil_bpd": null,
     "gas_mmd": null,
+    "storage_m3": 38361.0,
     "latitude": -27.49,
     "longitude": -48.66,
-    "notes": "Terminal terrestre da Transpetro em Biguaçu (SC), funcionando como entreposto para os diferentes modais de transporte. Coordenada aproximada do município.",
-    "source_url": "https://transpetro.com.br/transpetro-institucional/nossas-atividades/dutos-e-terminais/terminais-terrestres.htm",
-    "data_version": "V1.3-refino"
+    "notes": "Terminal terrestre da Transpetro em Biguaçu (SC). Capacidade nominal de 38.361 m³ em 10 tanques (derivados, álcool e biodiesel). Coordenada aproximada do município.",
+    "source_url": "https://transpetro.com.br/en_us/transpetro-institucional/business-areas/terminals-and-pipelines/inland-terminals/biguacu.htm",
+    "data_version": "V1.4-refino"
   },
   {
     "id": 2029,
@@ -173,11 +182,12 @@
     "year": null,
     "oil_bpd": null,
     "gas_mmd": null,
+    "storage_m3": 72351.0,
     "latitude": -15.79,
     "longitude": -47.88,
-    "notes": "Terminal terrestre da Transpetro em Brasília (DF), funcionando como entreposto para os diferentes modais de transporte. Coordenada aproximada do município.",
-    "source_url": "https://transpetro.com.br/transpetro-institucional/nossas-atividades/dutos-e-terminais/terminais-terrestres.htm",
-    "data_version": "V1.3-refino"
+    "notes": "Terminal terrestre da Transpetro em Brasília (DF). Capacidade nominal de armazenamento de 72.351 m³. Coordenada aproximada do município.",
+    "source_url": "https://www.gov.br/anp/pt-br/centrais-de-conteudo/dados-abertos/arquivos/cat/capacidade-armazenagem-terminais.csv/view",
+    "data_version": "V1.4-refino"
   },
   {
     "id": 2030,
@@ -191,11 +201,12 @@
     "year": null,
     "oil_bpd": null,
     "gas_mmd": null,
+    "storage_m3": 36417.0,
     "latitude": -12.67,
     "longitude": -38.55,
-    "notes": "Terminal terrestre da Transpetro em Candeias (BA), funcionando como entreposto para os diferentes modais de transporte. Coordenada aproximada do município.",
-    "source_url": "https://transpetro.com.br/transpetro-institucional/nossas-atividades/dutos-e-terminais/terminais-terrestres.htm",
-    "data_version": "V1.3-refino"
+    "notes": "Terminal terrestre da Transpetro em Candeias (BA). Capacidade nominal de 36.417 m³ em 12 tanques. Coordenada aproximada do município.",
+    "source_url": "https://transpetro.com.br/en_us/transpetro-institucional/business-areas/terminals-and-pipelines/inland-terminals/candeias.htm",
+    "data_version": "V1.4-refino"
   },
   {
     "id": 2031,
@@ -209,11 +220,12 @@
     "year": null,
     "oil_bpd": null,
     "gas_mmd": null,
+    "storage_m3": 113635.0,
     "latitude": -23.89,
     "longitude": -46.42,
-    "notes": "Terminal terrestre da Transpetro em Cubatão (SP), funcionando como entreposto para os diferentes modais de transporte. Coordenada aproximada do município.",
-    "source_url": "https://transpetro.com.br/transpetro-institucional/nossas-atividades/dutos-e-terminais/terminais-terrestres.htm",
-    "data_version": "V1.3-refino"
+    "notes": "Terminal terrestre da Transpetro em Cubatão (SP). Capacidade nominal de armazenamento de 113.635 m³. Coordenada aproximada do município.",
+    "source_url": "https://www.gov.br/anp/pt-br/centrais-de-conteudo/dados-abertos/arquivos/cat/capacidade-armazenagem-terminais.csv/view",
+    "data_version": "V1.4-refino"
   },
   {
     "id": 2032,
@@ -227,11 +239,12 @@
     "year": null,
     "oil_bpd": null,
     "gas_mmd": null,
+    "storage_m3": 18993.0,
     "latitude": -26.53,
     "longitude": -49.0,
-    "notes": "Terminal terrestre da Transpetro em Guaramirim (SC), funcionando como entreposto para os diferentes modais de transporte. Coordenada aproximada do município.",
-    "source_url": "https://transpetro.com.br/transpetro-institucional/nossas-atividades/dutos-e-terminais/terminais-terrestres.htm",
-    "data_version": "V1.3-refino"
+    "notes": "Terminal terrestre da Transpetro em Guaramirim (SC). Capacidade nominal de armazenamento de 18.993 m³. Coordenada aproximada do município.",
+    "source_url": "https://www.gov.br/anp/pt-br/centrais-de-conteudo/dados-abertos/arquivos/cat/capacidade-armazenagem-terminais.csv/view",
+    "data_version": "V1.4-refino"
   },
   {
     "id": 2033,
@@ -245,10 +258,11 @@
     "year": null,
     "oil_bpd": null,
     "gas_mmd": null,
+    "storage_m3": 1070964.0,
     "latitude": -23.41,
     "longitude": -46.03,
-    "notes": "Terminal terrestre da Transpetro em Guararema (SP), funcionando como entreposto para os diferentes modais de transporte. Coordenada aproximada do município.",
-    "source_url": "https://transpetro.com.br/transpetro-institucional/nossas-atividades/dutos-e-terminais/terminais-terrestres.htm",
-    "data_version": "V1.3-refino"
+    "notes": "Terminal terrestre da Transpetro em Guararema (SP). Capacidade nominal de 622.226 m³ em 9 tanques (derivados, álcool e biodiesel) mais 448.738 m³ em 5 tanques de petróleo, totalizando 1.070.964 m³. Coordenada aproximada do município.",
+    "source_url": "https://transpetro.com.br/transpetro-institucional/nossas-atividades/dutos-e-terminais/terminais-terrestres/guararema-sp.htm",
+    "data_version": "V1.4-refino"
   }
 ]
