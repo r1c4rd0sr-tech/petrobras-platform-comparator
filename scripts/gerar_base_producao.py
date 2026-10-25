@@ -1,17 +1,15 @@
 """
-Script de ingestão: baixa todos os ZIPs da ANP (2021-01 a 2023-10),
+Script de ingestão: baixa todos os ZIPs da ANP (2021-01 a 2023-12),
 agrega produção por campo/mês e gera backend/app/data/producao_mensal.json.
+
+URLs hardcoded conforme os links reais da ANP (padrões irregulares por período).
 
 Uso:
     python scripts/gerar_base_producao.py
-
-O JSON gerado deve ser commitado no repositório para que o backend
-leia dele instantaneamente (sem baixar ZIPs em runtime).
 """
 import csv
 import io
 import json
-import os
 import unicodedata
 import zipfile
 from pathlib import Path
@@ -23,8 +21,45 @@ BASE = (
     "arquivos/arquivos-producao-de-petroleo-e-gas-natural-por-poco"
 )
 
-JANELA = [(ano, mes) for ano in (2021, 2022, 2023) for mes in range(1, 13)
-          if not (ano == 2023 and mes > 10)]
+# URLs exatas fornecidas pelo usuário (padrões irregulares por período)
+URLS = {
+    "2021-01": f"{BASE}/2021_01_producao.zip",
+    "2021-02": f"{BASE}/2021_02_producao.zip",
+    "2021-03": f"{BASE}/2021_03_producao.zip",
+    "2021-04": f"{BASE}/2021_04_producao.zip",
+    "2021-05": f"{BASE}/2021_05_producao.zip",
+    "2021-06": f"{BASE}/2021_06_producao.zip",
+    "2021-07": f"{BASE}/2021_07_producao.zip",
+    "2021-08": f"{BASE}/2021-08-producao.zip",
+    "2021-09": f"{BASE}/2021-09-producao.zip",
+    "2021-10": f"{BASE}/2021-10-producao.zip",
+    "2021-11": f"{BASE}/2021-11-producao.zip",
+    "2021-12": f"{BASE}/2021-12-producao.zip",
+    "2022-01": f"{BASE}/2022/producao-2022-01.zip",
+    "2022-02": f"{BASE}/2022/producao-2022-02.zip",
+    "2022-03": f"{BASE}/2022/producao-2022-03.zip",
+    "2022-04": f"{BASE}/2022/producao-2022-04.zip",
+    "2022-05": f"{BASE}/2022/2022_05_producao.zip",
+    "2022-06": f"{BASE}/2022/producao-2022-06.zip",
+    "2022-07": f"{BASE}/2022/producao-2022-07.zip",
+    "2022-08": f"{BASE}/2022/producao-2022-08.zip",
+    "2022-09": f"{BASE}/2022/producao-2022-09.zip",
+    "2022-10": f"{BASE}/2022/producao-2022-10.zip",
+    "2022-11": f"{BASE}/2022/2022_11_producao.zip",
+    "2022-12": f"{BASE}/2022/2022_12_producao.zip",
+    "2023-01": f"{BASE}/2023/producao-01.zip",
+    "2023-02": f"{BASE}/2023/producao-02.zip",
+    "2023-03": f"{BASE}/2023/producao-03.zip",
+    "2023-04": f"{BASE}/2023/producao-04.zip",
+    "2023-05": f"{BASE}/2023/producao-05.zip",
+    "2023-06": f"{BASE}/2023/producao-06.zip",
+    "2023-07": f"{BASE}/2023/producao-07.zip",
+    "2023-08": f"{BASE}/2023/producao-08.zip",
+    "2023-09": f"{BASE}/2023/producao-09.zip",
+    "2023-10": f"{BASE}/2023/producao-10.zip",
+    "2023-11": f"{BASE}/2023/producao-11.zip",
+    "2023-12": f"{BASE}/2023/producao-12.zip",
+}
 
 SAIDA = Path(__file__).resolve().parent.parent / "backend" / "app" / "data" / "producao_mensal.json"
 
@@ -60,9 +95,7 @@ def main():
     base: dict[str, dict[str, dict[str, float]]] = {}
     avisos = []
     with httpx.Client(timeout=120, follow_redirects=True) as client:
-        for ano, mes in JANELA:
-            url = f"{BASE}/{ano}/producao-{ano}-{mes:02d}.zip"
-            periodo = f"{ano}-{mes:02d}"
+        for periodo, url in sorted(URLS.items()):
             try:
                 resp = client.get(url)
                 resp.raise_for_status()
@@ -84,7 +117,6 @@ def main():
                         entry["gas_mmd"] += parse_float(linha.get("Gás Natural (Mm³/dia)") or "0")
             print(f"OK {periodo}")
 
-    # Arredondar e montar estrutura final: {campo_normalizado: {periodo: {oleo_bpd, gas_mmd, campo}}}
     final = {}
     for chave, periodos in base.items():
         final[chave] = {}
@@ -98,7 +130,7 @@ def main():
     SAIDA.parent.mkdir(parents=True, exist_ok=True)
     SAIDA.write_text(json.dumps(final, ensure_ascii=False), encoding="utf-8")
     print(f"\nBase gerada: {SAIDA}")
-    print(f"Campos: {len(final)} | Períodos por campo: variável")
+    print(f"Campos: {len(final)}")
     if avisos:
         print("\nAvisos (meses sem ZIP):")
         for a in avisos:
