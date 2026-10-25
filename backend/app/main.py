@@ -1,42 +1,32 @@
-import os
-
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .database import Base, engine
-from .routers import data, dpp, platforms
-from .services.data_import import import_platforms_from_json
+from app.routers import platforms, onshore, refinarias, terminais_armazenamento, utgns_gas, ecomps_gasbol, dpp
 
-app = FastAPI(title="Petrobras Platform Comparator API", version="0.1.0")
+app = FastAPI(title="Petrobras Platform Comparator API")
 
-allowed_origins = os.getenv(
-    "CORS_ORIGINS",
-    "http://localhost:5173,https://petrobras-platform-comparator.vercel.app",
-).split(",")
-
+# CORS — permite a origem da Vercel e localhost para dev
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=allowed_origins,
-    allow_origin_regex=r"https://.*\.vercel\.app",
+    allow_origins=[
+        "https://petrobras-platform-comparator.vercel.app",
+        "http://localhost:5173",
+        "http://localhost:3000",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 app.include_router(platforms.router)
-app.include_router(data.router)
+app.include_router(onshore.router)
+app.include_router(refinarias.router)
+app.include_router(terminais_armazenamento.router)
+app.include_router(utgns_gas.router)
+app.include_router(ecomps_gasbol.router)
 app.include_router(dpp.router)
 
 
-@app.on_event("startup")
-def on_startup():
-    Base.metadata.create_all(bind=engine)
-    from .database import SessionLocal
-
-    with SessionLocal() as db:
-        import_platforms_from_json(db)
-
-
-@app.get("/api/health")
-def health():
-    return {"status": "ok"}
+@app.get("/")
+def root():
+    return {"status": "ok", "service": "petrobras-platform-comparator-api"}
