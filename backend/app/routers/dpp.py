@@ -1,8 +1,10 @@
 import asyncio
 import csv
 import io
+import sqlite3
 import unicodedata
 import zipfile
+from pathlib import Path
 
 import httpx
 from fastapi import APIRouter, HTTPException, Query
@@ -14,7 +16,6 @@ BASE = (
     "arquivos/arquivos-producao-de-petroleo-e-gas-natural-por-poco"
 )
 
-# URLs exatas dos ZIPs (padrões irregulares por período) — 2021-01 a 2023-12
 URLS = {
     "2021-01": f"{BASE}/2021_01_producao.zip",
     "2021-02": f"{BASE}/2021_02_producao.zip",
@@ -54,7 +55,9 @@ URLS = {
     "2023-12": f"{BASE}/2023/producao-12.zip",
 }
 
-# Cache em memória: URL do ZIP -> tupla de textos CSV
+DB_FILE = Path(__file__).resolve().parent / "data" / "producao.db"
+
+# Cache em memória: URL do ZIP -> tupla de textos CSV (fallback)
 _cache_zip: dict[str, tuple[str, ...]] = {}
 
 
@@ -123,9 +126,36 @@ def _agregar_por_campo(csvs: tuple[str, ...], campo: str) -> dict | None:
 
 
 def _janela(meses: int) -> list[str]:
-    """Retorna os últimos 'meses' períodos disponíveis em URLS (mais recentes primeiro)."""
     periodos = sorted(URLS.keys(), reverse=True)
     return periodos[:meses]
+
+
+def _serie_do_banco(campo: str, meses: int) -> list[dict] | None:
+    """Busca a série no SQLite. Retorna None se o banco não existir ou o campo não for encontrado."""
+    if not DB_FILE.exists():
+        return None
+    alvo = _normalizar(campo)
+    conn = sqlite3.connect(DB_FILE)
+    cur = conn.cursor()
+    # Match exato normalizado ou contenção
+    row = cur.execute(
+        "SELECT campo_norm FROM producao_mensal WHERE campo_norm = ? OR ? LIKE '%' || campo_norm || '%' OR campo_norm LIKE '%' || ? || '%' LIMIT 1",
+        (alvo, alvo, alvo),
+    ).fetchone()
+    if row is None:
+        conn.close()
+        return None
+    chave = row[0]
+    rows = cur.execute(
+        "SELECT periodo, campo, oleo_bpd, gas_mmd FROM producao_mensal WHERE campo_norm = ? ORDER BY periodo",
+        (chave,),
+    ).fetchall()
+    conn.close()
+    rows = rows[-meses:] if len(rows) > meses else rows
+    return [
+        {"periodo": r[0], "campo": r[1], "oleo_bpd": r[2], "gas_mmd": r[3]}
+        for r in rows
+    ]
 
 
 @router.get("/producao")
@@ -133,7 +163,11 @@ async def producao(
     campo: str = Query(..., description="Nome do campo de produção"),
     meses: int = Query(36, ge=1, le=36, description="Meses históricos (máx. 36)"),
 ):
-    """Série histórica por campo — ZIPs paralelos com URLs exatas (2021-2023)."""
+    """Série histórica por campo — prioriza banco SQLite (instantâneo); fallback: ZIPs paralelos."""
+    serie = _serie_do_banco(campo, meses)
+    if serie is not None:
+        return {"campo": campo, "meses": meses, "dados": serie, "avisos": [], "fonte": "banco_sqlite"}
+
     janela = _janela(meses)
     dados = []
     avisos = []
