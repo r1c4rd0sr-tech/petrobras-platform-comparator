@@ -1,10 +1,8 @@
 import asyncio
 import csv
 import io
-import json
 import unicodedata
 import zipfile
-from pathlib import Path
 
 import httpx
 from fastapi import APIRouter, HTTPException, Query
@@ -56,23 +54,8 @@ URLS = {
     "2023-12": f"{BASE}/2023/producao-12.zip",
 }
 
-DATA_FILE = Path(__file__).resolve().parent / "data" / "producao_mensal.json"
-
-# Cache em memória: URL do ZIP -> tupla de textos CSV (fallback)
+# Cache em memória: URL do ZIP -> tupla de textos CSV
 _cache_zip: dict[str, tuple[str, ...]] = {}
-
-# Base pré-agregada: {campo_normalizado: {periodo: {campo, oleo_bpd, gas_mmd}}}
-_base_producao: dict | None = None
-
-
-def _carregar_base() -> dict:
-    global _base_producao
-    if _base_producao is None:
-        if DATA_FILE.exists():
-            _base_producao = json.loads(DATA_FILE.read_text(encoding="utf-8"))
-        else:
-            _base_producao = {}
-    return _base_producao
 
 
 def _normalizar(texto: str) -> str:
@@ -145,41 +128,12 @@ def _janela(meses: int) -> list[str]:
     return periodos[:meses]
 
 
-def _serie_da_base(campo: str, meses: int) -> list[dict] | None:
-    base = _carregar_base()
-    if not base:
-        return None
-    alvo = _normalizar(campo)
-    chave_encontrada = None
-    for chave in base:
-        if chave == alvo or alvo in chave or chave in alvo:
-            chave_encontrada = chave
-            break
-    if chave_encontrada is None:
-        return None
-    periodos = sorted(base[chave_encontrada].keys())
-    periodos = periodos[-meses:] if len(periodos) > meses else periodos
-    return [
-        {
-            "periodo": p,
-            "campo": base[chave_encontrada][p]["campo"],
-            "oleo_bpd": base[chave_encontrada][p]["oleo_bpd"],
-            "gas_mmd": base[chave_encontrada][p]["gas_mmd"],
-        }
-        for p in periodos
-    ]
-
-
 @router.get("/producao")
 async def producao(
     campo: str = Query(..., description="Nome do campo de produção"),
     meses: int = Query(36, ge=1, le=36, description="Meses históricos (máx. 36)"),
 ):
-    """Série histórica por campo — prioriza base pré-agregada; fallback: ZIPs paralelos com URLs exatas."""
-    serie = _serie_da_base(campo, meses)
-    if serie is not None:
-        return {"campo": campo, "meses": meses, "dados": serie, "avisos": [], "fonte": "base_pre_agregada"}
-
+    """Série histórica por campo — ZIPs paralelos com URLs exatas (2021-2023)."""
     janela = _janela(meses)
     dados = []
     avisos = []
