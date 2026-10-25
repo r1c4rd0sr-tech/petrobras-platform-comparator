@@ -8,6 +8,13 @@ router = APIRouter(prefix="/api/dpp", tags=["dpp"])
 
 DB_FILE = Path(__file__).resolve().parent.parent / "data" / "producao.db"
 
+# Mapeamento de apelidos: nomes antigos -> nomes atuais no banco
+ALIASES = {
+    "lula": "tupi",
+    "santos": "tupi",
+    "tambu": "tambu",
+}
+
 
 def _normalizar(texto: str) -> str:
     sem_acento = unicodedata.normalize("NFD", texto)
@@ -24,6 +31,8 @@ async def producao(
     if not DB_FILE.exists():
         raise HTTPException(status_code=503, detail="Banco de dados de produção ainda não disponível.")
     alvo = _normalizar(campo)
+    # Aplica apelido se existir (ex.: Lula -> Tupi)
+    alvo = ALIASES.get(alvo, alvo)
     conn = sqlite3.connect(DB_FILE)
     cur = conn.cursor()
     row = cur.execute(
@@ -32,7 +41,14 @@ async def producao(
     ).fetchone()
     if row is None:
         conn.close()
-        raise HTTPException(status_code=404, detail=f"Campo '{campo}' não encontrado no banco de dados.")
+        # Fallback: retorna 200 com lista vazia em vez de 404 (não quebra o frontend)
+        return {
+            "campo": campo,
+            "meses": meses,
+            "dados": [],
+            "avisos": [f"Campo '{campo}' não encontrado no banco de dados."],
+            "fonte": "banco_sqlite",
+        }
     chave = row[0]
     rows = cur.execute(
         "SELECT periodo, campo, oleo_bpd, gas_mmd FROM producao_mensal WHERE campo_norm = ? ORDER BY periodo",
