@@ -5,14 +5,15 @@ from fastapi import APIRouter
 
 router = APIRouter(prefix="/api/dpp", tags=["dpp"])
 
-DB_FILE = Path(__file__).resolve().parent / "data" / "producao.db"
+# Correção: sobe dois níveis (routers/ -> app/) para encontrar backend/app/data/producao.db
+DB_FILE = Path(__file__).resolve().parent.parent / "data" / "producao.db"
 
 
 @router.get("/test")
 def test_banco():
     """Endpoint de teste: confirma que o banco SQLite existe e responde a consultas."""
     if not DB_FILE.exists():
-        return {"status": "erro", "mensagem": "Banco producao.db não encontrado."}
+        return {"status": "erro", "mensagem": f"Banco producao.db não encontrado em {DB_FILE}"}
     conn = sqlite3.connect(DB_FILE)
     cur = conn.cursor()
     total = cur.execute("SELECT COUNT(*) FROM producao_mensal").fetchone()[0]
@@ -24,6 +25,7 @@ def test_banco():
     conn.close()
     return {
         "status": "ok",
+        "caminho": str(DB_FILE),
         "total_registros": total,
         "campos_unicos": campos,
         "periodos_unicos": periodos,
