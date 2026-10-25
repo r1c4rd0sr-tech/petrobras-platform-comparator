@@ -1,3 +1,4 @@
+import asyncio
 import csv
 import io
 import json
@@ -15,10 +16,45 @@ BASE = (
     "arquivos/arquivos-producao-de-petroleo-e-gas-natural-por-poco"
 )
 
-JANELA_FIM_ANO = 2023
-JANELA_FIM_MES = 10
-JANELA_INICIO_ANO = 2021
-JANELA_INICIO_MES = 1
+# URLs exatas dos ZIPs (padrões irregulares por período) — 2021-01 a 2023-12
+URLS = {
+    "2021-01": f"{BASE}/2021_01_producao.zip",
+    "2021-02": f"{BASE}/2021_02_producao.zip",
+    "2021-03": f"{BASE}/2021_03_producao.zip",
+    "2021-04": f"{BASE}/2021_04_producao.zip",
+    "2021-05": f"{BASE}/2021_05_producao.zip",
+    "2021-06": f"{BASE}/2021_06_producao.zip",
+    "2021-07": f"{BASE}/2021_07_producao.zip",
+    "2021-08": f"{BASE}/2021-08-producao.zip",
+    "2021-09": f"{BASE}/2021-09-producao.zip",
+    "2021-10": f"{BASE}/2021-10-producao.zip",
+    "2021-11": f"{BASE}/2021-11-producao.zip",
+    "2021-12": f"{BASE}/2021-12-producao.zip",
+    "2022-01": f"{BASE}/2022/producao-2022-01.zip",
+    "2022-02": f"{BASE}/2022/producao-2022-02.zip",
+    "2022-03": f"{BASE}/2022/producao-2022-03.zip",
+    "2022-04": f"{BASE}/2022/producao-2022-04.zip",
+    "2022-05": f"{BASE}/2022/2022_05_producao.zip",
+    "2022-06": f"{BASE}/2022/producao-2022-06.zip",
+    "2022-07": f"{BASE}/2022/producao-2022-07.zip",
+    "2022-08": f"{BASE}/2022/producao-2022-08.zip",
+    "2022-09": f"{BASE}/2022/producao-2022-09.zip",
+    "2022-10": f"{BASE}/2022/producao-2022-10.zip",
+    "2022-11": f"{BASE}/2022/2022_11_producao.zip",
+    "2022-12": f"{BASE}/2022/2022_12_producao.zip",
+    "2023-01": f"{BASE}/2023/producao-01.zip",
+    "2023-02": f"{BASE}/2023/producao-02.zip",
+    "2023-03": f"{BASE}/2023/producao-03.zip",
+    "2023-04": f"{BASE}/2023/producao-04.zip",
+    "2023-05": f"{BASE}/2023/producao-05.zip",
+    "2023-06": f"{BASE}/2023/producao-06.zip",
+    "2023-07": f"{BASE}/2023/producao-07.zip",
+    "2023-08": f"{BASE}/2023/producao-08.zip",
+    "2023-09": f"{BASE}/2023/producao-09.zip",
+    "2023-10": f"{BASE}/2023/producao-10.zip",
+    "2023-11": f"{BASE}/2023/producao-11.zip",
+    "2023-12": f"{BASE}/2023/producao-12.zip",
+}
 
 DATA_FILE = Path(__file__).resolve().parent / "data" / "producao_mensal.json"
 
@@ -43,12 +79,6 @@ def _normalizar(texto: str) -> str:
     sem_acento = unicodedata.normalize("NFD", texto)
     sem_acento = "".join(c for c in sem_acento if unicodedata.category(c) != "Mn")
     return sem_acento.strip().casefold()
-
-
-def _url_zip(ano: int, mes: int | None) -> str:
-    if ano <= 2020:
-        return f"{BASE}/producao-por-poco-{ano}.zip"
-    return f"{BASE}/{ano}/producao-{ano}-{mes:02d}.zip"
 
 
 def _parse_float(value: str) -> float:
@@ -109,27 +139,17 @@ def _agregar_por_campo(csvs: tuple[str, ...], campo: str) -> dict | None:
     return {"periodo": periodo, "campo": campo, "oleo_bpd": round(total_oleo, 2), "gas_mmd": round(total_gas, 3)}
 
 
-def _janela(meses: int) -> list[tuple[int, int]]:
-    pares = []
-    ano, mes = JANELA_FIM_ANO, JANELA_FIM_MES
-    while (ano > JANELA_INICIO_ANO) or (ano == JANELA_INICIO_ANO and mes >= JANELA_INICIO_MES):
-        pares.append((ano, mes))
-        if len(pares) >= meses:
-            break
-        mes -= 1
-        if mes == 0:
-            mes = 12
-            ano -= 1
-    return pares
+def _janela(meses: int) -> list[str]:
+    """Retorna os últimos 'meses' períodos disponíveis em URLS (mais recentes primeiro)."""
+    periodos = sorted(URLS.keys(), reverse=True)
+    return periodos[:meses]
 
 
 def _serie_da_base(campo: str, meses: int) -> list[dict] | None:
-    """Busca a série no JSON pré-agregado. Retorna None se o campo não existir na base."""
     base = _carregar_base()
     if not base:
         return None
     alvo = _normalizar(campo)
-    # Match exato normalizado ou contenção
     chave_encontrada = None
     for chave in base:
         if chave == alvo or alvo in chave or chave in alvo:
@@ -138,7 +158,6 @@ def _serie_da_base(campo: str, meses: int) -> list[dict] | None:
     if chave_encontrada is None:
         return None
     periodos = sorted(base[chave_encontrada].keys())
-    # Pegar os últimos 'meses' períodos disponíveis
     periodos = periodos[-meses:] if len(periodos) > meses else periodos
     return [
         {
@@ -154,43 +173,23 @@ def _serie_da_base(campo: str, meses: int) -> list[dict] | None:
 @router.get("/producao")
 async def producao(
     campo: str = Query(..., description="Nome do campo de produção"),
-    meses: int = Query(36, ge=1, le=36, description="Meses históricos (máx. 33)"),
-    ano: int | None = Query(None, description="Ano específico para teste pontual"),
-    mes: int | None = Query(None, ge=1, le=12, description="Mês específico para teste pontual"),
+    meses: int = Query(36, ge=1, le=36, description="Meses históricos (máx. 36)"),
 ):
-    """Série histórica por campo — prioriza base pré-agregada (instantâneo); fallback: ZIPs paralelos."""
-    # 1) Tentar base pré-agregada (instantâneo)
+    """Série histórica por campo — prioriza base pré-agregada; fallback: ZIPs paralelos com URLs exatas."""
     serie = _serie_da_base(campo, meses)
     if serie is not None:
         return {"campo": campo, "meses": meses, "dados": serie, "avisos": [], "fonte": "base_pre_agregada"}
-
-    # 2) Fallback: baixar ZIPs em paralelo (se base não existir ou campo não encontrado)
-    if ano and mes:
-        url = _url_zip(ano, mes)
-        try:
-            async with httpx.AsyncClient(timeout=60, follow_redirects=True) as client:
-                csvs = await _csvs_de_zip(client, url)
-            registro = _agregar_por_campo(csvs, campo)
-            return {
-                "campo": campo,
-                "periodo": f"{ano}-{mes:02d}",
-                "dados": [registro] if registro else [],
-                "avisos": [] if registro else ["Campo não encontrado nos CSVs deste mês"],
-                "fonte": "zip_anp",
-            }
-        except Exception as e:
-            raise HTTPException(status_code=502, detail=f"Falha ao consultar ZIP {ano}-{mes:02d}: {e}")
 
     janela = _janela(meses)
     dados = []
     avisos = []
     async with httpx.AsyncClient(timeout=60, follow_redirects=True) as client:
-        tarefas = [_csvs_de_zip(client, _url_zip(a, m)) for a, m in janela]
+        tarefas = [_csvs_de_zip(client, URLS[p]) for p in janela]
         resultados = await asyncio.gather(*tarefas, return_exceptions=True)
 
-    for (a, m), res in zip(janela, resultados):
+    for periodo, res in zip(janela, resultados):
         if isinstance(res, Exception):
-            avisos.append(f"{a}-{m:02d}: {res}")
+            avisos.append(f"{periodo}: {res}")
             continue
         registro = _agregar_por_campo(res, campo)
         if registro:
@@ -201,8 +200,10 @@ async def producao(
 
 
 @router.get("/debug")
-async def debug(ano: int = Query(...), mes: int = Query(..., ge=1, le=12)):
-    url = _url_zip(ano, mes)
+async def debug(periodo: str = Query(..., description="Período no formato YYYY-MM")):
+    url = URLS.get(periodo)
+    if not url:
+        raise HTTPException(status_code=404, detail=f"Período {periodo} não disponível")
     try:
         async with httpx.AsyncClient(timeout=60, follow_redirects=True) as client:
             csvs = await _csvs_de_zip(client, url)
