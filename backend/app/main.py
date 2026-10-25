@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .routers import platforms, data, dpp
+from .routers import platforms, data, dpp, refino
 
 app = FastAPI(title="Petrobras Platform Comparator API")
 
@@ -17,6 +17,7 @@ app.add_middleware(
 app.include_router(platforms.router)
 app.include_router(data.router)
 app.include_router(dpp.router)
+app.include_router(refino.router)
 
 
 @app.get("/")
