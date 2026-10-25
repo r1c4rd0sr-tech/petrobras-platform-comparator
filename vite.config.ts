@@ -12,7 +12,7 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: "index.html",
-        temporal: "frontend/temporal.html",
+        temporal: "temporal.html",
       },
     },
   },
