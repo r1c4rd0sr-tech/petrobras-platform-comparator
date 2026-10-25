@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-"""Gera backend/data/refino.db a partir dos CSVs da ANP."""
+"""Gera backend/data/refino.db a partir dos CSVs da ANP.
+
+Tabelas usadas:
+- tabela2-34: capacidade de refino por refinaria
+- tabela2-36: carga processada por origem
+"""
 from __future__ import annotations
 
 import sqlite3
@@ -10,14 +15,10 @@ import pandas as pd
 PASTA = Path("backend/data/anp")
 BANCO = Path("backend/data/refino.db")
 
-
-def achar_csv(padrao: str) -> Path | None:
-    if not PASTA.exists():
-        return None
-    for arquivo in sorted(PASTA.glob("*.csv")):
-        if padrao.lower() in arquivo.name.lower():
-            return arquivo
-    return None
+TABELAS = {
+    "capacidade_refino_bruto": "anuario-2026-dados_abertos-tabela2-34.csv",
+    "carga_processada_bruto": "anuario-2026-dados_abertos-tabela2-36.csv",
+}
 
 
 def criar_tabelas(con: sqlite3.Connection) -> None:
@@ -48,22 +49,21 @@ def criar_tabelas(con: sqlite3.Connection) -> None:
     )
 
 
-def importar_csv(con: sqlite3.Connection, caminho: Path | None, tabela: str) -> None:
-    if not caminho:
-        print(f"Aviso: CSV para {tabela} não encontrado.")
-        return
-    df = pd.read_csv(caminho, sep=None, engine="python", encoding="utf-8-sig")
-    df.columns = [str(c).strip() for c in df.columns]
-    df.to_sql(tabela + "_bruto", con, if_exists="replace", index=False)
-    print(f"Importado {tabela}_bruto: {len(df)} linhas de {caminho.name}")
-
-
 def main() -> None:
     BANCO.parent.mkdir(parents=True, exist_ok=True)
     con = sqlite3.connect(BANCO)
     criar_tabelas(con)
-    importar_csv(con, achar_csv("capacidade"), "capacidade_refino")
-    importar_csv(con, achar_csv("carga"), "carga_processada")
+
+    for tabela, nome_arquivo in TABELAS.items():
+        caminho = PASTA / nome_arquivo
+        if not caminho.exists():
+            print(f"Aviso: arquivo não encontrado: {nome_arquivo}")
+            continue
+        df = pd.read_csv(caminho, sep=None, engine="python", encoding="utf-8-sig")
+        df.columns = [str(c).strip() for c in df.columns]
+        df.to_sql(tabela, con, if_exists="replace", index=False)
+        print(f"Importado {tabela}: {len(df)} linhas de {caminho.name}")
+
     con.commit()
     con.close()
     print(f"Banco criado: {BANCO}")

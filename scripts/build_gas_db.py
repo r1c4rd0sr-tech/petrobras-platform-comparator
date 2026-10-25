@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-"""Gera backend/data/gas.db a partir dos CSVs da ANP."""
+"""Gera backend/data/gas.db a partir dos CSVs da ANP.
+
+Tabelas usadas:
+- tabela2-39: capacidade de processamento de gás natural por polo
+- tabela2-41: volumes processados e produção de derivados
+"""
 from __future__ import annotations
 
 import sqlite3
@@ -10,14 +15,10 @@ import pandas as pd
 PASTA = Path("backend/data/anp")
 BANCO = Path("backend/data/gas.db")
 
-
-def achar_csv(padrao: str) -> Path | None:
-    if not PASTA.exists():
-        return None
-    for arquivo in sorted(PASTA.glob("*.csv")):
-        if padrao.lower() in arquivo.name.lower():
-            return arquivo
-    return None
+TABELAS = {
+    "capacidade_processamento_bruto": "anuario-2026-dados_abertos-tabela2-39.csv",
+    "volumes_processados_bruto": "anuario-2026-dados_abertos-tabela2-41.csv",
+}
 
 
 def main() -> None:
@@ -54,19 +55,15 @@ def main() -> None:
         """
     )
 
-    for padrao, tabela in [
-        ("capacidade", "capacidade_processamento"),
-        ("processado", "volumes_processados"),
-        ("producao", "producao_derivados"),
-    ]:
-        caminho = achar_csv(padrao)
-        if caminho:
-            df = pd.read_csv(caminho, sep=None, engine="python", encoding="utf-8-sig")
-            df.columns = [str(c).strip() for c in df.columns]
-            df.to_sql(tabela + "_bruto", con, if_exists="replace", index=False)
-            print(f"Importado {tabela}_bruto: {len(df)} linhas de {caminho.name}")
-        else:
-            print(f"Aviso: CSV para {tabela} não encontrado.")
+    for tabela, nome_arquivo in TABELAS.items():
+        caminho = PASTA / nome_arquivo
+        if not caminho.exists():
+            print(f"Aviso: arquivo não encontrado: {nome_arquivo}")
+            continue
+        df = pd.read_csv(caminho, sep=None, engine="python", encoding="utf-8-sig")
+        df.columns = [str(c).strip() for c in df.columns]
+        df.to_sql(tabela, con, if_exists="replace", index=False)
+        print(f"Importado {tabela}: {len(df)} linhas de {caminho.name}")
 
     con.commit()
     con.close()
