@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { useMap } from "react-leaflet";
-import { Bar, BarChart, CartesianGrid, Cell, Legend, Pie, PieChart, PolarAngleAxis, PolarGrid, PolarRadiusAxis, Radar, RadarChart, ResponsiveContainer, Scatter, ScatterChart, Tooltip, XAxis, YAxis, ZAxis } from "recharts";
+import { Bar, BarChart, CartesianGrid, Cell, Legend, Line, LineChart, Pie, PieChart, PolarAngleAxis, PolarGrid, PolarRadiusAxis, Radar, RadarChart, ResponsiveContainer, Scatter, ScatterChart, Tooltip, XAxis, YAxis, ZAxis } from "recharts";
 import { MapContainer, Marker, Popup, TileLayer, Tooltip as LeafletTooltip } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { fetchPlatforms, fetchOnshore, fetchRefinarias, fetchTerminaisArmazenamento, fetchUtgnsGas, fetchEcompsGasbol } from "./api";
+import { fetchPlatforms, fetchOnshore, fetchRefinarias, fetchTerminaisArmazenamento, fetchUtgnsGas, fetchEcompsGasbol, fetchProducaoHistorica } from "./api";
 import { POB_OVERRIDES } from "./pob-overrides";
 import type { Platform } from "./types";
 import onshoreData from "./data/onshore.json";
@@ -32,6 +32,8 @@ const TOOLTIP_UNIT_MAP: Record<string, string> = {
   "Campos": "",
   "BOE/poço": " /d por poço",
   "Óleo/acomodação": " bpd por pessoa",
+  "Óleo (bpd)": " bpd",
+  "Gás (Mm³/dia)": " Mm³/dia",
 };
 
 const CustomTooltip = ({ active, payload, label }: any) => {
@@ -173,6 +175,10 @@ export default function App() {
   const [isMobile, setIsMobile] = useState(typeof window !== "undefined" ? window.innerWidth < 768 : false);
   const [showHeatmap, setShowHeatmap] = useState(false);
   const [filters, setFilters] = useState({ search: "", status: "", unit_type: "", basin: "", field: "", operator: "", state: "", municipality: "", oil: "", gas: "", year: "", accommodation: "", wells: "", storage: "", sort: "oil" });
+  const [serieData, setSerieData] = useState<any[]>([]);
+  const [serieCampos, setSerieCampos] = useState<string[]>([]);
+  const [serieStatus, setSerieStatus] = useState<"idle" | "loading" | "ok" | "erro">("idle");
+  const [serieErro, setSerieErro] = useState("");
 
   const [onshoreUnits, setOnshoreUnits] = useState<Platform[]>(onshoreData as unknown as Platform[]);
   const [refinariasUnits, setRefinariasUnits] = useState<Platform[]>(refinariasData as unknown as Platform[]);
@@ -382,6 +388,51 @@ export default function App() {
   const set = (key: keyof typeof filters, value: string) => setFilters((f) => ({ ...f, [key]: value }));
   const resetFilters = () => setFilters({ search: "", status: "", unit_type: "", basin: "", field: "", operator: "", state: "", municipality: "", oil: "", gas: "", year: "", accommodation: "", wells: "", storage: "", sort: "oil" });
   const pinColor = (id: number) => PIN_COLORS[selected.findIndex((s) => s.id === id) % PIN_COLORS.length];
+
+  const carregarSerie = async () => {
+    const campos = [...new Set(selected.map((p) => p.field).filter(Boolean) as string[])];
+    if (campos.length === 0) { window.alert("Nenhuma unidade selecionada possui campo informado."); return; }
+    setSerieStatus("loading");
+    setSerieErro("");
+    setSerieData([]);
+    setSerieCampos([]);
+    try {
+      const resultados = await Promise.all(
+        campos.map((campo) =>
+          fetchProducaoHistorica(campo, 36)
+            .then((raw) => ({ campo, dados: raw.dados || [] }))
+            .catch(() => ({ campo, dados: [] }))
+        )
+      );
+      const mapa: Record<string, any[]> = {};
+      resultados.forEach(({ campo, dados }) => { if (dados.length > 0) mapa[campo] = dados; });
+      const camposComDados = Object.keys(mapa);
+      if (camposComDados.length === 0) {
+        setSerieStatus("erro");
+        setSerieErro("Nenhum dos campos selecionados retornou dados históricos.");
+        return;
+      }
+      const periodos = new Set<string>();
+      camposComDados.forEach((c) => (mapa[c] || []).forEach((r: any) => { if (r?.periodo) periodos.add(String(r.periodo)); }));
+      const consolidada = Array.from(periodos).sort().map((periodo) => {
+        const entry: any = { periodo };
+        camposComDados.forEach((campo) => {
+          const row = (mapa[campo] || []).find((r: any) => String(r?.periodo) === periodo);
+          if (row) {
+            entry[`oleo_${campo}`] = row.oleo_bpd;
+            entry[`gas_${campo}`] = row.gas_mmd;
+          }
+        });
+        return entry;
+      });
+      setSerieData(consolidada);
+      setSerieCampos(camposComDados);
+      setSerieStatus("ok");
+    } catch (e: any) {
+      setSerieErro(e?.message || "Erro desconhecido");
+      setSerieStatus("erro");
+    }
+  };
 
   const exportCSV = () => {
     if (selected.length === 0) { window.alert("Selecione pelo menos uma unidade para exportar."); return; }
@@ -629,7 +680,7 @@ export default function App() {
 
           <section className="panel" style={{ marginTop: 18 }}>
             <div className="tabs">
-              {["comparativo", "estatisticas", "graficos", "radar"].map((x) => <button key={x} className={`tab ${tab === x ? "active" : ""}`} onClick={() => setTab(x)}>{x === "radar" ? "Radar" : x === "estatisticas" ? "Estatísticas" : x.charAt(0).toUpperCase() + x.slice(1)}</button>)}
+              {["comparativo", "estatisticas", "graficos", "radar", "temporal"].map((x) => <button key={x} className={`tab ${tab === x ? "active" : ""}`} onClick={() => setTab(x)}>{x === "temporal" ? "Temporal" : x === "radar" ? "Radar" : x === "estatisticas" ? "Estatísticas" : x.charAt(0).toUpperCase() + x.slice(1)}</button>)}
             </div>
             <div className="panel-body">
               {tab === "comparativo" && (
@@ -917,6 +968,52 @@ export default function App() {
                         </ResponsiveContainer>
                       </div>
                     </div>
+                  )}
+                </div>
+              )}
+              {tab === "temporal" && (
+                <div className="charts">
+                  <h3>Série Temporal — produção mensal por campo ({selected.length}/10)</h3>
+                  <p style={{ color: axisColor, fontSize: 13 }}>Fonte: banco de dados próprio (SQLite) a partir dos dados abertos da ANP (2021-2023). Óleo em bbl/dia; gás em Mm³/dia.</p>
+                  {selected.length === 0 && <p style={{ color: axisColor }}>Selecione unidades na lista à esquerda para carregar a série temporal.</p>}
+                  {selected.length > 0 && (
+                    <>
+                      <button style={{ ...actionBtnStyle, background: "#008542", color: "#fff" }} onClick={carregarSerie} disabled={serieStatus === "loading"}>
+                        {serieStatus === "loading" ? "Carregando série..." : "📈 Carregar série temporal"}
+                      </button>
+                      {serieStatus === "erro" && <p style={{ color: "#e30613", marginTop: 8 }}>Erro: {serieErro}</p>}
+                      {serieStatus === "ok" && serieCampos.length === 0 && <p style={{ color: axisColor, marginTop: 8 }}>Nenhum dos campos selecionados retornou dados históricos.</p>}
+                      {serieCampos.length > 0 && (
+                        <>
+                          <h5 style={{ color: isDark ? "#fff" : "#0c2340", margin: "16px 0 4px" }}>Óleo (bbl/dia)</h5>
+                          <ResponsiveContainer width="100%" height={isMobile ? 260 : 320}>
+                            <LineChart data={serieData}>
+                              <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
+                              <XAxis dataKey="periodo" stroke={axisColor} fontSize={11} />
+                              <YAxis stroke={axisColor} />
+                              <Tooltip content={<CustomTooltip />} />
+                              <Legend />
+                              {serieCampos.map((campo, i) => (
+                                <Line key={campo} type="monotone" dataKey={`oleo_${campo}`} name={`${campo} — Óleo`} stroke={PIN_COLORS[i % PIN_COLORS.length]} strokeWidth={2} dot={false} />
+                              ))}
+                            </LineChart>
+                          </ResponsiveContainer>
+                          <h5 style={{ color: isDark ? "#fff" : "#0c2340", margin: "16px 0 4px" }}>Gás (Mm³/dia)</h5>
+                          <ResponsiveContainer width="100%" height={isMobile ? 260 : 320}>
+                            <LineChart data={serieData}>
+                              <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
+                              <XAxis dataKey="periodo" stroke={axisColor} fontSize={11} />
+                              <YAxis stroke={axisColor} />
+                              <Tooltip content={<CustomTooltip />} />
+                              <Legend />
+                              {serieCampos.map((campo, i) => (
+                                <Line key={campo} type="monotone" dataKey={`gas_${campo}`} name={`${campo} — Gás`} stroke={PIN_COLORS[i % PIN_COLORS.length]} strokeWidth={2} dot={false} />
+                              ))}
+                            </LineChart>
+                          </ResponsiveContainer>
+                        </>
+                      )}
+                    </>
                   )}
                 </div>
               )}
