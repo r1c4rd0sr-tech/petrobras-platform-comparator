@@ -1,12 +1,14 @@
 """
 Script de ingestão 2024-2026: baixa os CSVs da ANP (mar por ano, terra por trimestre),
-detecta colunas automaticamente e insere no banco backend/app/data/producao.db.
+detecta colunas com colchetes e converte unidades (óleo m³ -> bbl/dia; gás Mm³ mensal -> Mm³/dia).
 
 Uso:
     python scripts/gerar_base_2024.py
 """
+import calendar
 import csv
 import io
+import re
 import sqlite3
 import unicodedata
 from pathlib import Path
@@ -37,6 +39,8 @@ URLS = {
 
 SAIDA = Path(__file__).resolve().parent.parent / "backend" / "app" / "data" / "producao.db"
 
+M3_PARA_BBL = 6.28981  # 1 m³ = 6.28981 bbl
+
 
 def normalizar(texto: str) -> str:
     sem_acento = unicodedata.normalize("NFD", texto)
@@ -45,18 +49,20 @@ def normalizar(texto: str) -> str:
 
 
 def detectar_colunas(cabecalho: list[str]) -> dict:
-    """Detecta colunas de campo, período, óleo e gás por heurística de nome."""
+    """Detecta colunas com colchetes: [Campo], [Mês/Ano], [Produção de Óleo (m³)], [Produção de Gás Associado (Mm³)], [Produção de Gás Não Associado (Mm³)]."""
     mapa = {}
     for col in cabecalho:
         c = normalizar(col)
-        if "campo" in c and "campo" not in mapa:
+        if c == "[campo]" and "campo" not in mapa:
             mapa["campo"] = col
-        elif ("periodo" in c or "mes" in c or "competencia" in c) and "periodo" not in mapa:
+        elif c == "[mes/ano]" and "periodo" not in mapa:
             mapa["periodo"] = col
-        elif ("oleo" in c or "petroleo" in c) and "bbl" in c and "oleo" not in mapa:
+        elif "producao de oleo" in c and "oleo" not in mapa:
             mapa["oleo"] = col
-        elif ("gas" in c) and ("mm3" in c or "m3" in c) and "gas" not in mapa:
-            mapa["gas"] = col
+        elif "producao de gas associado" in c and "gas_assoc" not in mapa:
+            mapa["gas_assoc"] = col
+        elif "producao de gas nao associado" in c and "gas_nao_assoc" not in mapa:
+            mapa["gas_nao_assoc"] = col
     return mapa
 
 
@@ -81,24 +87,28 @@ def dict_reader(texto: str):
     return csv.DictReader(io.StringIO(texto), delimiter=delim)
 
 
-def extrair_periodo(valor: str) -> str:
-    """Extrai período no formato YYYY-MM a partir de valores como 'jan/2024', '01/2024', etc."""
+def extrair_periodo(valor: str) -> tuple[str, int] | None:
+    """Extrai (YYYY-MM, dias_no_mes) a partir de valores como 'jan/2024', '01/2024', etc."""
     v = normalizar(valor)
-    meses = {"jan": "01", "fev": "02", "mar": "03", "abr": "04", "mai": "05", "jun": "06", "jul": "07", "ago": "08", "set": "09", "out": "10", "nov": "11", "dez": "12"}
+    meses = {"jan": 1, "fev": 2, "mar": 3, "abr": 4, "mai": 5, "jun": 6, "jul": 7, "ago": 8, "set": 9, "out": 10, "nov": 11, "dez": 12}
     for k, m in meses.items():
         if k in v:
             ano = "".join(ch for ch in v if ch.isdigit())
             if len(ano) >= 4:
-                return f"{ano[:4]}-{m}"
-    # Tenta formato MM/YYYY ou YYYY-MM
-    import re
+                ano_int = int(ano[:4])
+                dias = calendar.monthrange(ano_int, m)[1]
+                return f"{ano_int}-{m:02d}", dias
     match = re.search(r"(\d{1,2})/(\d{4})", valor)
     if match:
-        return f"{match.group(2)}-{match.group(1).zfill(2)}"
+        mes, ano = int(match.group(1)), int(match.group(2))
+        dias = calendar.monthrange(ano, mes)[1]
+        return f"{ano}-{mes:02d}", dias
     match = re.search(r"(\d{4})-(\d{1,2})", valor)
     if match:
-        return f"{match.group(1)}-{match.group(2).zfill(2)}"
-    return valor
+        ano, mes = int(match.group(1)), int(match.group(2))
+        dias = calendar.monthrange(ano, mes)[1]
+        return f"{ano}-{mes:02d}", dias
+    return None
 
 
 def main():
@@ -120,7 +130,7 @@ def main():
             leitor = dict_reader(texto)
             cabecalho = leitor.fieldnames or []
             mapa = detectar_colunas(cabecalho)
-            if not all(k in mapa for k in ("campo", "periodo", "oleo", "gas")):
+            if not all(k in mapa for k in ("campo", "periodo", "oleo", "gas_assoc", "gas_nao_assoc")):
                 avisos.append(f"{rotulo}: colunas não detectadas — cabeçalho: {cabecalho}")
                 continue
             inseridos = 0
@@ -129,18 +139,24 @@ def main():
                 periodo_raw = (linha.get(mapa["periodo"]) or "").strip()
                 if not campo or not periodo_raw:
                     continue
-                periodo = extrair_periodo(periodo_raw)
+                periodo_dias = extrair_periodo(periodo_raw)
+                if periodo_dias is None:
+                    continue
+                periodo, dias = periodo_dias
                 chave = normalizar(campo)
-                oleo = parse_float(linha.get(mapa["oleo"]) or "0")
-                gas = parse_float(linha.get(mapa["gas"]) or "0")
-                # Acumular se o mesmo campo/período aparecer mais de uma vez (ex.: vários poços)
+                oleo_m3 = parse_float(linha.get(mapa["oleo"]) or "0")
+                gas_assoc = parse_float(linha.get(mapa["gas_assoc"]) or "0")
+                gas_nao_assoc = parse_float(linha.get(mapa["gas_nao_assoc"]) or "0")
+                # Conversão: óleo m³ mensal -> bbl/dia; gás Mm³ mensal -> Mm³/dia
+                oleo_bpd = round((oleo_m3 * M3_PARA_BBL) / dias, 2)
+                gas_mmd = round((gas_assoc + gas_nao_assoc) / dias, 3)
                 existente = cur.execute(
                     "SELECT oleo_bpd, gas_mmd FROM producao_mensal WHERE periodo = ? AND campo_norm = ?",
                     (periodo, chave),
                 ).fetchone()
                 if existente:
-                    novo_oleo = round(existente[0] + oleo, 2)
-                    novo_gas = round(existente[1] + gas, 3)
+                    novo_oleo = round(existente[0] + oleo_bpd, 2)
+                    novo_gas = round(existente[1] + gas_mmd, 3)
                     cur.execute(
                         "UPDATE producao_mensal SET oleo_bpd = ?, gas_mmd = ? WHERE periodo = ? AND campo_norm = ?",
                         (novo_oleo, novo_gas, periodo, chave),
@@ -148,7 +164,7 @@ def main():
                 else:
                     cur.execute(
                         "INSERT INTO producao_mensal (periodo, campo, campo_norm, oleo_bpd, gas_mmd) VALUES (?, ?, ?, ?, ?)",
-                        (periodo, campo, chave, round(oleo, 2), round(gas, 3)),
+                        (periodo, campo, chave, oleo_bpd, gas_mmd),
                     )
                 inseridos += 1
             conn.commit()
