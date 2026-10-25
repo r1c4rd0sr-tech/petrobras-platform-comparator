@@ -175,9 +175,10 @@ export default function App() {
   const [isMobile, setIsMobile] = useState(typeof window !== "undefined" ? window.innerWidth < 768 : false);
   const [showHeatmap, setShowHeatmap] = useState(false);
   const [filters, setFilters] = useState({ search: "", status: "", unit_type: "", basin: "", field: "", operator: "", state: "", municipality: "", oil: "", gas: "", year: "", accommodation: "", wells: "", storage: "", sort: "oil" });
-  const [dppSerie, setDppSerie] = useState<Record<string, any[]>>({});
-  const [dppStatus, setDppStatus] = useState<"idle" | "loading" | "ok" | "erro">("idle");
-  const [dppErro, setDppErro] = useState("");
+  const [serieData, setSerieData] = useState<any[]>([]);
+  const [serieCampos, setSerieCampos] = useState<string[]>([]);
+  const [serieStatus, setSerieStatus] = useState<"idle" | "loading" | "ok" | "erro">("idle");
+  const [serieErro, setSerieErro] = useState("");
 
   const [onshoreUnits, setOnshoreUnits] = useState<Platform[]>(onshoreData as unknown as Platform[]);
   const [refinariasUnits, setRefinariasUnits] = useState<Platform[]>(refinariasData as unknown as Platform[]);
@@ -391,9 +392,10 @@ export default function App() {
   const carregarSerie = async () => {
     const campos = [...new Set(selected.map((p) => p.field).filter(Boolean) as string[])];
     if (campos.length === 0) { window.alert("Nenhuma unidade selecionada possui campo informado."); return; }
-    setDppStatus("loading");
-    setDppErro("");
-    setDppSerie({});
+    setSerieStatus("loading");
+    setSerieErro("");
+    setSerieData([]);
+    setSerieCampos([]);
     try {
       const resultados = await Promise.all(
         campos.map((campo) =>
@@ -404,14 +406,32 @@ export default function App() {
       );
       const mapa: Record<string, any[]> = {};
       resultados.forEach(({ campo, dados }) => { if (dados.length > 0) mapa[campo] = dados; });
-      setDppSerie(mapa);
-      setDppStatus("ok");
-      if (Object.keys(mapa).length === 0) {
-        setDppErro("Nenhum dos campos selecionados retornou dados históricos.");
+      const camposComDados = Object.keys(mapa);
+      if (camposComDados.length === 0) {
+        setSerieStatus("erro");
+        setSerieErro("Nenhum dos campos selecionados retornou dados históricos.");
+        return;
       }
+      // Consolidar em linhas por período
+      const periodos = new Set<string>();
+      camposComDados.forEach((c) => (mapa[c] || []).forEach((r: any) => { if (r?.periodo) periodos.add(String(r.periodo)); }));
+      const consolidada = Array.from(periodos).sort().map((periodo) => {
+        const entry: any = { periodo };
+        camposComDados.forEach((campo) => {
+          const row = (mapa[campo] || []).find((r: any) => String(r?.periodo) === periodo);
+          if (row) {
+            entry[`oleo_${campo}`] = row.oleo_bpd;
+            entry[`gas_${campo}`] = row.gas_mmd;
+          }
+        });
+        return entry;
+      });
+      setSerieData(consolidada);
+      setSerieCampos(camposComDados);
+      setSerieStatus("ok");
     } catch (e: any) {
-      setDppErro(e?.message || "Erro desconhecido");
-      setDppStatus("erro");
+      setSerieErro(e?.message || "Erro desconhecido");
+      setSerieStatus("erro");
     }
   };
 
@@ -470,25 +490,6 @@ export default function App() {
   const rankStrongColor = isDark ? "#fff" : "#0c2340";
   const chartRowStyle: React.CSSProperties = { display: "flex", gap: 16, flexWrap: "wrap", marginBottom: 24, flexDirection: isMobile ? "column" : "row" };
   const actionBtnStyle: React.CSSProperties = { padding: "8px 14px", borderRadius: 8, border: "1px solid #2a4a6b", background: isDark ? "#123a5c" : "#e8eef4", color: isDark ? "#fff" : "#0c2340", fontSize: 13, cursor: "pointer", transition: "all .2s" };
-
-  // Consolidar séries de múltiplos campos em linhas por período
-  const serieCampos = useMemo(() => Object.keys(dppSerie).filter((c) => (dppSerie[c] || []).length > 0), [dppSerie]);
-  const serieConsolidada = useMemo(() => {
-    if (serieCampos.length === 0) return [];
-    const periodos = new Set<string>();
-    serieCampos.forEach((c) => (dppSerie[c] || []).forEach((r: any) => { if (r?.periodo) periodos.add(String(r.periodo)); }));
-    return Array.from(periodos).sort().map((periodo) => {
-      const entry: any = { periodo };
-      serieCampos.forEach((campo) => {
-        const row = (dppSerie[campo] || []).find((r: any) => String(r?.periodo) === periodo);
-        if (row) {
-          entry[`oleo_${campo}`] = row.oleo_bpd;
-          entry[`gas_${campo}`] = row.gas_mmd;
-        }
-      });
-      return entry;
-    });
-  }, [dppSerie, serieCampos]);
 
   return (
     <div className="app">
@@ -974,18 +975,18 @@ export default function App() {
                         <div style={chartBoxStyle}>
                           <h4 style={chartTitleStyle}>Série Temporal — produção mensal por campo</h4>
                           <p style={{ color: axisColor, fontSize: 12, marginTop: 0 }}>
-                            Fonte: dados abertos da ANP (produção por poço, agregada por campo). Cobertura: 2021–2023. Óleo em bbl/dia; gás em Mm³/dia.
+                            Fonte: banco de dados próprio (SQLite) a partir dos dados abertos da ANP (2021-2023). Óleo em bbl/dia; gás em Mm³/dia.
                           </p>
-                          <button style={{ ...actionBtnStyle, background: "#008542", color: "#fff" }} onClick={carregarSerie} disabled={dppStatus === "loading"}>
-                            {dppStatus === "loading" ? "Carregando série..." : "📈 Carregar série temporal"}
+                          <button style={{ ...actionBtnStyle, background: "#008542", color: "#fff" }} onClick={carregarSerie} disabled={serieStatus === "loading"}>
+                            {serieStatus === "loading" ? "Carregando série..." : "📈 Carregar série temporal"}
                           </button>
-                          {dppStatus === "erro" && <p style={{ color: "#e30613", marginTop: 8 }}>Erro: {dppErro}</p>}
-                          {dppStatus === "ok" && serieCampos.length === 0 && <p style={{ color: axisColor, marginTop: 8 }}>Nenhum dos campos selecionados retornou dados históricos.</p>}
+                          {serieStatus === "erro" && <p style={{ color: "#e30613", marginTop: 8 }}>Erro: {serieErro}</p>}
+                          {serieStatus === "ok" && serieCampos.length === 0 && <p style={{ color: axisColor, marginTop: 8 }}>Nenhum dos campos selecionados retornou dados históricos.</p>}
                           {serieCampos.length > 0 && (
                             <>
                               <h5 style={{ color: isDark ? "#fff" : "#0c2340", margin: "16px 0 4px" }}>Óleo (bbl/dia)</h5>
                               <ResponsiveContainer width="100%" height={isMobile ? 260 : 320}>
-                                <LineChart data={serieConsolidada}>
+                                <LineChart data={serieData}>
                                   <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
                                   <XAxis dataKey="periodo" stroke={axisColor} fontSize={11} />
                                   <YAxis stroke={axisColor} />
@@ -998,7 +999,7 @@ export default function App() {
                               </ResponsiveContainer>
                               <h5 style={{ color: isDark ? "#fff" : "#0c2340", margin: "16px 0 4px" }}>Gás (Mm³/dia)</h5>
                               <ResponsiveContainer width="100%" height={isMobile ? 260 : 320}>
-                                <LineChart data={serieConsolidada}>
+                                <LineChart data={serieData}>
                                   <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
                                   <XAxis dataKey="periodo" stroke={axisColor} fontSize={11} />
                                   <YAxis stroke={axisColor} />
