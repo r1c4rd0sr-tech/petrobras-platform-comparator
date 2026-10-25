@@ -8,6 +8,7 @@ import { fetchPlatforms, fetchOnshore, fetchRefinarias, fetchTerminaisArmazename
 import { fetchProducaoHistorica } from "./api/producao";
 import { POB_OVERRIDES } from "./pob-overrides";
 import type { Platform } from "./types";
+import Temporal from "./Temporal";
 import onshoreData from "./data/onshore.json";
 import refinariasData from "./data/refinarias.json";
 import terminaisArmazenamentoData from "./data/terminais-armazenamento.json";
@@ -181,6 +182,7 @@ export default function App() {
   const [serieCampos, setSerieCampos] = useState<string[]>([]);
   const [serieStatus, setSerieStatus] = useState<"idle" | "loading" | "ok" | "erro">("idle");
   const [serieErro, setSerieErro] = useState("");
+  const [temporalInline, setTemporalInline] = useState(false);
 
   const [onshoreUnits, setOnshoreUnits] = useState<Platform[]>(onshoreData as unknown as Platform[]);
   const [refinariasUnits, setRefinariasUnits] = useState<Platform[]>(refinariasData as unknown as Platform[]);
@@ -393,7 +395,9 @@ export default function App() {
 
   const carregarSerie = async () => {
     if (isRefino) {
-      window.location.href = "/temporal.html";
+      setTemporalInline(true);
+      setSerieStatus("ok");
+      setSerieErro("");
       return;
     }
     const campos = [...new Set(selected.map((p) => p.field).filter(Boolean) as string[])];
@@ -981,6 +985,10 @@ export default function App() {
                 <div className="charts">
                   <h3>Série Temporal — produção mensal por campo ({selected.length}/10)</h3>
                   <p style={{ color: axisColor, fontSize: 13 }}>Fonte: banco de dados próprio (SQLite) a partir dos dados abertos da ANP (2021-2023). Óleo em bbl/dia; gás em Mm³/dia.</p>
+                  {isRefino && temporalInline ? (
+                    <Temporal />
+                  ) : (
+                    <>
                   {selected.length === 0 && <p style={{ color: axisColor }}>Selecione unidades na lista à esquerda para carregar a série temporal.</p>}
                   {selected.length > 0 && (
                     <>
@@ -1019,6 +1027,8 @@ export default function App() {
                           </ResponsiveContainer>
                         </>
                       )}
+                    </>
+                  )}
                     </>
                   )}
                 </div>
