@@ -5,14 +5,10 @@ from .routers import platforms, data, dpp
 
 app = FastAPI(title="Petrobras Platform Comparator API")
 
-# CORS — permite a origem da Vercel e localhost para dev
+# CORS — usa regex para aceitar subdomínios da Vercel (ex.: www) e localhost para dev
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "https://petrobras-platform-comparator.vercel.app",
-        "http://localhost:5173",
-        "http://localhost:3000",
-    ],
+    allow_origin_regex=r"^https://(www\.)?petrobras-platform-comparator\.vercel\.app$|^http://localhost:(5173|3000)$",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
