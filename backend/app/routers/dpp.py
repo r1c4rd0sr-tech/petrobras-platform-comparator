@@ -1,9 +1,9 @@
-import asyncio
 import csv
 import io
+import json
 import unicodedata
 import zipfile
-from datetime import date
+from pathlib import Path
 
 import httpx
 from fastapi import APIRouter, HTTPException, Query
@@ -20,8 +20,23 @@ JANELA_FIM_MES = 10
 JANELA_INICIO_ANO = 2021
 JANELA_INICIO_MES = 1
 
-# Cache em memória: URL do ZIP -> tupla de textos CSV
+DATA_FILE = Path(__file__).resolve().parent / "data" / "producao_mensal.json"
+
+# Cache em memória: URL do ZIP -> tupla de textos CSV (fallback)
 _cache_zip: dict[str, tuple[str, ...]] = {}
+
+# Base pré-agregada: {campo_normalizado: {periodo: {campo, oleo_bpd, gas_mmd}}}
+_base_producao: dict | None = None
+
+
+def _carregar_base() -> dict:
+    global _base_producao
+    if _base_producao is None:
+        if DATA_FILE.exists():
+            _base_producao = json.loads(DATA_FILE.read_text(encoding="utf-8"))
+        else:
+            _base_producao = {}
+    return _base_producao
 
 
 def _normalizar(texto: str) -> str:
@@ -108,6 +123,34 @@ def _janela(meses: int) -> list[tuple[int, int]]:
     return pares
 
 
+def _serie_da_base(campo: str, meses: int) -> list[dict] | None:
+    """Busca a série no JSON pré-agregado. Retorna None se o campo não existir na base."""
+    base = _carregar_base()
+    if not base:
+        return None
+    alvo = _normalizar(campo)
+    # Match exato normalizado ou contenção
+    chave_encontrada = None
+    for chave in base:
+        if chave == alvo or alvo in chave or chave in alvo:
+            chave_encontrada = chave
+            break
+    if chave_encontrada is None:
+        return None
+    periodos = sorted(base[chave_encontrada].keys())
+    # Pegar os últimos 'meses' períodos disponíveis
+    periodos = periodos[-meses:] if len(periodos) > meses else periodos
+    return [
+        {
+            "periodo": p,
+            "campo": base[chave_encontrada][p]["campo"],
+            "oleo_bpd": base[chave_encontrada][p]["oleo_bpd"],
+            "gas_mmd": base[chave_encontrada][p]["gas_mmd"],
+        }
+        for p in periodos
+    ]
+
+
 @router.get("/producao")
 async def producao(
     campo: str = Query(..., description="Nome do campo de produção"),
@@ -115,7 +158,13 @@ async def producao(
     ano: int | None = Query(None, description="Ano específico para teste pontual"),
     mes: int | None = Query(None, ge=1, le=12, description="Mês específico para teste pontual"),
 ):
-    """Série histórica por campo — downloads paralelos dos ZIPs da ANP."""
+    """Série histórica por campo — prioriza base pré-agregada (instantâneo); fallback: ZIPs paralelos."""
+    # 1) Tentar base pré-agregada (instantâneo)
+    serie = _serie_da_base(campo, meses)
+    if serie is not None:
+        return {"campo": campo, "meses": meses, "dados": serie, "avisos": [], "fonte": "base_pre_agregada"}
+
+    # 2) Fallback: baixar ZIPs em paralelo (se base não existir ou campo não encontrado)
     if ano and mes:
         url = _url_zip(ano, mes)
         try:
@@ -127,6 +176,7 @@ async def producao(
                 "periodo": f"{ano}-{mes:02d}",
                 "dados": [registro] if registro else [],
                 "avisos": [] if registro else ["Campo não encontrado nos CSVs deste mês"],
+                "fonte": "zip_anp",
             }
         except Exception as e:
             raise HTTPException(status_code=502, detail=f"Falha ao consultar ZIP {ano}-{mes:02d}: {e}")
@@ -147,7 +197,7 @@ async def producao(
             dados.append(registro)
 
     dados.sort(key=lambda r: r["periodo"])
-    return {"campo": campo, "meses": meses, "dados": dados, "avisos": avisos}
+    return {"campo": campo, "meses": meses, "dados": dados, "avisos": avisos, "fonte": "zip_anp"}
 
 
 @router.get("/debug")
