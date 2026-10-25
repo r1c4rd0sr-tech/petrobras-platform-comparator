@@ -208,7 +208,14 @@ body {
   .panel-head h2 { font-size: 15px; }
   .panel-body { padding: 12px; }
 
-  .panel-body.list { grid-template-columns: 1fr; max-height: none; gap: 10px; }
+  .panel-body.list {
+    grid-template-columns: 1fr;
+    max-height: 55vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    gap: 10px;
+    padding-right: 4px;
+  }
   .card { padding: 12px; }
   .card-top h4 { font-size: 14px; }
   .metrics { grid-template-columns: 1fr; }
