@@ -8,4 +8,12 @@ export default defineConfig({
       "/api": "http://localhost:8000",
     },
   },
+  build: {
+    rollupOptions: {
+      input: {
+        main: "index.html",
+        temporal: "frontend/temporal.html",
+      },
+    },
+  },
 });
