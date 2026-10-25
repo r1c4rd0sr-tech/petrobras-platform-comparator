@@ -124,11 +124,11 @@ const BASIN_ALIASES: Record<string, string> = {
   "parana basin": "Bacia do Paraná",
   "pelotas basin": "Bacia de Pelotas",
   "foz do amazonas basin": "Bacia de Foz do Amazonas",
-  "jequitinhonha basin": "Bacia do Jequitinhonha",
+  "jequitinhonha basin": "Bacia de Jequitinhonha",
   "cumuruxatiba basin": "Bacia de Cumuruxatiba",
   "camamu-almada basin": "Bacia do Camamu-Almada",
-  "jacuípe basin": "Bacia de Jacuípe",
-  "jacuipe basin": "Bacia de Jacuípe",
+  "jacuípe basin": "Bacia do Jacuípe",
+  "jacuipe basin": "Bacia do Jacuípe",
   "barreirinhas basin": "Bacia de Barreirinhas",
   "para-maranhão basin": "Bacia Para-Maranhão",
   "para-maranhao basin": "Bacia Para-Maranhão",
@@ -140,10 +140,10 @@ const BASIN_ALIASES: Record<string, string> = {
   "acre basin": "Bacia do Acre",
   "madre de dios basin": "Bacia Madre de Dios",
   "beni basin": "Bacia do Beni",
-  "taubaté basin": "Bacia de Taubaté",
-  "taubate basin": "Bacia de Taubaté",
-  "são paulo basin": "Bacia de São Paulo",
-  "sao paulo basin": "Bacia de São Paulo",
+  "taubaté basin": "Bacia do Taubaté",
+  "taubate basin": "Bacia do Taubate",
+  "são paulo basin": "Bacia do São Paulo",
+  "sao paulo basin": "Bacia do São Paulo",
   "curitiba basin": "Bacia de Curitiba",
   "candiota basin": "Bacia de Candiota",
 };
@@ -392,6 +392,10 @@ export default function App() {
   const pinColor = (id: number) => PIN_COLORS[selected.findIndex((s) => s.id === id) % PIN_COLORS.length];
 
   const carregarSerie = async () => {
+    if (isRefino) {
+      window.location.href = "/temporal.html";
+      return;
+    }
     const campos = [...new Set(selected.map((p) => p.field).filter(Boolean) as string[])];
     if (campos.length === 0) { window.alert("Nenhuma unidade selecionada possui campo informado."); return; }
     setSerieStatus("loading");
