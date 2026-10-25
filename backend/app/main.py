@@ -26,3 +26,8 @@ app.include_router(dpp.router)
 @app.get("/")
 def root():
     return {"status": "ok", "service": "petrobras-platform-comparator-api"}
+
+
+@app.get("/api/health")
+def health():
+    return {"status": "ok"}

@@ -1,5 +1,16 @@
+import pytest
 from fastapi.testclient import TestClient
+
+from app.database import Base, engine
 from app.main import app
+
+
+@pytest.fixture(scope="module", autouse=True)
+def setup_database():
+    Base.metadata.create_all(bind=engine)
+    yield
+    Base.metadata.drop_all(bind=engine)
+
 
 client = TestClient(app)
 
