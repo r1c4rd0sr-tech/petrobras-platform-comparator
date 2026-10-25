@@ -1,0 +1,51 @@
+name: Consultar bancos de dados
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - "backend/data/amostras.md"
+
+permissions:
+  contents: write
+
+jobs:
+  amostragem:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Gerar amostras dos bancos
+        run: |
+          mkdir -p backend/data
+          {
+            echo "# Amostras dos bancos de dados"
+            echo
+            for db in backend/data/refino.db backend/data/gas.db backend/data/logistica.db; do
+              echo "## $(basename $db)"
+              echo
+              echo "### Tabelas"
+              sqlite3 "$db" ".tables"
+              echo
+              for tabela in $(sqlite3 "$db" "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%';"); do
+                echo "### $tabela"
+                sqlite3 -header "$db" "SELECT * FROM \"$tabela\" LIMIT 5;"
+                echo
+              done
+            done
+          } > backend/data/amostras.md
+
+      - name: Commit das amostras
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add backend/data/amostras.md
+          if git diff --cached --quiet; then
+            echo "Nenhuma alteração nas amostras."
+          else
+            git commit -m "chore(data): atualiza amostras dos bancos"
+            git push
+          fi
