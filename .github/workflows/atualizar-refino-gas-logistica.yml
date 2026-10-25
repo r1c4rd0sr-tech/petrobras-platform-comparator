@@ -1,0 +1,48 @@
+name: Atualizar Refino, Gás e Logística (ANP)
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "30 9 * * 1"
+
+permissions:
+  contents: write
+
+jobs:
+  atualizar-bancos:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Instalar dependências
+        run: pip install requests beautifulsoup4
+
+      - name: Baixar novos CSVs do Anuário da ANP
+        run: python scripts/download_anp_csvs.py
+
+      - name: Atualizar banco de Refino
+        run: python scripts/build_refino_db.py
+
+      - name: Atualizar banco de Gás
+        run: python scripts/build_gas_db.py
+
+      - name: Atualizar banco de Logística
+        run: python scripts/build_logistica_db.py
+
+      - name: Commit e push dos bancos atualizados
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add backend/data/anp backend/app/data
+          if git diff --cached --quiet; then
+            echo "Nenhum CSV novo da ANP."
+          else
+            git commit -m "chore(data): atualiza bancos de Refino, Gás e Logística com novos CSVs da ANP"
+            git push
+          fi
