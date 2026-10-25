@@ -5,6 +5,7 @@ import { MapContainer, Marker, Popup, TileLayer, Tooltip as LeafletTooltip } fro
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { fetchPlatforms, fetchOnshore, fetchRefinarias, fetchTerminaisArmazenamento, fetchUtgnsGas, fetchEcompsGasbol, fetchProducaoHistorica } from "./api";
+import { fetchProducaoHistorica } from "./api/producao";
 import { POB_OVERRIDES } from "./pob-overrides";
 import type { Platform } from "./types";
 import onshoreData from "./data/onshore.json";
@@ -20,6 +21,7 @@ const STATUS_LABEL: Record<string, string> = {
 };
 
 const PIN_COLORS = ["#008542", "#ffcc29", "#0c2340", "#e30613", "#0072ce", "#7a28a0", "#00a878", "#f28c28", "#c2185b", "#5d4037"];
+const SERIE_COLORS = ["#4ade80", "#fbbf24", "#60a5fa", "#f472b6", "#a78bfa", "#fb923c", "#22d3ee", "#f87171", "#a3e635", "#e879f9"];
 const STATUS_COLORS = ["#008542", "#ffcc29", "#e30613", "#0072ce", "#f28c28", "#7a28a0", "#00a878", "#c2185b"];
 const MAX_SELECTED = 10;
 
@@ -992,9 +994,9 @@ export default function App() {
                               <XAxis dataKey="periodo" stroke={axisColor} fontSize={11} />
                               <YAxis stroke={axisColor} />
                               <Tooltip content={<CustomTooltip />} />
-                              <Legend />
+                              <Legend wrapperStyle={{ color: isDark ? "#e2e8f0" : "#0c2340" }} />
                               {serieCampos.map((campo, i) => (
-                                <Line key={campo} type="monotone" dataKey={`oleo_${campo}`} name={`${campo} — Óleo`} stroke={PIN_COLORS[i % PIN_COLORS.length]} strokeWidth={2} dot={false} />
+                                <Line key={campo} type="monotone" dataKey={`oleo_${campo}`} name={`${campo} — Óleo`} stroke={SERIE_COLORS[i % SERIE_COLORS.length]} strokeWidth={2.5} dot={false} />
                               ))}
                             </LineChart>
                           </ResponsiveContainer>
@@ -1005,9 +1007,9 @@ export default function App() {
                               <XAxis dataKey="periodo" stroke={axisColor} fontSize={11} />
                               <YAxis stroke={axisColor} />
                               <Tooltip content={<CustomTooltip />} />
-                              <Legend />
+                              <Legend wrapperStyle={{ color: isDark ? "#e2e8f0" : "#0c2340" }} />
                               {serieCampos.map((campo, i) => (
-                                <Line key={campo} type="monotone" dataKey={`gas_${campo}`} name={`${campo} — Gás`} stroke={PIN_COLORS[i % PIN_COLORS.length]} strokeWidth={2} dot={false} />
+                                <Line key={campo} type="monotone" dataKey={`gas_${campo}`} name={`${campo} — Gás`} stroke={SERIE_COLORS[i % SERIE_COLORS.length]} strokeWidth={2.5} dot={false} />
                               ))}
                             </LineChart>
                           </ResponsiveContainer>
