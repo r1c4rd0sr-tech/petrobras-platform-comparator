@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.routers import platforms, onshore, refinarias, terminais_armazenamento, utgns_gas, ecomps_gasbol, dpp
+from app.routers import platforms, data, dpp
 
 app = FastAPI(title="Petrobras Platform Comparator API")
 
@@ -19,11 +19,7 @@ app.add_middleware(
 )
 
 app.include_router(platforms.router)
-app.include_router(onshore.router)
-app.include_router(refinarias.router)
-app.include_router(terminais_armazenamento.router)
-app.include_router(utgns_gas.router)
-app.include_router(ecomps_gasbol.router)
+app.include_router(data.router)
 app.include_router(dpp.router)
 
 
