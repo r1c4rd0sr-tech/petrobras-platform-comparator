@@ -3,9 +3,6 @@ name: Gerar base de produção (2021-2023)
 on:
   push:
     branches: [main]
-    paths:
-      - "scripts/gerar_base_producao.py"
-      - ".github/workflows/gerar-base-producao.yml"
   workflow_dispatch:
 
 jobs:
