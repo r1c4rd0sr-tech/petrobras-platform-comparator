@@ -8,10 +8,12 @@ router = APIRouter(prefix="/api/dpp", tags=["dpp"])
 
 DB_FILE = Path(__file__).resolve().parent.parent / "data" / "producao.db"
 
-# Mapeamento de apelidos: nomes antigos -> nomes atuais no banco
+# Mapeamento de apelidos: nomes antigos ou módulos -> nomes atuais no banco
 ALIASES = {
     "lula": "tupi",
     "santos": "tupi",
+    "iracema sul": "tupi",
+    "iracema norte": "tupi",
     "tambu": "tambu",
 }
 
@@ -31,7 +33,7 @@ async def producao(
     if not DB_FILE.exists():
         raise HTTPException(status_code=503, detail="Banco de dados de produção ainda não disponível.")
     alvo = _normalizar(campo)
-    # Aplica apelido se existir (ex.: Lula -> Tupi)
+    # Aplica apelido se existir (ex.: Lula -> Tupi, Iracema Sul -> Tupi)
     alvo = ALIASES.get(alvo, alvo)
     conn = sqlite3.connect(DB_FILE)
     cur = conn.cursor()
