@@ -1,4 +1,4 @@
-name: Gerar banco SQLite de produção (2021-2023)
+name: Gerar banco SQLite de produção (2021-2026)
 
 on:
   push:
@@ -23,8 +23,11 @@ jobs:
       - name: Instalar dependências
         run: pip install httpx
 
-      - name: Gerar banco SQLite
+      - name: Gerar banco base (2021-2023)
         run: python scripts/gerar_base_sqlite.py
+
+      - name: Adicionar dados 2024-2026
+        run: python scripts/gerar_base_2024.py
 
       - name: Commit e push do banco
         run: |
@@ -34,6 +37,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "Nenhuma mudança no banco."
           else
-            git commit -m "chore(dpp): atualiza banco SQLite de produção (2021-2023)"
+            git commit -m "chore(dpp): atualiza banco SQLite de produção (2021-2026)"
             git push
           fi
